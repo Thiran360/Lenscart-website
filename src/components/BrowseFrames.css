@@ -1,8 +1,8 @@
 .browse-frames-section {
   padding: 10px 20px 0px 20px;
-  background-color: #f9f9f9;
+  background-color: #F6F1E8;
   text-align: center;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Instrument Sans', sans-serif;
 }
 
 .frames-grid {
@@ -32,6 +32,7 @@
   animation: fadeUpFrame 0.8s ease-out forwards;
   opacity: 0;
   transform: translateY(30px);
+  overflow: hidden;
 }
 
 @keyframes fadeUpFrame {
@@ -50,8 +51,8 @@
 .frame-card:hover {
   transform: translateY(-8px) scale(1.03);
   box-shadow: 0 12px 30px rgba(0, 59, 109, 0.15);
-  border-color: #003b6d;
-  color: #003b6d;
+  border-color: #3A2415;
+  color: #3A2415;
 }
 
 .frame-card:hover .frame-icon {
@@ -82,8 +83,6 @@
   object-fit: contain;
   display: block;
   transition: transform 0.4s ease;
-  mix-blend-mode: multiply;
-  filter: contrast(1.1) brightness(1.05);
 }
 
 .frame-card:hover .frame-image {
@@ -164,3 +163,10 @@
     font-size: 9px;
   }
 }
+
+
+
+.remove-fake-bg .frame-image {
+  filter: contrast(2.5) brightness(1.3);
+}
+

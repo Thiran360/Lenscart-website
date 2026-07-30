@@ -2,8 +2,8 @@
   width: 100vw;
   margin-left: calc(-50vw + 50%);
   padding: 30px 20px;
-  background-color: #f9f9f9;
-  font-family: 'Inter', sans-serif;
+  background-color: #F6F1E8;
+  font-family: 'Instrument Sans', sans-serif;
 }
 
 .collections-container {
@@ -12,7 +12,7 @@
 }
 
 .collections-main-title {
-  color: #000042;
+  color: #3A2415;
   font-size: 24px;
   font-weight: bold;
   margin: 0 0 25px 0;
@@ -32,7 +32,7 @@
   padding: 3px;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background-color: #fff;
+  background-color: #F6F1E8;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
@@ -120,3 +120,5 @@
     font-size: 12px;
   }
 }
+
+

@@ -46,10 +46,10 @@ function Profile() {
         {/* Sidebar */}
         <aside className="dashboard-sidebar">
           <div style={{ padding: "10px 25px 25px 25px", marginBottom: "15px", display: "flex", alignItems: "center", gap: "15px" }}>
-            <FaUserCircle size={45} color="#003b6d" />
+            <FaUserCircle size={45} color="#3A2415" />
             <div>
-              <h3 style={{ margin: 0, color: "#666", fontSize: "14px", fontWeight: "normal" }}>Welcome back,</h3>
-              <h2 style={{ margin: "2px 0 0 0", color: "#003b6d", fontSize: "20px" }}>{savedUser.name || "Guest"}</h2>
+              <h3 style={{ margin: 0, color: "#6E4B34", fontSize: "14px", fontWeight: "normal" }}>Welcome back,</h3>
+              <h2 style={{ margin: "2px 0 0 0", color: "#3A2415", fontSize: "20px" }}>{savedUser.name || "Guest"}</h2>
             </div>
           </div>
           
@@ -87,7 +87,7 @@ function Profile() {
               
               <div className="form-grid" style={{ maxWidth: '600px', marginTop: '30px' }}>
                 <div style={{ marginBottom: 25 }}>
-                  <label style={{ display: 'block', color: "#555", marginBottom: 8, fontSize: '14px', fontWeight: 'bold' }}>Full Name</label>
+                  <label style={{ display: 'block', color: "#6E4B34", marginBottom: 8, fontSize: '14px', fontWeight: 'bold' }}>Full Name</label>
                   <input 
                     type="text" 
                     value={editName} 
@@ -97,7 +97,7 @@ function Profile() {
                   />
                 </div>
                 <div style={{ marginBottom: 25 }}>
-                  <label style={{ display: 'block', color: "#555", marginBottom: 8, fontSize: '14px', fontWeight: 'bold' }}>Email Address</label>
+                  <label style={{ display: 'block', color: "#6E4B34", marginBottom: 8, fontSize: '14px', fontWeight: 'bold' }}>Email Address</label>
                   <input 
                     type="email" 
                     value={editEmail} 
@@ -131,3 +131,5 @@ function Profile() {
 }
 
 export default Profile;
+
+

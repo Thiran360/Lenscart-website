@@ -70,7 +70,7 @@ const EyeglassCategories = () => {
             justifyContent: 'space-between'
           }}>
             <div>
-              <h3 style={{ margin: '0 0 4px 0', color: '#000042', fontSize: '16px', fontWeight: '600' }}>{col.title}</h3>
+              <h3 style={{ margin: '0 0 4px 0', color: '#3A2415', fontSize: '16px', fontWeight: '600' }}>{col.title}</h3>
               <span style={{ color: '#0066cc', fontSize: '11px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path></svg>
                 {col.badge}
@@ -115,9 +115,9 @@ const EyeglassCategories = () => {
                 </div>
                 <div style={{ flex: 1 }}>
                   <h4 style={{ margin: '0 0 2px 0', fontSize: '13px', color: '#333', fontWeight: '500' }}>{item.name}</h4>
-                  <p style={{ margin: 0, fontSize: '12px', color: '#000042', fontWeight: 'bold' }}>{item.price}</p>
+                  <p style={{ margin: 0, fontSize: '12px', color: '#3A2415', fontWeight: 'bold' }}>{item.price}</p>
                 </div>
-                <div style={{ color: '#000042', fontWeight: 'bold', fontSize: '18px' }}>›</div>
+                <div style={{ color: '#3A2415', fontWeight: 'bold', fontSize: '18px' }}>›</div>
               </div>
             ))}
           </div>
@@ -128,3 +128,4 @@ const EyeglassCategories = () => {
 };
 
 export default EyeglassCategories;
+

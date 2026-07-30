@@ -20,7 +20,7 @@ function Home() {
       <Hero />
       <BrowseFrames />
 
-      <section className="featured-products-section" style={{ backgroundColor: '#f9f9f9' }}>
+      <section className="featured-products-section" style={{ backgroundColor: '#F6F1E8' }}>
         <div style={{ maxWidth: '100%', margin: '0 auto', padding: '0 20px' }} className="home-content-wrapper">
           <div className="marquee-wrapper">
             <div className="marquee-content">
@@ -56,7 +56,7 @@ function Home() {
               <button 
                 onClick={() => setVisibleCount(prev => prev + 6)}
                 style={{
-                  backgroundColor: '#003b6d',
+                  backgroundColor: '#3A2415',
                   color: 'white',
                   padding: '12px 40px',
                   border: 'none',

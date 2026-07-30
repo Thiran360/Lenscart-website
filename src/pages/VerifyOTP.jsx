@@ -57,12 +57,12 @@ function VerifyOTP() {
 
         <input type="text" placeholder="Enter OTP" value={otpInput} onChange={(e) => setOtpInput(e.target.value)} style={{ width: "100%", padding: "10px", marginTop: "15px", boxSizing: "border-box", fontSize: "14px" }} />
 
-        <button onClick={handleVerify} style={{ width: "100%", padding: "10px", marginTop: "20px", background: "#003b6d", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "15px" }}>
+        <button onClick={handleVerify} style={{ width: "100%", padding: "10px", marginTop: "20px", background: "#3A2415", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "15px" }}>
           Verify
         </button>
 
         <p style={{ textAlign: "center", marginTop: "15px", fontSize: "14px", lineHeight: "1.6" }}>
-          Back to <Link to="/login" style={{ color: "#003b6d", textDecoration: "none", fontWeight: "bold" }}>Login</Link>
+          Back to <Link to="/login" style={{ color: "#3A2415", textDecoration: "none", fontWeight: "bold" }}>Login</Link>
         </p>
       </div>
 
@@ -72,3 +72,4 @@ function VerifyOTP() {
 }
 
 export default VerifyOTP;
+

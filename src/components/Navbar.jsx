@@ -152,13 +152,13 @@ function Navbar() {
               className="search-action-icon" 
               title="Voice Search" 
               onClick={handleVoiceSearch}
-              style={{ color: isListening ? '#ff4d4f' : '#ffffff', cursor: 'pointer' }}
+              style={{ color: isListening ? '#ff4d4f' : '#3A2415', cursor: 'pointer' }}
             />
             <FaCamera 
               className="search-action-icon" 
               title="Virtual Try-On" 
               onClick={() => setIsTryOnOpen(true)}
-              style={{ color: '#ffffff', cursor: 'pointer', marginLeft: '10px' }}
+              style={{ color: '#3A2415', cursor: 'pointer', marginLeft: '10px' }}
             />
           </div>
         </div>

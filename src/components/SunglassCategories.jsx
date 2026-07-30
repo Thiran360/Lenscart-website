@@ -70,8 +70,8 @@ const SunglassCategories = () => {
             justifyContent: 'space-between'
           }}>
             <div>
-              <h3 style={{ margin: '0 0 4px 0', color: '#000042', fontSize: '16px', fontWeight: '600' }}>{col.title}</h3>
-              <span style={{ color: '#666', fontSize: '11px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <h3 style={{ margin: '0 0 4px 0', color: '#3A2415', fontSize: '16px', fontWeight: '600' }}>{col.title}</h3>
+              <span style={{ color: '#6E4B34', fontSize: '11px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 {col.badge}
               </span>
             </div>
@@ -114,9 +114,9 @@ const SunglassCategories = () => {
                 </div>
                 <div style={{ flex: 1 }}>
                   <h4 style={{ margin: '0 0 2px 0', fontSize: '13px', color: '#333', fontWeight: '500' }}>{item.name}</h4>
-                  <p style={{ margin: 0, fontSize: '12px', color: '#000042', fontWeight: 'bold' }}>{item.price}</p>
+                  <p style={{ margin: 0, fontSize: '12px', color: '#3A2415', fontWeight: 'bold' }}>{item.price}</p>
                 </div>
-                <div style={{ color: '#000042', fontWeight: 'bold', fontSize: '18px' }}>›</div>
+                <div style={{ color: '#3A2415', fontWeight: 'bold', fontSize: '18px' }}>›</div>
               </div>
             ))}
           </div>
@@ -127,3 +127,4 @@ const SunglassCategories = () => {
 };
 
 export default SunglassCategories;
+

@@ -45,7 +45,7 @@ function Checkout() {
           <div className="payment-modal">
             <div className="spinner"></div>
             <h2 style={{ marginTop: 20 }}>Processing Payment</h2>
-            <p style={{ color: '#666', marginTop: 10 }}>{paymentStatus}</p>
+            <p style={{ color: '#6E4B34', marginTop: 10 }}>{paymentStatus}</p>
             <div className="secure-lock">
               🔒 128-bit Secure SSL Connection
             </div>
@@ -143,7 +143,7 @@ function Checkout() {
             </section>
 
             <button type="submit" className="place-order-btn">Secure Checkout</button>
-            <p style={{ textAlign: 'center', fontSize: 12, color: '#888', marginTop: 10 }}>
+            <p style={{ textAlign: 'center', fontSize: 12, color: '#6E4B34', marginTop: 10 }}>
                🔒 Payments are secured by 128-bit SSL encryption.
             </p>
           </form>
@@ -159,7 +159,7 @@ function Checkout() {
                     <p style={{ margin: "5px 0", fontSize: "13px" }}>Qty: {item.quantity}</p>
                     {item.lensDetails && (
                       <div style={{ marginTop: 5 }}>
-                        <p style={{ color: "#00b7c6", fontSize: "12px", margin: "2px 0", fontWeight: 'bold' }}>
+                        <p style={{ color: "#C9A66B", fontSize: "12px", margin: "2px 0", fontWeight: 'bold' }}>
                           + {item.lensDetails.type.title}
                         </p>
                         {item.lensDetails.surcharge > 0 && (
@@ -168,7 +168,7 @@ function Checkout() {
                           </p>
                         )}
                         {item.lensDetails.prescription && (
-                          <p style={{ color: "#888", fontSize: "11px", margin: "2px 0" }}>
+                          <p style={{ color: "#6E4B34", fontSize: "11px", margin: "2px 0" }}>
                             Rx: {item.lensDetails.prescription.method === 'later' ? 'Provide Later' : 'Provided'}
                           </p>
                         )}

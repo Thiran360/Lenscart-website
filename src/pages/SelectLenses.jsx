@@ -186,11 +186,11 @@ function SelectLenses() {
                 {rxMethod === 'upload' && (
                   <div className="rx-upload-area" onClick={() => setUploadedFile("prescription_image.jpg")}>
                     {uploadedFile ? (
-                      <div style={{ color: '#00b7c6', fontWeight: 'bold' }}>✓ File Selected: {uploadedFile}</div>
+                      <div style={{ color: '#C9A66B', fontWeight: 'bold' }}>✓ File Selected: {uploadedFile}</div>
                     ) : (
                       <>
-                        <p style={{ margin: 0, color: '#00b7c6', fontWeight: 'bold', fontSize: 18 }}>📷 Click to Upload Prescription Image/PDF</p>
-                        <span style={{ fontSize: 13, color: '#888', display: 'block', marginTop: 10 }}>Supported formats: JPG, PNG, PDF</span>
+                        <p style={{ margin: 0, color: '#C9A66B', fontWeight: 'bold', fontSize: 18 }}>📷 Click to Upload Prescription Image/PDF</p>
+                        <span style={{ fontSize: 13, color: '#6E4B34', display: 'block', marginTop: 10 }}>Supported formats: JPG, PNG, PDF</span>
                       </>
                     )}
                   </div>
@@ -219,7 +219,7 @@ function SelectLenses() {
 
                 {rxMethod === 'later' && (
                   <div style={{ padding: '30px', textAlign: 'center', backgroundColor: '#f9f9f9', border: '1px solid #eee', borderRadius: 8 }}>
-                    <p style={{ color: '#666', fontSize: 15, margin: 0 }}>You can proceed to checkout now and upload or enter your prescription in your Dashboard later.</p>
+                    <p style={{ color: '#6E4B34', fontSize: 15, margin: 0 }}>You can proceed to checkout now and upload or enter your prescription in your Dashboard later.</p>
                   </div>
                 )}
               </>
@@ -288,7 +288,7 @@ function SelectLenses() {
             <span>₹{calculateTotal()}</span>
           </div>
           
-          <p style={{ fontSize: 12, color: '#888', marginTop: 15, textAlign: 'center' }}>
+          <p style={{ fontSize: 12, color: '#6E4B34', marginTop: 15, textAlign: 'center' }}>
             Final price may vary based on complex prescriptions.
           </p>
         </div>
@@ -298,3 +298,4 @@ function SelectLenses() {
 }
 
 export default SelectLenses;
+

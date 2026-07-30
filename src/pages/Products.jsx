@@ -156,7 +156,7 @@ function Products() {
 
           <div className="products-grid">
             {processedProducts.length === 0 ? (
-              <div style={{ padding: '40px', width: '100%', textAlign: 'center', color: '#666' }}>
+              <div style={{ padding: '40px', width: '100%', textAlign: 'center', color: '#6E4B34' }}>
                 <h3>No products match your filters.</h3>
               </div>
             ) : (

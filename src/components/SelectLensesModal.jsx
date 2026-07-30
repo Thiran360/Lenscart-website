@@ -126,11 +126,11 @@ function SelectLensesModal({ isOpen, onClose, onConfirm, basePrice }) {
               {rxMethod === 'upload' && (
                 <div className="rx-upload-area" onClick={() => setUploadedFile("prescription_image.jpg")}>
                   {uploadedFile ? (
-                    <div style={{ color: '#00b7c6', fontWeight: 'bold' }}>✓ File Selected: {uploadedFile}</div>
+                    <div style={{ color: '#C9A66B', fontWeight: 'bold' }}>✓ File Selected: {uploadedFile}</div>
                   ) : (
                     <>
-                      <p style={{ margin: 0, color: '#00b7c6', fontWeight: 'bold', fontSize: 18 }}>📷 Click to Upload Prescription Image/PDF</p>
-                      <span style={{ fontSize: 13, color: '#888' }}>Supported formats: JPG, PNG, PDF</span>
+                      <p style={{ margin: 0, color: '#C9A66B', fontWeight: 'bold', fontSize: 18 }}>📷 Click to Upload Prescription Image/PDF</p>
+                      <span style={{ fontSize: 13, color: '#6E4B34' }}>Supported formats: JPG, PNG, PDF</span>
                     </>
                   )}
                 </div>
@@ -159,7 +159,7 @@ function SelectLensesModal({ isOpen, onClose, onConfirm, basePrice }) {
 
               {rxMethod === 'later' && (
                 <div style={{ padding: '30px', textAlign: 'center', backgroundColor: '#f9f9f9', borderRadius: 8 }}>
-                  <p style={{ color: '#666', fontSize: 15, margin: 0 }}>You can add this frame to cart now and upload or enter your prescription in your Dashboard or via email after checkout.</p>
+                  <p style={{ color: '#6E4B34', fontSize: 15, margin: 0 }}>You can add this frame to cart now and upload or enter your prescription in your Dashboard or via email after checkout.</p>
                 </div>
               )}
             </div>
@@ -189,3 +189,4 @@ function SelectLensesModal({ isOpen, onClose, onConfirm, basePrice }) {
 }
 
 export default SelectLensesModal;
+

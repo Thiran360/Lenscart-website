@@ -1,6 +1,6 @@
 .details-container {
   padding: 40px 20px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Instrument Sans', sans-serif;
 }
 
 .details-layout {
@@ -18,7 +18,7 @@
 
 .main-image-container {
   position: relative;
-  background-color: #f7f7f7;
+  background-color: #F6F1E8;
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
@@ -66,7 +66,7 @@
   border-radius: 4px;
   cursor: pointer;
   padding: 5px;
-  background: #f7f7f7;
+  background: #F6F1E8;
 }
 
 .thumb.active {
@@ -122,7 +122,7 @@
 
 .details-old-price {
   font-size: 18px;
-  color: #999;
+  color: #6E4B34;
   text-decoration: line-through;
 }
 
@@ -133,7 +133,7 @@
 }
 
 .details-offers {
-  background: #f1fcfe;
+  background: #F6F1E8;
   padding: 15px;
   border-radius: 6px;
   margin-bottom: 25px;
@@ -183,12 +183,12 @@
 }
 
 .big-swatch.black { background: #333; }
-.big-swatch.grey { background: #888; }
-.big-swatch.white { background: #fff; border-color: #ccc; }
+.big-swatch.grey { background: #6E4B34; }
+.big-swatch.white { background: #F6F1E8; border-color: #ccc; }
 .big-swatch.blue { background: #1a73e8; }
-.big-swatch.red { background: #e53935; }
-.big-swatch.gold { background: #ffca28; }
-.big-swatch.pink { background: #f48fb1; }
+.big-swatch.red { background: #F6F1E8; }
+.big-swatch.gold { background: #F6F1E8; }
+.big-swatch.pink { background: #F6F1E8; }
 
 .add-to-cart-btn {
   background-color: var(--teal);
@@ -228,7 +228,7 @@
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  background: #e8e8e8;
+  background: #F6F1E8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -244,7 +244,7 @@
   flex: 1;
   height: 500px;
   border-radius: 12px;
-  background: #f5f5f5;
+  background: #F6F1E8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -358,3 +358,5 @@
     padding: 12px 10px !important;
   }
 }
+
+

@@ -46,12 +46,12 @@ function ForgotPassword() {
         
         <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} style={{ width: "100%", padding: "10px", marginTop: "15px", boxSizing: "border-box", fontSize: "14px" }} />
 
-        <button onClick={handleResetPassword} style={{ width: "100%", padding: "10px", marginTop: "20px", background: "#003b6d", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "15px", fontWeight: "bold" }}>
+        <button onClick={handleResetPassword} style={{ width: "100%", padding: "10px", marginTop: "20px", background: "#3A2415", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "15px", fontWeight: "bold" }}>
           Reset Password
         </button>
 
         <p style={{ textAlign: "center", marginTop: "15px", fontSize: "14px", lineHeight: "1.6" }}>
-          Remembered? <Link to="/login" style={{ color: "#003b6d", textDecoration: "none", fontWeight: "bold" }}>Login</Link>
+          Remembered? <Link to="/login" style={{ color: "#3A2415", textDecoration: "none", fontWeight: "bold" }}>Login</Link>
         </p>
       </div>
 
@@ -61,3 +61,4 @@ function ForgotPassword() {
 }
 
 export default ForgotPassword;
+

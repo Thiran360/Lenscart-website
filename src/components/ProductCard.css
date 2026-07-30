@@ -6,7 +6,7 @@
   border: 1px solid #eaeaea;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   overflow: hidden;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Instrument Sans', sans-serif;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   cursor: pointer;
   height: 100%;
@@ -31,7 +31,7 @@
 
 .card-image-section {
   position: relative;
-  background: #f5f7f9;
+  background: #ffffff;
   padding: 15px 15px 5px;
   margin: 0;
   border-radius: 16px 16px 0 0;
@@ -152,7 +152,7 @@
 
 .brand-name {
   font-size: 11px;
-  color: #005fb8;
+  color: #C9A66B;
   font-weight: 700;
   margin: 0 0 4px 0;
   text-transform: uppercase;
@@ -161,9 +161,10 @@
 
 .product-name {
   font-size: 17px;
-  color: #003366;
+  color: #3A2415;
   margin: 0 0 10px 0;
   font-weight: 800;
+  font-family: 'Cormorant Garamond', serif;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -179,9 +180,9 @@
 }
 
 .tag-pill {
-  background: #f0f0f0;
+  background: #F6F1E8;
   border: none;
-  color: #005fb8;
+  color: #C9A66B;
   padding: 4px 10px;
   border-radius: 20px;
   font-size: 10px;
@@ -199,12 +200,12 @@
   font-size: 10px;
   margin-bottom: 12px;
   font-weight: 600;
-  background: #f0f0f0;
-  color: #005fb8;
+  background: #F6F1E8;
+  color: #C9A66B;
 }
 
 .size-char {
-  background: #005fb8;
+  background: #C9A66B;
   color: white;
   width: 16px;
   height: 16px;
@@ -226,26 +227,26 @@
 .current-price {
   font-size: 16px;
   font-weight: 800;
-  color: #003366;
+  color: #3A2415;
   letter-spacing: -0.5px;
 }
 
 .old-price {
   font-size: 12px;
-  color: #888888;
+  color: #6E4B34;
   text-decoration: line-through;
 }
 
 .discount {
   font-size: 12px;
   font-weight: 600;
-  color: #005fb8;
+  color: #C9A66B;
 }
 
 .emi-offers {
   font-size: 10px;
-  color: #005fb8;
-  background: #f8f8f8;
+  color: #C9A66B;
+  background: #F6F1E8;
   border: 1px solid #eaeaea;
   padding: 6px 12px;
   border-radius: 6px;
@@ -258,16 +259,16 @@
 .coupon-code {
   font-size: 10px;
   font-weight: 500;
-  color: #005fb8;
+  color: #C9A66B;
   display: flex;
   align-items: center;
   gap: 5px;
 }
 .coupon-code strong {
-  background: #f0f0f0;
+  background: #F6F1E8;
   padding: 3px 8px;
   border-radius: 4px;
-  color: #003366;
+  color: #3A2415;
   font-weight: 800;
 }
 
@@ -307,3 +308,4 @@
   .heart-icon { font-size: 12px; }
   .floating-cart-btn { width: 22px; height: 22px; }
 }
+

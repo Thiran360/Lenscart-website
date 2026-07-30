@@ -66,12 +66,12 @@ function ChangePassword() {
 
         <input type="password" placeholder="New Password" value={newPass} onChange={(e) => setNewPass(e.target.value)} style={{ width: "100%", padding: "12px", marginTop: "15px", boxSizing: "border-box" }} />
 
-        <button onClick={handleChange} style={{ width: "100%", padding: "12px", marginTop: "20px", background: "#00b7c6", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "16px" }}>
+        <button onClick={handleChange} style={{ width: "100%", padding: "12px", marginTop: "20px", background: "#C9A66B", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "16px" }}>
           Save Password
         </button>
 
         <p style={{ textAlign: "center", marginTop: "20px" }}>
-          Back to <Link to="/profile" style={{ color: "#00b7c6", textDecoration: "none", fontWeight: "bold" }}>Profile</Link>
+          Back to <Link to="/profile" style={{ color: "#C9A66B", textDecoration: "none", fontWeight: "bold" }}>Profile</Link>
         </p>
       </div>
 

@@ -58,7 +58,7 @@
 }
 
 .close-btn:hover {
-  background: #ff4d4f;
+  background: #F6F1E8;
   transform: scale(1.1);
 }
 
@@ -224,7 +224,7 @@
 .frame-option {
   flex: 0 0 120px;
   height: 80px;
-  background: #fff;
+  background: #F6F1E8;
   border-radius: 10px;
   cursor: pointer;
   display: flex;

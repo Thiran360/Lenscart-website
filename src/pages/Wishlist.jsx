@@ -23,15 +23,15 @@ function Wishlist() {
       <Navbar />
       
       <div className="container" style={{ flex: 1, padding: '40px 20px' }}>
-        <h1 style={{ color: '#003b6d', marginBottom: '10px' }}>My Wishlist</h1>
-        <p style={{ color: '#666', marginBottom: '30px' }}>
+        <h1 style={{ color: '#3A2415', marginBottom: '10px' }}>My Wishlist</h1>
+        <p style={{ color: '#6E4B34', marginBottom: '30px' }}>
           {wishlist.length} {wishlist.length === 1 ? 'item' : 'items'} saved
         </p>
 
         {wishlist.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', background: '#f9f9f9', borderRadius: '10px' }}>
-            <h2 style={{ color: '#555' }}>Your wishlist is empty</h2>
-            <p style={{ color: '#888', marginBottom: '30px' }}>Save items you love to revisit them later.</p>
+            <h2 style={{ color: '#6E4B34' }}>Your wishlist is empty</h2>
+            <p style={{ color: '#6E4B34', marginBottom: '30px' }}>Save items you love to revisit them later.</p>
             <Link to="/products" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-block' }}>
               Start Shopping
             </Link>
@@ -67,3 +67,4 @@ function Wishlist() {
 }
 
 export default Wishlist;
+

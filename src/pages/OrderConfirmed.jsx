@@ -49,7 +49,7 @@ function OrderConfirmed() {
             boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)'
           }}>✓</div>
           <h1 style={{ color: 'var(--primary)', marginBottom: '5px', fontSize: '24px' }}>Order Confirmed!</h1>
-          <p style={{ fontSize: '14px', color: '#555', margin: '0 auto 20px auto', maxWidth: '250px' }}>
+          <p style={{ fontSize: '14px', color: '#6E4B34', margin: '0 auto 20px auto', maxWidth: '250px' }}>
             Thank you for your purchase. Your order has been successfully placed.
           </p>
           
@@ -101,3 +101,4 @@ function OrderConfirmed() {
 }
 
 export default OrderConfirmed;
+

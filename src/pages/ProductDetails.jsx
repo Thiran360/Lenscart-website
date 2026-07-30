@@ -159,7 +159,7 @@ function ProductDetails() {
               <button 
                 className="add-to-cart-btn" 
                 onClick={() => executeAction('cart')}
-                style={{ backgroundColor: '#003b6d', flex: 1, fontSize: '15px' }}
+                style={{ backgroundColor: '#3A2415', flex: 1, fontSize: '15px' }}
               >
                 Add to Cart
               </button>
@@ -167,7 +167,7 @@ function ProductDetails() {
               <button 
                 className="add-to-cart-btn buy-now-btn" 
                 onClick={() => handleInitialAction('buy')}
-                style={{ backgroundColor: '#003b6d', flex: 1 }}
+                style={{ backgroundColor: '#3A2415', flex: 1 }}
               >
                 Buy Now
               </button>
@@ -177,7 +177,7 @@ function ProductDetails() {
             <div style={{ marginTop: '40px', borderTop: '1px solid #eee', paddingTop: '30px' }}>
               <h3 style={{ fontSize: '20px', color: '#333', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 Customer Reviews 
-                <span style={{ fontSize: '14px', background: '#f5f5f5', padding: '4px 10px', borderRadius: '20px', color: '#666' }}>{product.rating} ★</span>
+                <span style={{ fontSize: '14px', background: '#f5f5f5', padding: '4px 10px', borderRadius: '20px', color: '#6E4B34' }}>{product.rating} ★</span>
               </h3>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -193,10 +193,10 @@ function ProductDetails() {
                     </div>
                     <span style={{ color: '#f39c12', letterSpacing: '1px', fontSize: '12px' }}>★★★★★</span>
                   </div>
-                  <p style={{ color: '#555', fontSize: '13px', lineHeight: '1.5', margin: 0 }}>
+                  <p style={{ color: '#6E4B34', fontSize: '13px', lineHeight: '1.5', margin: 0 }}>
                     "Amazing quality and perfect fit! The frame feels very premium and lightweight. I was worried about the size, but it fits perfectly. Delivery was also super fast."
                   </p>
-                  <span style={{ display: 'block', marginTop: '10px', fontSize: '11px', color: '#999' }}>2 weeks ago</span>
+                  <span style={{ display: 'block', marginTop: '10px', fontSize: '11px', color: '#6E4B34' }}>2 weeks ago</span>
                 </div>
 
                 {/* Review 2 */}
@@ -211,10 +211,10 @@ function ProductDetails() {
                     </div>
                     <span style={{ color: '#f39c12', letterSpacing: '1px', fontSize: '12px' }}>★★★★<span style={{ color: '#ddd' }}>★</span></span>
                   </div>
-                  <p style={{ color: '#555', fontSize: '13px', lineHeight: '1.5', margin: 0 }}>
+                  <p style={{ color: '#6E4B34', fontSize: '13px', lineHeight: '1.5', margin: 0 }}>
                     "The frame looks great but it feels slightly tight around the temples. I'll probably get used to it. The lens clarity is top notch."
                   </p>
-                  <span style={{ display: 'block', marginTop: '10px', fontSize: '11px', color: '#999' }}>1 month ago</span>
+                  <span style={{ display: 'block', marginTop: '10px', fontSize: '11px', color: '#6E4B34' }}>1 month ago</span>
                 </div>
               </div>
             </div>
@@ -234,3 +234,4 @@ function ProductDetails() {
 }
 
 export default ProductDetails;
+

@@ -90,7 +90,7 @@ function Register() {
             width: "100%",
             padding: "10px",
             marginTop: "20px",
-            background: "#003b6d",
+            background: "#3A2415",
             color: "#fff",
             border: "none",
             borderRadius: "6px",
@@ -114,7 +114,7 @@ function Register() {
           <Link
             to="/login"
             style={{
-              color: "#003b6d",
+              color: "#3A2415",
               textDecoration: "none",
               fontWeight: "bold",
             }}
@@ -130,3 +130,4 @@ function Register() {
 }
 
 export default Register;
+

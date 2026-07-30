@@ -24,7 +24,7 @@
 }
 
 .category-offer-banner {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  background: linear-gradient(135deg, #3A2415 0%, #6E4B34 100%);
   color: white;
   border-radius: 12px;
   margin-bottom: 25px;
@@ -66,14 +66,14 @@
 }
 
 .offer-highlight {
-  background: #ff4d4f;
-  color: white;
+  background: #F6F1E8;
+  color: #3A2415;
   padding: 6px 12px;
   border-radius: 20px;
   font-weight: bold;
   font-size: 14px;
   text-transform: uppercase;
-  box-shadow: 0 2px 8px rgba(255, 77, 79, 0.4);
+  box-shadow: 0 2px 8px rgba(58, 36, 21, 0.4);
 }
 
 .banner-badge {
@@ -89,7 +89,7 @@
 }
 
 .offer-bogo {
-  background: #ffc107;
+  background: #F6F1E8;
   color: #000;
   padding: 6px 12px;
   border-radius: 20px;

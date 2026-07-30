@@ -75,7 +75,7 @@ function Login() {
           <Link
             to="/register"
             style={{
-              color: "#003b6d",
+              color: "#3A2415",
               textDecoration: "none",
               fontWeight: "bold",
             }}
@@ -83,7 +83,7 @@ function Login() {
             Sign up
           </Link>
           <br />
-          <Link to="/forgot-password" style={{ color: "#003b6d", textDecoration: "none", fontWeight: "bold" }}>Forgot Password?</Link>
+          <Link to="/forgot-password" style={{ color: "#3A2415", textDecoration: "none", fontWeight: "bold" }}>Forgot Password?</Link>
         </p>
       </div>
 

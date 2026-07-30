@@ -1,7 +1,7 @@
 .cart-item{
     display:flex;
     gap:20px;
-    background:#fff;
+    background: #F6F1E8;
     padding:20px;
     margin-bottom:20px;
     border-radius:10px;
@@ -29,7 +29,7 @@
 .quantity button{
     width:35px;
     height:35px;
-    background:#00b7c6;
+    background:#C9A66B;
     color:white;
     border:none;
     border-radius:50%;

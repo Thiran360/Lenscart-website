@@ -36,7 +36,7 @@
 }
 
 .category-card:hover img {
-  border-color: #003b6d;
+  border-color: #3A2415;
   box-shadow: 0 12px 25px rgba(0, 59, 109, 0.2);
   transform: scale(1.08);
 }
@@ -87,3 +87,4 @@
     font-size: 0.75rem;
   }
 }
+

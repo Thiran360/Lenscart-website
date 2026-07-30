@@ -27,7 +27,7 @@ function PrescriptionManager() {
       {prescriptions.length === 0 && !isAdding && (
         <div style={{ textAlign: 'center', padding: '40px 0' }}>
           <img src="https://cdn-icons-png.flaticon.com/512/2983/2983057.png" alt="Rx" style={{ width: 60, opacity: 0.5, marginBottom: 15 }} />
-          <p style={{ color: '#666', marginBottom: 20 }}>You haven't saved any prescriptions yet.</p>
+          <p style={{ color: '#6E4B34', marginBottom: 20 }}>You haven't saved any prescriptions yet.</p>
           <button className="btn-primary" onClick={() => setIsAdding(true)}>+ Add New Prescription</button>
         </div>
       )}
@@ -36,7 +36,7 @@ function PrescriptionManager() {
         <>
           {prescriptions.map(rx => (
             <div key={rx.id} className="rx-card">
-              <h3 style={{ marginTop: 0, color: '#003b6d' }}>{rx.name}</h3>
+              <h3 style={{ marginTop: 0, color: '#3A2415' }}>{rx.name}</h3>
               <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid #ddd' }}>
@@ -78,8 +78,8 @@ function PrescriptionManager() {
           <h3 style={{ marginTop: 0 }}>Add Prescription</h3>
           
           <div className="upload-area" onClick={() => alert("File picker dialog would open here!")}>
-            <p style={{ margin: 0, color: '#00b7c6', fontWeight: 'bold' }}>📷 Click to Upload Prescription Image/PDF</p>
-            <span style={{ fontSize: 12, color: '#888' }}>or enter manually below</span>
+            <p style={{ margin: 0, color: '#C9A66B', fontWeight: 'bold' }}>📷 Click to Upload Prescription Image/PDF</p>
+            <span style={{ fontSize: 12, color: '#6E4B34' }}>or enter manually below</span>
           </div>
 
           <div className="rx-form-group" style={{ marginBottom: 20 }}>
@@ -130,3 +130,5 @@ function PrescriptionManager() {
 }
 
 export default PrescriptionManager;
+
+

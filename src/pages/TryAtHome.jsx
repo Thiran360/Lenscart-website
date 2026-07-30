@@ -40,7 +40,7 @@ function TryAtHome() {
 
           {/* Right Side - Content */}
           <div className="try-at-home-content" style={{ flex: '1 1 400px', padding: '50px 40px', textAlign: 'center' }}>
-            <h1 className="try-at-home-title" style={{ color: '#000042', marginBottom: '40px', fontWeight: '800' }}>
+            <h1 className="try-at-home-title" style={{ color: '#3A2415', marginBottom: '40px', fontWeight: '800' }}>
               Get your eyes checked at home
             </h1>
 
@@ -48,34 +48,34 @@ function TryAtHome() {
               
               {/* Feature 1 */}
               <div className="try-at-home-feature-item">
-                <div style={{ fontSize: '30px', color: '#000042', marginBottom: '10px' }}>
+                <div style={{ fontSize: '30px', color: '#3A2415', marginBottom: '10px' }}>
                   <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                     <circle cx="12" cy="12" r="3"></circle>
                   </svg>
                 </div>
-                <p style={{ color: '#000042', fontSize: '14px', fontWeight: '600', margin: 0, lineHeight: '1.4' }}>
+                <p style={{ color: '#3A2415', fontSize: '14px', fontWeight: '600', margin: 0, lineHeight: '1.4' }}>
                   12 Step Eye<br/>Checkup
                 </p>
               </div>
 
               {/* Feature 2 */}
               <div className="try-at-home-feature-item">
-                <div style={{ fontSize: '30px', color: '#000042', marginBottom: '10px' }}>
+                <div style={{ fontSize: '30px', color: '#3A2415', marginBottom: '10px' }}>
                   <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
                     <line x1="8" y1="21" x2="16" y2="21"></line>
                     <line x1="12" y1="17" x2="12" y2="21"></line>
                   </svg>
                 </div>
-                <p style={{ color: '#000042', fontSize: '14px', fontWeight: '600', margin: 0, lineHeight: '1.4' }}>
+                <p style={{ color: '#3A2415', fontSize: '14px', fontWeight: '600', margin: 0, lineHeight: '1.4' }}>
                   Latest Eye Test<br/>Equipments
                 </p>
               </div>
 
               {/* Feature 3 */}
               <div className="try-at-home-feature-item">
-                <div style={{ fontSize: '30px', color: '#000042', marginBottom: '10px' }}>
+                <div style={{ fontSize: '30px', color: '#3A2415', marginBottom: '10px' }}>
                   <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="6" cy="15" r="4"></circle>
                     <circle cx="18" cy="15" r="4"></circle>
@@ -84,7 +84,7 @@ function TryAtHome() {
                     <path d="M21.5 13L19 7c-.7-1.3-1.5-2-3-2"></path>
                   </svg>
                 </div>
-                <p style={{ color: '#000042', fontSize: '14px', fontWeight: '600', margin: 0, lineHeight: '1.4' }}>
+                <p style={{ color: '#3A2415', fontSize: '14px', fontWeight: '600', margin: 0, lineHeight: '1.4' }}>
                   Try 150+ frames<br/>at home
                 </p>
               </div>
@@ -94,7 +94,7 @@ function TryAtHome() {
             <button 
               onClick={() => setShowModal(true)}
               style={{
-                backgroundColor: '#000042',
+                backgroundColor: '#3A2415',
                 color: 'white',
                 padding: '15px 40px',
                 border: 'none',
@@ -136,7 +136,7 @@ function TryAtHome() {
           }}>
             <button 
               onClick={() => setShowModal(false)}
-              style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#666' }}
+              style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#6E4B34' }}
             >
               &times;
             </button>
@@ -144,12 +144,12 @@ function TryAtHome() {
             {bookingSuccess ? (
               <div style={{ textAlign: 'center', padding: '40px 0' }}>
                 <div style={{ color: '#4caf50', fontSize: '48px', marginBottom: '20px' }}>✓</div>
-                <h2 style={{ color: '#000042', margin: 0 }}>Booking Confirmed!</h2>
-                <p style={{ color: '#666', marginTop: '10px' }}>Our specialist will contact you shortly.</p>
+                <h2 style={{ color: '#3A2415', margin: 0 }}>Booking Confirmed!</h2>
+                <p style={{ color: '#6E4B34', marginTop: '10px' }}>Our specialist will contact you shortly.</p>
               </div>
             ) : (
               <>
-                <h2 style={{ color: '#000042', marginTop: 0, marginBottom: '25px', textAlign: 'center' }}>Book Your Home Checkup</h2>
+                <h2 style={{ color: '#3A2415', marginTop: 0, marginBottom: '25px', textAlign: 'center' }}>Book Your Home Checkup</h2>
                 <form onSubmit={handleBookSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                   <div>
                     <label style={{ display: 'block', marginBottom: '5px', color: '#333', fontWeight: '500' }}>Full Name</label>
@@ -170,7 +170,7 @@ function TryAtHome() {
                     </div>
                   </div>
                   <button type="submit" style={{
-                    backgroundColor: '#000042',
+                    backgroundColor: '#3A2415',
                     color: 'white',
                     padding: '15px',
                     border: 'none',
@@ -182,7 +182,7 @@ function TryAtHome() {
                     transition: 'background-color 0.2s'
                   }}
                   onMouseOver={(e) => e.target.style.backgroundColor = '#000066'}
-                  onMouseOut={(e) => e.target.style.backgroundColor = '#000042'}
+                  onMouseOut={(e) => e.target.style.backgroundColor = '#3A2415'}
                   >
                     Confirm Booking
                   </button>
@@ -199,3 +199,5 @@ function TryAtHome() {
 }
 
 export default TryAtHome;
+
+

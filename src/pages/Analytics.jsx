@@ -82,8 +82,8 @@ function Analytics() {
                 <AreaChart data={trafficData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorVisitors" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#00b7c6" stopOpacity={0.4}/>
-                      <stop offset="95%" stopColor="#00b7c6" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#C9A66B" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#C9A66B" stopOpacity={0}/>
                     </linearGradient>
                     <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.4}/>
@@ -91,11 +91,11 @@ function Analytics() {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                  <XAxis dataKey="name" stroke="#666" />
-                  <YAxis stroke="#666" />
+                  <XAxis dataKey="name" stroke="#6E4B34" />
+                  <YAxis stroke="#6E4B34" />
                   <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '5px', color: '#333' }} />
                   <Legend />
-                  <Area type="monotone" dataKey="visitors" stroke="#00b7c6" strokeWidth={3} fillOpacity={1} fill="url(#colorVisitors)" />
+                  <Area type="monotone" dataKey="visitors" stroke="#C9A66B" strokeWidth={3} fillOpacity={1} fill="url(#colorVisitors)" />
                   <Area type="monotone" dataKey="pageViews" stroke="#82ca9d" strokeWidth={3} fillOpacity={1} fill="url(#colorViews)" />
                 </AreaChart>
               </ResponsiveContainer>
@@ -109,11 +109,11 @@ function Analytics() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={salesData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                  <XAxis dataKey="name" stroke="#666" />
-                  <YAxis stroke="#666" />
+                  <XAxis dataKey="name" stroke="#6E4B34" />
+                  <YAxis stroke="#6E4B34" />
                   <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '5px', color: '#333' }} />
                   <Legend />
-                  <Bar dataKey="revenue" fill="#003b6d" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="revenue" fill="#3A2415" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -125,3 +125,5 @@ function Analytics() {
 }
 
 export default Analytics;
+
+

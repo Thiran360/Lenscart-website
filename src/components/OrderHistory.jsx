@@ -52,7 +52,7 @@ function OrderHistory({ initialAction }) {
           <div className="order-header">
             <div>
               <strong>Order #{order.id}</strong>
-              <div style={{ fontSize: 13, color: '#666', marginTop: 4 }}>Placed on {order.date}</div>
+              <div style={{ fontSize: 13, color: '#6E4B34', marginTop: 4 }}>Placed on {order.date}</div>
             </div>
             <div style={{ textAlign: 'right' }}>
               <div className="order-status" style={{ color: order.status === 'Delivered' ? '#4CAF50' : '#FF9800' }}>
@@ -85,7 +85,7 @@ function OrderHistory({ initialAction }) {
           <div className="dash-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 600 }}>
             <button className="close-btn" onClick={closeModal}>×</button>
             <h2 style={{ marginBottom: 5 }}>Track Order</h2>
-            <p style={{ color: '#666', marginBottom: 25 }}>Order #{selectedOrder.id}</p>
+            <p style={{ color: '#6E4B34', marginBottom: 25 }}>Order #{selectedOrder.id}</p>
             
             <div className="timeline-extended">
               <div className="timeline-step active">
@@ -120,15 +120,15 @@ function OrderHistory({ initialAction }) {
               <div className="courier-section">
                 <div className="courier-info">
                   <div style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
-                    <div style={{ width: 40, height: 40, background: '#f5f5f5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#003b6d' }}>
+                    <div style={{ width: 40, height: 40, background: '#f5f5f5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#3A2415' }}>
                       DL
                     </div>
                     <div>
                       <h4 style={{ margin: 0 }}>Delhivery Courier</h4>
-                      <p style={{ margin: 0, color: '#666', fontSize: 13 }}>Tracking ID: DEL-{selectedOrder.id.replace('OD', '')}</p>
+                      <p style={{ margin: 0, color: '#6E4B34', fontSize: 13 }}>Tracking ID: DEL-{selectedOrder.id.replace('OD', '')}</p>
                     </div>
                   </div>
-                  <button className="btn-secondary" onClick={() => alert('Redirecting to Delhivery Tracking Portal...')} style={{ background: '#fff', color: '#00b7c6', border: '1px solid #00b7c6' }}>
+                  <button className="btn-secondary" onClick={() => alert('Redirecting to Delhivery Tracking Portal...')} style={{ background: '#fff', color: '#C9A66B', border: '1px solid #C9A66B' }}>
                     Live Track Package
                   </button>
                 </div>
@@ -184,3 +184,5 @@ function OrderHistory({ initialAction }) {
 }
 
 export default OrderHistory;
+
+
