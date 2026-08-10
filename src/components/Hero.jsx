@@ -30,7 +30,6 @@ function Hero() {
       <video 
         src={sliderData[currentSlide].video} 
         className="hero-bg" 
-        key={currentSlide} /* Force re-render of video for animation */
         autoPlay
         muted
         loop

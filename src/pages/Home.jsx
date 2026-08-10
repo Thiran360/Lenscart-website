@@ -5,6 +5,7 @@ import BrowseFrames from "../components/BrowseFrames";
 import CategoryCard from "../components/CategoryCard";
 import ProductCard from "../components/ProductCard";
 import TrendingVideos from "../components/TrendingVideos";
+import BestSellers from "../components/BestSellers";
 import PromoBanner from "../components/PromoBanner";
 import CollectionsGrid from "../components/CollectionsGrid";
 import { productsData } from "../data/products";
@@ -42,6 +43,7 @@ function Home() {
           </div>
           
           <TrendingVideos />
+          <BestSellers />
           <PromoBanner />
           <CollectionsGrid />
 

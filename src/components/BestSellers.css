@@ -1,0 +1,385 @@
+.bestsellers-section {
+  background-color: #F7F7F7; /* Neutral light gray background that fits modern eCommerce aesthetics */
+  padding: 40px 0; /* 0 padding on sides for absolute full screen edge-to-edge layout */
+  margin: 30px 0;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  position: relative;
+}
+
+.bestsellers-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 25px;
+  padding: 0 40px; /* Kept padding for text header to align with site layout grid */
+}
+
+.bestsellers-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 38px;
+  font-weight: 900;
+  color: #111;
+  margin: 0 0 15px 0;
+  letter-spacing: -0.5px;
+}
+
+.bestsellers-tabs {
+  display: flex;
+  gap: 25px;
+}
+
+.bestsellers-tab {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  padding: 5px 0;
+  position: relative;
+  transition: color 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.bestsellers-tab.active {
+  color: #000;
+  font-weight: 700;
+}
+
+.bestsellers-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #000;
+  transition: width 0.3s ease;
+}
+
+.bestsellers-shopall-btn {
+  background-color: #000;
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.bestsellers-shopall-btn:hover {
+  background-color: #222;
+  transform: translateY(-1px);
+}
+
+/* Carousel Slider */
+.bestsellers-carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 40px; /* Leaves exactly 40px (~half inch) padding on sides for grid alignment and arrows */
+  box-sizing: border-box;
+}
+
+.bestsellers-carousel {
+  display: flex;
+  gap: 20px;
+  overflow-x: hidden; /* Disable manual swipe / drag scrolling */
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+  padding: 10px 0;
+  width: 100%;
+}
+
+.bestsellers-carousel::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome/Safari */
+}
+
+/* Bestseller Card */
+.bestseller-card {
+  min-width: calc((100% - 80px) / 5); /* Exactly 5 products visible with 20px gap */
+  width: calc((100% - 80px) / 5);
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e6e6e6; /* Added soft border to define the card box properly */
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  flex-shrink: 0;
+}
+
+.bestseller-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  border-color: #d4d4d4; /* Darkens border slightly on hover */
+}
+
+.bestseller-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.bestseller-image-wrapper {
+  position: relative;
+  background-color: #ffffff;
+  padding: 15px;
+  height: 210px; /* Increased height to give the card a larger and more attractive box size */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.bestseller-top-badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background-color: #E2F2F5;
+  color: #0c5e75;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.2px;
+}
+
+.bestseller-wishlist-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: #ccc;
+  cursor: pointer;
+  z-index: 10;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.bestseller-wishlist-btn:hover {
+  color: #ff4d4f;
+  transform: scale(1.1);
+  background-color: rgba(0,0,0,0.03);
+}
+
+.bestseller-product-image {
+  max-width: 90%;
+  max-height: 150px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  transition: transform 0.4s ease;
+}
+
+.bestseller-card:hover .bestseller-product-image {
+  transform: scale(1.08);
+}
+
+.bestseller-tryon-overlay-btn {
+  position: absolute;
+  bottom: 15px;
+  background-color: #ffffff;
+  color: #111;
+  border: 1px solid #ddd;
+  border-radius: 30px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 10;
+  font-family: 'Poppins', sans-serif;
+}
+
+.bestseller-tryon-overlay-btn:hover {
+  background-color: #000;
+  color: #fff;
+  border-color: #000;
+  transform: scale(1.05);
+}
+
+.bestseller-tryon-overlay-btn svg {
+  font-size: 12px;
+}
+
+/* Card Details */
+.bestseller-card-info {
+  padding: 15px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid #f2f2f2;
+}
+
+.bestseller-price-rating-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bestseller-price {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111;
+}
+
+.bestseller-rating {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #111;
+}
+
+.bestseller-star-icon {
+  color: #f39c12;
+  font-size: 12px;
+}
+
+.bestseller-reviews-count {
+  color: #777;
+  font-weight: 500;
+  font-size: 12px;
+  margin-left: 2px;
+}
+
+.bestseller-shape-row {
+  display: flex;
+}
+
+.bestseller-shape {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.bestseller-delivery {
+  font-size: 12.5px;
+  color: #27ae60;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.bestseller-swatches {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+}
+
+.bestseller-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0,0,0,0.1);
+  padding: 0;
+}
+
+.bestseller-swatch:hover {
+  transform: scale(1.15);
+}
+
+.bestseller-swatch.active-swatch {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 1.5px #fff, 0 0 0 3px #111;
+  border-color: transparent;
+}
+
+.bestseller-swatch-more {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  cursor: pointer;
+}
+
+/* Nav Carousel Buttons */
+.bestsellers-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #ffffff;
+  color: #111;
+  border: 1px solid #ddd;
+  width: 36px; /* Smaller size */
+  height: 36px;
+  border-radius: 50%;
+  font-size: 12px; /* Smaller icon text */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.bestsellers-nav-btn:hover {
+  background-color: #000;
+  color: #fff;
+  border-color: #000;
+  transform: translateY(-50%) scale(1.05);
+}
+
+.bestsellers-nav-btn.prev {
+  left: 10px; /* Sits comfortably in the 40px margin space */
+}
+
+.bestsellers-nav-btn.next {
+  right: 10px; /* Sits comfortably in the 40px margin space */
+}
+
+@media (max-width: 1024px) {
+  .bestsellers-carousel {
+    overflow-x: auto; /* Enable touch swipe on mobile and tablets */
+  }
+  .bestseller-card {
+    min-width: calc((100% - 40px) / 3);
+    width: calc((100% - 40px) / 3);
+  }
+}
+
+@media (max-width: 768px) {
+  .bestsellers-section {
+    padding: 30px 20px;
+    max-width: 100%;
+    border-radius: 0;
+  }
+  .bestsellers-title {
+    font-size: 28px;
+  }
+  .bestseller-card {
+    min-width: calc((100% - 20px) / 1.5);
+    width: calc((100% - 20px) / 1.5);
+  }
+  .bestsellers-nav-btn {
+    display: none; /* Hide arrow buttons on mobile */
+  }
+}

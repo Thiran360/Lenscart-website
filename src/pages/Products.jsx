@@ -8,7 +8,7 @@ import "./ProductsLayout.css";
 
 function Products() {
   const [activeTab, setActiveTab] = useState("All");
-  const [filters, setFilters] = useState({ gender: [], brand: [], shape: [] });
+  const [filters, setFilters] = useState({ gender: [], brand: [], shape: [], size: [], color: [], price: [], material: [], bestSellers: [], sales: [] });
   const [sortOrder, setSortOrder] = useState("Recommended");
   const [is3DMode, setIs3DMode] = useState(false);
   
@@ -25,35 +25,35 @@ function Products() {
 
   useEffect(() => {
     setActiveTab("All");
-    setFilters({ gender: [], brand: [], shape: [] });
+    setFilters({ gender: [], brand: [], shape: [], size: [], color: [], price: [], material: [], bestSellers: [], sales: [] });
   }, [filterType]);
 
-  const getCategoryStats = (type) => {
-    const items = productsData.filter(p => p.type === type);
-    if (!items.length) return null;
+  const isBogoShop = searchParams.get("bogo") === "true";
+  const isKidsClub = searchQuery === "kids";
+
+  const getCategoryStats = (type, bogo, kids) => {
+    let items = productsData;
+    if (type) items = items.filter(p => p.type === type);
+    if (kids) items = items.filter(p => p.category?.toLowerCase().includes('kids') || p.name?.toLowerCase().includes('kids'));
+    
+    if (!items.length) return { minPrice: 1000, maxPrice: 5000, maxDiscount: 50 };
     const minPrice = Math.min(...items.map(p => p.price));
     const maxPrice = Math.max(...items.map(p => p.price));
     const maxDiscount = Math.max(...items.map(p => p.discount));
     return { minPrice, maxPrice, maxDiscount };
   };
 
-  const categoryStats = filterType ? getCategoryStats(filterType) : null;
+  const showBanner = filterType || isKidsClub || isBogoShop;
+  const categoryStats = showBanner ? getCategoryStats(filterType, isBogoShop, isKidsClub) : null;
 
-  const getCategoryTitle = (type) => {
+  const getCategoryTitle = (type, bogo, kids) => {
+    if (bogo) return 'BOGO Exclusive';
+    if (kids) return 'Kids Club';
     switch (type) {
       case 'eyeglasses': return 'Eyeglasses';
       case 'sunglasses': return 'Sunglasses';
       case 'contacts': return 'Contact Lenses';
       default: return 'Products';
-    }
-  };
-
-  const getBannerImage = (type) => {
-    switch (type) {
-      case 'eyeglasses': return 'https://images.unsplash.com/photo-1591076482161-42ce6da69f67?w=600&q=80';
-      case 'sunglasses': return 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&q=80';
-      case 'contacts': return 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600&q=80';
-      default: return 'https://images.unsplash.com/photo-1591076482161-42ce6da69f67?w=600&q=80';
     }
   };
 
@@ -69,9 +69,9 @@ function Products() {
   if (searchQuery) {
     const query = searchQuery.toLowerCase();
     processedProducts = processedProducts.filter(p => 
-      p.name.toLowerCase().includes(query) || 
-      p.brand.toLowerCase().includes(query) ||
-      p.category.toLowerCase().includes(query)
+      p.name?.toLowerCase().includes(query) || 
+      p.brand?.toLowerCase().includes(query) ||
+      p.category?.toLowerCase().includes(query)
     );
   }
 
@@ -87,8 +87,44 @@ function Products() {
   if (filters.brand.length > 0) {
     processedProducts = processedProducts.filter(p => filters.brand.includes(p.brand));
   }
-  if (filters.shape.length > 0) {
+  if (filters.shape?.length > 0) {
     processedProducts = processedProducts.filter(p => filters.shape.includes(p.shape));
+  }
+
+  // 3. New Sidebar Filters (Size, Color, Price, Material, Best Sellers, Sales)
+  if (filters.size?.length > 0) {
+    processedProducts = processedProducts.filter(p => filters.size.includes(p.size));
+  }
+  
+  if (filters.color?.length > 0) {
+    processedProducts = processedProducts.filter(p => 
+      filters.color.some(c => p.colors?.map(color => color.toLowerCase()).includes(c.toLowerCase()))
+    );
+  }
+
+  if (filters.price?.length > 0) {
+    processedProducts = processedProducts.filter(p => {
+      return (
+        (filters.price.includes("Under ₹2000") && p.price < 2000) ||
+        (filters.price.includes("₹2000 - ₹4000") && p.price >= 2000 && p.price <= 4000) ||
+        (filters.price.includes("Above ₹4000") && p.price > 4000)
+      );
+    });
+  }
+
+  if (filters.bestSellers?.includes("Yes")) {
+    processedProducts = processedProducts.filter(p => p.rating >= 4.7);
+  }
+
+  if (filters.sales?.includes("Yes")) {
+    processedProducts = processedProducts.filter(p => p.discount > 0);
+  }
+
+  if (filters.material?.length > 0) {
+    // Note: since material is not strictly in the DB, this might return empty if no products have material,
+    // or we mock the check here by assuming specific brands or types have specific materials,
+    // but the safest generic way is just to check if material field matches.
+    processedProducts = processedProducts.filter(p => p.material && filters.material.includes(p.material));
   }
 
   // 3. Sorting
@@ -115,30 +151,66 @@ function Products() {
 
         <section className="product-area">
           {categoryStats && (
-            <div className="category-offer-banner">
+            <div className={`category-offer-banner ${isBogoShop ? 'bogo-poster-banner' : ''}`}>
               <div className="banner-content">
-                <div className="banner-badge">🎉 Limited Time Offer</div>
-                <h2>Explore Our {getCategoryTitle(filterType)} Collection</h2>
+                <div className="banner-badge">🎉 {isBogoShop ? "MEGA BOGO SALE" : isKidsClub ? "Kids Special Offer" : "Limited Time Offer"}</div>
+                <h2>{isBogoShop ? "BUY 1 GET 1 FREE" : `Explore Our ${getCategoryTitle(filterType, isBogoShop, isKidsClub)} Collection`}</h2>
                 <div className="offer-details">
-                  <span className="offer-highlight">Up To {categoryStats.maxDiscount}% OFF!</span>
-                  <span className="offer-bogo">BUY 1 GET 1 FREE</span>
+                  <span className="offer-highlight">{isBogoShop ? "Mix & Match Any Frames" : `Up To ${categoryStats.maxDiscount}% OFF!`}</span>
                 </div>
                 <div className="offer-extras" style={{ marginBottom: '20px' }}>
-                  <span>✨ Free Premium Lenses</span>
-                  <span>✨ Starting at ₹{categoryStats.minPrice} to ₹{categoryStats.maxPrice}</span>
-                  <span>✨ 1 Year Warranty</span>
-                  <span>✨ Free Home Delivery</span>
+                  {isKidsClub ? (
+                    <>
+                      <span>✨ Unbreakable Flex Frames</span>
+                      <span>✨ Blue Light Protection</span>
+                      <span>✨ Fun Colors & Designs</span>
+                      <span>✨ 1 Year Warranty</span>
+                    </>
+                  ) : isBogoShop ? (
+                    <>
+                      <span>✨ Pay for 1, Get 2</span>
+                      <span>✨ Premium Lenses Included</span>
+                      <span>✨ Valid on Top Brands</span>
+                      <span>✨ 1 Year Warranty on Both</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>✨ Free Premium Lenses</span>
+                      <span>✨ Starting at ₹{categoryStats.minPrice} to ₹{categoryStats.maxPrice}</span>
+                      <span>✨ 1 Year Warranty</span>
+                      <span>✨ Free Home Delivery</span>
+                    </>
+                  )}
                 </div>
               </div>
-              <video 
-                key={filterType}
-                src={filterType === 'eyeglasses' ? "/eyeglasses-video.mp4" : filterType === 'contacts' ? "/contacts-video.mp4?v=2" : "/lens-video.mp4"} 
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="banner-image" 
-              />
+              {isKidsClub ? (
+                <img 
+                  src="/kids-category.jpeg" 
+                  alt="Kids Club Collection"
+                  className="banner-image" 
+                  style={{ objectFit: 'cover' }}
+                />
+              ) : isBogoShop ? (
+                <video 
+                  src="/slider4.mp4" 
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="banner-image" 
+                  style={{ objectFit: 'cover' }}
+                />
+              ) : (
+                <video 
+                  key={filterType}
+                  src={filterType === 'eyeglasses' ? "/eyeglasses-video.mp4" : filterType === 'contacts' ? "/contacts-video.mp4?v=2" : "/lens-video.mp4"} 
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="banner-image" 
+                />
+              )}
             </div>
           )}
           

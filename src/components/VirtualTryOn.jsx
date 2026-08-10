@@ -2,11 +2,25 @@ import React, { useEffect, useRef, useState } from 'react';
 import Webcam from 'react-webcam';
 import { FaTimes, FaCamera, FaDownload, FaSyncAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import './VirtualTryOn.css';
-import { productsData } from '../data/products';
+import { productsData, perfectSVG, roundSVG, rimlessSVG, ovalSVG, aviatorSVG, featherSVG, miniRoundSVG, boldSquareSVG, halfRimSVG, clearWayfarerSVG } from '../data/products';
+
+const svgFrames = [
+  { id: 'svg1', shape: 'Rectangle', image: perfectSVG },
+  { id: 'svg2', shape: 'Round', image: roundSVG },
+  { id: 'svg3', shape: 'Rimless', image: rimlessSVG },
+  { id: 'svg4', shape: 'Oval', image: ovalSVG },
+  { id: 'svg5', shape: 'Aviator', image: aviatorSVG },
+  { id: 'svg6', shape: 'Wayfarer', image: clearWayfarerSVG },
+  { id: 'svg7', shape: 'Square', image: boldSquareSVG },
+  { id: 'svg8', shape: 'Round', image: miniRoundSVG },
+];
 
 const defaultFrames = productsData.filter(p => p.image && typeof p.image === 'string' && p.image.startsWith('data:image/svg'));
+if (defaultFrames.length === 0) {
+  defaultFrames.push(...svgFrames);
+}
 
-const VirtualTryOn = ({ isOpen, onClose, initialProduct }) => {
+const VirtualTryOn = ({ isOpen, onClose, initialProduct, selectedColor }) => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
@@ -19,10 +33,14 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct }) => {
   const cameraRef = useRef(null);
   const animationRef = useRef(null);
   
-  const [verticalOffset, setVerticalOffset] = useState(0.5);
+  const [verticalOffset, setVerticalOffset] = useState(0.45);
+  const [horizontalOffset, setHorizontalOffset] = useState(0);
+  const [tiltOffset, setTiltOffset] = useState(0);
   const [scaleMultiplier, setScaleMultiplier] = useState(2.2);
   
   const verticalOffsetRef = useRef(verticalOffset);
+  const horizontalOffsetRef = useRef(horizontalOffset);
+  const tiltOffsetRef = useRef(tiltOffset);
   const scaleMultiplierRef = useRef(scaleMultiplier);
   
   const selectedFrameRef = useRef(selectedFrame);
@@ -41,14 +59,71 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct }) => {
     }
   };
 
+  const colorMap = {
+    black: '#1a1a1a',
+    grey: '#888888',
+    silver: '#c0c0c0',
+    gold: '#daa520',
+    red: '#cc0000',
+    blue: '#1e3799',
+    green: '#218c74',
+    pink: '#f8a5c2',
+    brown: '#8b4513',
+    transparent: '#f1f2f6',
+    white: '#ffffff',
+    yellow: '#fbc531',
+    purple: '#8c7ae6'
+  };
+
+  const getCleanTryOnImage = (frame) => {
+    if (!frame) return null;
+    if (frame.image && typeof frame.image === 'string') {
+      if (frame.image.startsWith('data:image/svg') || frame.image.endsWith('.png') || frame.image.endsWith('.jpg')) {
+        return frame.image;
+      }
+    }
+    
+    const shape = (frame.shape || '').toLowerCase();
+    
+    // Use the explicitly selected color, or fallback to the product's first color, or black
+    const baseColorName = selectedColor ? selectedColor.toLowerCase() : ((frame.colors && frame.colors.length > 0) ? frame.colors[0].toLowerCase() : 'black');
+    const hexColor = encodeURIComponent(colorMap[baseColorName] || '#1a1a1a');
+    
+    let matchingSvgFrame = svgFrames.find(f => (f.shape || '').toLowerCase() === shape);
+    
+    if (!matchingSvgFrame) {
+      if (shape.includes('round')) matchingSvgFrame = svgFrames.find(f => (f.shape || '').toLowerCase().includes('round'));
+      else if (shape.includes('square')) matchingSvgFrame = svgFrames.find(f => (f.shape || '').toLowerCase().includes('square'));
+      else if (shape.includes('aviator')) matchingSvgFrame = svgFrames.find(f => (f.shape || '').toLowerCase().includes('aviator'));
+      else if (shape.includes('oval')) matchingSvgFrame = svgFrames.find(f => (f.shape || '').toLowerCase().includes('oval'));
+      else if (shape.includes('wayfarer')) matchingSvgFrame = svgFrames.find(f => (f.shape || '').toLowerCase().includes('wayfarer'));
+    }
+    
+    let svgStr = (matchingSvgFrame || svgFrames[0]).image;
+    
+    // Inject the product's exact color into the SVG to make it match!
+    svgStr = svgStr.replace(/%23111/g, hexColor)
+                   .replace(/%23333/g, hexColor)
+                   .replace(/%231a1a1a/g, hexColor)
+                   .replace(/%23b0b0b0/g, hexColor)
+                   .replace(/%23e5a93d/g, hexColor)
+                   .replace(/%23daa520/g, hexColor)
+                   .replace(/%23444/g, hexColor)
+                   .replace(/%23225588/g, hexColor);
+                   
+    return svgStr;
+  };
+
   useEffect(() => {
     selectedFrameRef.current = selectedFrame;
-    if (selectedFrame && !imageCacheRef.current[selectedFrame.id]) {
+    const cacheKey = selectedFrame ? `${selectedFrame.id}-${selectedColor || 'default'}` : null;
+    
+    if (selectedFrame && cacheKey && !imageCacheRef.current[cacheKey]) {
       const img = new Image();
-      img.src = selectedFrame.image;
-      imageCacheRef.current[selectedFrame.id] = img;
+      img.src = getCleanTryOnImage(selectedFrame);
+      imageCacheRef.current[cacheKey] = img;
     }
-  }, [selectedFrame]);
+  }, [selectedFrame, selectedColor]);
 
   useEffect(() => {
     isMirroredRef.current = isMirrored;
@@ -57,6 +132,14 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct }) => {
   useEffect(() => {
     verticalOffsetRef.current = verticalOffset;
   }, [verticalOffset]);
+
+  useEffect(() => {
+    horizontalOffsetRef.current = horizontalOffset;
+  }, [horizontalOffset]);
+
+  useEffect(() => {
+    tiltOffsetRef.current = tiltOffset;
+  }, [tiltOffset]);
 
   useEffect(() => {
     scaleMultiplierRef.current = scaleMultiplier;
@@ -187,8 +270,12 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct }) => {
       ctx.scale(-1, 1);
     }
     
+    // Brighten the video feed so the user's face is clear even in dark rooms
+    ctx.filter = 'brightness(1.3) contrast(1.1)';
     // Draw the video frame to the canvas
     ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+    ctx.filter = 'none'; // reset filter
+
     
     if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
       const landmarks = results.multiFaceLandmarks[0];
@@ -221,8 +308,22 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct }) => {
       const eye2 = leftOuterPt.x < rightOuterPt.x ? rightOuterPt : leftOuterPt;
       const angle = Math.atan2(eye2.y - eye1.y, eye2.x - eye1.x);
       
-      // Calculate distance between eyes for scaling
-      const pupilDistance = Math.hypot(rightOuterPt.x - leftOuterPt.x, rightOuterPt.y - leftOuterPt.y);
+      // Use the sides of the face (cheekbones near ears) for precise width scaling
+      const leftSide = 234;
+      const rightSide = 454;
+      
+      const leftSidePt = {
+        x: landmarks[leftSide].x * w,
+        y: landmarks[leftSide].y * h
+      };
+      
+      const rightSidePt = {
+        x: landmarks[rightSide].x * w,
+        y: landmarks[rightSide].y * h
+      };
+      
+      // Calculate face width to accurately scale the glasses frame from ear to ear
+      const faceWidth = Math.hypot(rightSidePt.x - leftSidePt.x, rightSidePt.y - leftSidePt.y);
       
       // Calculate the exact midpoint between the eyes as the center point
       const centerPt = { 
@@ -230,17 +331,18 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct }) => {
         y: (leftOuterPt.y + rightOuterPt.y) / 2 
       };
       
-      // Draw Glasses
-      drawGlasses(ctx, centerPt, pupilDistance, angle);
+      // Draw Glasses using faceWidth instead of pupilDistance
+      drawGlasses(ctx, centerPt, faceWidth, angle);
     }
     ctx.restore();
   };
 
-  const drawGlasses = (ctx, centerPt, pupilDistance, angle) => {
+  const drawGlasses = (ctx, centerPt, faceWidth, angle) => {
     const currentFrame = selectedFrameRef.current;
     if (!currentFrame) return;
     
-    const img = imageCacheRef.current[currentFrame.id];
+    const cacheKey = currentFrame ? `${currentFrame.id}-${selectedColor || 'default'}` : null;
+    const img = imageCacheRef.current[cacheKey];
     
     // Wait for image to load if not already
     if (!img || !img.complete) return;
@@ -248,22 +350,20 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct }) => {
     ctx.save();
     
 
-    // Magic blend mode to remove the white background from product images!
-    ctx.globalCompositeOperation = 'multiply';
+    // Removed 'multiply' blend mode because it causes the glasses to vanish completely in dark environments!
+    ctx.globalCompositeOperation = 'source-over';
     
-    // The Lenskart product images have a LOT of white padding around the glasses.
-    // To make the actual glasses fit the face, the total image width needs to be much larger than the pupil distance.
-    // Pupil distance is roughly 63mm, glasses width is 135mm. The image itself has padding.
-    // A multiplier of 3.2 ensures the frames span correctly across the face without being oversized.
-    const glassesWidth = pupilDistance * scaleMultiplierRef.current; 
+    // The glasses width should perfectly match the face width (ear to ear) multiplied by user scale
+    const glassesWidth = faceWidth * scaleMultiplierRef.current; 
     const scale = glassesWidth / img.width;
     const glassesHeight = img.height * scale;
     
-    // Move to the exact midpoint between the eyes
-    ctx.translate(centerPt.x, centerPt.y);
+    // Move to the exact midpoint between the eyes, plus horizontal offset
+    const xOffset = glassesWidth * horizontalOffsetRef.current;
+    ctx.translate(centerPt.x + xOffset, centerPt.y);
     
-    // Rotate to match eye angle
-    ctx.rotate(angle);
+    // Rotate to match eye angle, plus manual tilt offset
+    ctx.rotate(angle + tiltOffsetRef.current);
     
     // Draw image centered at the translated origin
     // Adjust yOffset to correctly position the glasses over the eyes.
@@ -307,20 +407,34 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct }) => {
         {/* Main View Area */}
         <div className="tryon-view-area">
           {/* Controls */}
-          <div className="tryon-controls" style={{ position: 'absolute', top: '20px', left: '20px', zIndex: 40, background: 'rgba(15, 15, 15, 0.4)', backdropFilter: 'blur(12px)', padding: '12px 16px', borderRadius: '12px', color: 'white', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.2)', width: '140px' }}>
+          <div className="tryon-controls" style={{ position: 'absolute', top: '20px', left: '20px', zIndex: 40, background: 'rgba(15, 15, 15, 0.6)', backdropFilter: 'blur(12px)', padding: '12px 16px', borderRadius: '12px', color: 'white', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)', width: '160px' }}>
             <div style={{ marginBottom: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <label style={{ fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#ccc' }}>Size</label>
                 <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#fff' }}>{scaleMultiplier.toFixed(1)}</span>
               </div>
-              <input type="range" min="1.0" max="8.0" step="0.1" value={scaleMultiplier} onChange={(e) => setScaleMultiplier(parseFloat(e.target.value))} style={{ width: '100%', height: '4px', accentColor: '#fff', cursor: 'pointer' }} />
+              <input type="range" min="0.5" max="3.0" step="0.05" value={scaleMultiplier} onChange={(e) => setScaleMultiplier(parseFloat(e.target.value))} style={{ width: '100%', height: '4px', accentColor: '#fff', cursor: 'pointer' }} />
             </div>
-            <div>
+            <div style={{ marginBottom: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <label style={{ fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#ccc' }}>Height</label>
+                <label style={{ fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#ccc' }}>Height (Y)</label>
                 <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#fff' }}>{verticalOffset.toFixed(2)}</span>
               </div>
               <input type="range" min="-0.5" max="1.5" step="0.05" value={verticalOffset} onChange={(e) => setVerticalOffset(parseFloat(e.target.value))} style={{ width: '100%', height: '4px', accentColor: '#fff', cursor: 'pointer' }} />
+            </div>
+            <div style={{ marginBottom: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label style={{ fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#ccc' }}>Shift (X)</label>
+                <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#fff' }}>{horizontalOffset.toFixed(2)}</span>
+              </div>
+              <input type="range" min="-0.5" max="0.5" step="0.02" value={horizontalOffset} onChange={(e) => setHorizontalOffset(parseFloat(e.target.value))} style={{ width: '100%', height: '4px', accentColor: '#fff', cursor: 'pointer' }} />
+            </div>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label style={{ fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#ccc' }}>Tilt (Angle)</label>
+                <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#fff' }}>{(tiltOffset * (180/Math.PI)).toFixed(0)}°</span>
+              </div>
+              <input type="range" min="-0.5" max="0.5" step="0.02" value={tiltOffset} onChange={(e) => setTiltOffset(parseFloat(e.target.value))} style={{ width: '100%', height: '4px', accentColor: '#fff', cursor: 'pointer' }} />
             </div>
           </div>
 
@@ -373,32 +487,6 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct }) => {
           </div>
         </div>
 
-        {/* Frame Selection Carousel */}
-        {!capturedImage && (
-          <div className="tryon-footer">
-            <h3>Try Other Frames</h3>
-            <div className="carousel-wrapper" style={{ position: 'relative', display: 'flex', alignItems: 'center', width: '100%' }}>
-              <button className="carousel-nav-btn" onClick={() => scroll('left')} style={{ position: 'absolute', left: 0, zIndex: 10, background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}>
-                <FaChevronLeft />
-              </button>
-              <div className="frames-carousel" ref={scrollRef} style={{ scrollBehavior: 'smooth' }}>
-                {defaultFrames.map((frame) => (
-                  <div 
-                    key={frame.id} 
-                    className={`frame-option ${selectedFrame?.id === frame.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedFrame(frame)}
-                  >
-                    <img src={frame.image} alt={frame.name} />
-                    <span className="frame-name">{frame.name}</span>
-                  </div>
-                ))}
-              </div>
-              <button className="carousel-nav-btn" onClick={() => scroll('right')} style={{ position: 'absolute', right: 0, zIndex: 10, background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}>
-                <FaChevronRight />
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

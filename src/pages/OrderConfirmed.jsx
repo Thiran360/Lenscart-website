@@ -1,104 +1,59 @@
-import { Link } from "react-router-dom";
-import { useEffect } from "react";
-import confetti from "canvas-confetti";
+import React, { useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import "./Checkout.css"; // Reuse some checkout styles if needed
+import "./OrderConfirmed.css";
 
 function OrderConfirmed() {
-  const orderNumber = Math.floor(100000 + Math.random() * 900000); // Generate a random 6-digit order ID
+  const location = useLocation();
+  const orderId = location.state?.orderId || `LK${Math.floor(10000000 + Math.random() * 90000000)}`;
+  const total = location.state?.total || 0;
 
   useEffect(() => {
-    // Fire confetti when page loads
-    confetti({
-      particleCount: 150,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
+    window.scrollTo(0, 0);
   }, []);
 
   return (
-    <div className="page-wrapper">
+    <div className="order-confirmed-wrapper">
       <Navbar />
-      
-      <div className="container" style={{ textAlign: 'center', padding: '40px 20px', minHeight: '40vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{
-          backgroundColor: 'white',
-          padding: '30px 20px',
-          borderRadius: '12px',
-          boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-          maxWidth: '400px',
-          width: '100%',
-          margin: '0 auto',
-          aspectRatio: '1 / 1', /* Forces it to be roughly square shaped */
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center'
-        }}>
-          <div className="success-bounce" style={{ 
-            fontSize: '40px', 
-            color: 'white', 
-            backgroundColor: '#4CAF50', 
-            width: '60px', 
-            height: '60px', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            borderRadius: '12px',
-            margin: '0 auto 15px auto',
-            boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)'
-          }}>✓</div>
-          <h1 style={{ color: 'var(--primary)', marginBottom: '5px', fontSize: '24px' }}>Order Confirmed!</h1>
-          <p style={{ fontSize: '14px', color: '#6E4B34', margin: '0 auto 20px auto', maxWidth: '250px' }}>
-            Thank you for your purchase. Your order has been successfully placed.
-          </p>
-          
-          <div style={{ backgroundColor: '#f9f9f9', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>
-            <p style={{ margin: 0, fontSize: '12px', fontWeight: 'bold' }}>Order Number:</p>
-            <p style={{ margin: '5px 0 0', fontSize: '20px', letterSpacing: '1px', color: 'var(--teal)' }}>
-              #{orderNumber}
-            </p>
+      <div className="order-confirmed-container">
+        <div className="success-icon-wrapper">
+          <svg className="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+            <path className="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+          </svg>
+        </div>
+        
+        <h1>Thank you for your order!</h1>
+        <p className="order-subtitle">Your order has been placed successfully and is being processed.</p>
+
+        <div className="order-details-card">
+          <div className="order-info-row">
+            <span className="order-info-label">Order Number</span>
+            <span className="order-info-value">{orderId}</span>
           </div>
-
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
-            <Link to="/products" style={{
-              display: 'inline-block',
-              padding: '10px 20px',
-              backgroundColor: 'var(--primary)',
-              color: 'white',
-              textDecoration: 'none',
-              fontSize: '13px',
-              fontWeight: 'bold',
-              borderRadius: '4px',
-              transition: 'background-color 0.2s',
-              flex: 1
-            }}>
-              Continue Shopping
-            </Link>
-
-            <Link to="/profile?tab=orders&action=track" style={{
-              display: 'inline-block',
-              padding: '10px 20px',
-              backgroundColor: 'white',
-              color: 'var(--primary)',
-              border: '2px solid var(--primary)',
-              textDecoration: 'none',
-              fontSize: '13px',
-              fontWeight: 'bold',
-              borderRadius: '4px',
-              transition: 'background-color 0.2s',
-              flex: 1
-            }}>
-              Track Order
-            </Link>
+          <div className="order-info-row">
+            <span className="order-info-label">Amount Paid</span>
+            <span className="order-info-value">₹{total > 0 ? total.toFixed(2) : "Calculated at checkout"}</span>
+          </div>
+          <div className="order-info-row">
+            <span className="order-info-label">Estimated Delivery</span>
+            <span className="order-info-value" style={{ color: '#0d6b6d', fontWeight: 'bold' }}>3 - 5 Business Days</span>
           </div>
         </div>
-      </div>
 
+        <p className="email-confirmation">
+          We've sent a confirmation email with your order details and tracking information.
+        </p>
+
+        <div className="action-buttons">
+          <Link to="/products" className="continue-shopping-btn">Continue Shopping</Link>
+          <Link to="/track-order" state={{ orderId }} className="track-order-btn">Track Order</Link>
+        </div>
+      </div>
       <Footer />
     </div>
   );
 }
 
 export default OrderConfirmed;
-

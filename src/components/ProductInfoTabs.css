@@ -1,0 +1,128 @@
+.product-info-tabs-container {
+  margin-top: 40px;
+  width: 100%;
+  font-family: Arial, sans-serif;
+  border-top: 1px solid #eaeaea;
+}
+
+.tabs-header {
+  display: flex;
+  border-bottom: 1px solid #eaeaea;
+  background: #fff;
+}
+
+.tab-btn {
+  padding: 16px 36px;
+  background: none;
+  border: none;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  font-size: 16px;
+  font-weight: 800;
+  color: #000;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+  margin-bottom: -1px;
+}
+
+.tab-btn:hover {
+  color: #007a68;
+}
+
+.tab-btn.active {
+  border-top: 3px solid #007a68;
+  border-bottom: 3px solid #000;
+  color: #007a68;
+  border-left: 1px solid #eaeaea;
+  border-right: 1px solid #eaeaea;
+  background: #fff;
+}
+
+/* Ensure the first tab doesn't have double left border if it's active */
+.tab-btn:first-child.active {
+  border-left: 1px solid transparent;
+}
+
+.tab-content {
+  padding: 40px 0;
+}
+
+/* Description Tab Layout */
+.description-tab-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.description-text {
+  flex: 1;
+}
+
+.desc-section {
+  margin-bottom: 32px;
+}
+
+.desc-section h3 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 12px 0;
+}
+
+.desc-section p {
+  font-size: 16px;
+  color: #444;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.description-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 40px;
+}
+
+.description-image img {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Other Tabs */
+.fit-size-tab-content h3,
+.features-tab-content h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.fit-size-tab-content p {
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+.features-tab-content ul {
+  list-style-type: disc;
+  padding-left: 24px;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+@media (max-width: 768px) {
+  .description-tab-content {
+    flex-direction: column;
+  }
+  
+  .description-image {
+    width: 100%;
+  }
+}

@@ -105,11 +105,11 @@ function SelectLenses() {
     };
 
     const qty = parseInt(queryParams.get("qty")) || 1;
-    addToCart(finalProduct, qty);
 
     if (action === "buy") {
-      navigate("/checkout");
+      navigate("/checkout", { state: { buyNowProduct: { ...finalProduct, quantity: qty } } });
     } else {
+      addToCart(finalProduct, qty);
       navigate("/cart");
     }
   };

@@ -1,10 +1,8 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaSearch, FaRegHeart, FaShoppingBag, FaRegUser, FaBars, FaCamera, FaMicrophone } from "react-icons/fa";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
-import EyeglassCategories from "./EyeglassCategories";
-import SunglassCategories from "./SunglassCategories";
-import ContactCategories from "./ContactCategories";
+
 import VirtualTryOn from "./VirtualTryOn";
 import "./Navbar.css";
 import { useState, useEffect } from "react";
@@ -14,11 +12,15 @@ function Navbar() {
   const { totalWishlistItems } = useWishlist();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [isTryOnOpen, setIsTryOnOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const urlParams = new URLSearchParams(location.search);
+  const currentType = urlParams.get('type');
+  const currentSearch = urlParams.get('search');
 
   useEffect(() => {
     const logged = localStorage.getItem("isLoggedIn") === "true";
@@ -26,13 +28,6 @@ function Navbar() {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user && user.name) setUserName(user.name);
   }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn'); 
-    localStorage.removeItem('currentUser'); 
-    navigate('/');
-    setIsMenuOpen(false);
-  };
 
   const handleSearch = (e) => {
     if (e) e.preventDefault();
@@ -87,53 +82,83 @@ function Navbar() {
     <nav className="navbar">
       <div className="nav-left">
         
-        {/* Hamburger Menu */}
+        {/* Hamburger Menu - Navigate directly to Profile */}
         <div className="hamburger-container">
-          <FaBars className="hamburger-icon" onClick={() => setIsMenuOpen(!isMenuOpen)} />
-          {isMenuOpen && (
-            <div className="hamburger-dropdown">
-              <ul>
-                <li><Link to="/profile?tab=orders" onClick={() => setIsMenuOpen(false)}>My Order</Link></li>
-                <li><Link to="/profile?tab=orders&action=track" onClick={() => setIsMenuOpen(false)}>Track Order</Link></li>
-                <li><Link to="/profile?tab=profile" onClick={() => setIsMenuOpen(false)}>Profile</Link></li>
-                <li><Link to="/analytics" onClick={() => setIsMenuOpen(false)}>Analytics & Performance</Link></li>
-                <li><button onClick={handleLogout} className="dropdown-logout-btn">Logout</button></li>
-              </ul>
-            </div>
-          )}
+          <Link to="/profile" style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
+            <FaBars className="hamburger-icon" />
+          </Link>
         </div>
 
-        <Link to="/" className="logo">
-          {/* Using a generic infinity-like Lenskart logo mockup */}
-          <svg width="40" height="20" viewBox="0 0 100 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M25 25C25 15 35 15 35 25C35 35 25 35 25 25Z" stroke="currentColor" strokeWidth="6"/>
-            <path d="M75 25C75 15 65 15 65 25C65 35 75 35 75 25Z" stroke="currentColor" strokeWidth="6"/>
-            <path d="M35 25H65" stroke="currentColor" strokeWidth="6"/>
+        <Link to="/" className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* Custom Modern Lens/Eye Logo */}
+          <svg width="34" height="24" viewBox="0 0 100 70" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ color: '#0d6b6d' }}>
+            {/* The Eye Shape */}
+            <path d="M5 35 C 30 5, 70 5, 95 35 C 70 65, 30 65, 5 35 Z" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
+            {/* The Lens / Iris */}
+            <circle cx="50" cy="35" r="16" stroke="currentColor" strokeWidth="6"/>
+            {/* The Pupil / Shutter */}
+            <circle cx="50" cy="35" r="6" fill="currentColor"/>
+            {/* Sparkle / Reflection */}
+            <circle cx="55" cy="28" r="3" fill="#fff"/>
           </svg>
-          <span style={{ fontSize: '15px', fontWeight: '800', letterSpacing: '1px', whiteSpace: 'nowrap', marginLeft: '5px' }}>LENS HUB</span>
+          <span style={{ fontSize: '18px', fontWeight: '900', letterSpacing: '1px', whiteSpace: 'nowrap', fontFamily: "'Outfit', 'Poppins', sans-serif" }}>
+            LENS<span style={{ color: '#0d6b6d' }}>HUB</span>
+          </span>
         </Link>
         <ul className="nav-links">
-          <li><Link to="/">HOME</Link></li>
           <li className="category-nav-item">
-            <Link to="/products?type=eyeglasses" onClick={(e) => { if (window.innerWidth <= 900) e.preventDefault(); }}>EYEGLASSES&nbsp;▾</Link>
-            <div className="category-mega-menu">
-              <EyeglassCategories />
-            </div>
+            <Link 
+              to="/products?type=eyeglasses" 
+              className={currentType === 'eyeglasses' ? 'active-nav-box' : ''}
+              onClick={(e) => { if (window.innerWidth <= 900) e.preventDefault(); }}
+            >
+              EYEGLASSES
+            </Link>
           </li>
           <li className="category-nav-item">
-            <Link to="/products?type=sunglasses" onClick={(e) => { if (window.innerWidth <= 900) e.preventDefault(); }}>SUNGLASSES&nbsp;▾</Link>
-            <div className="category-mega-menu">
-              <SunglassCategories />
-            </div>
+            <Link 
+              to="/products?type=sunglasses" 
+              className={currentType === 'sunglasses' ? 'active-nav-box' : ''}
+              onClick={(e) => { if (window.innerWidth <= 900) e.preventDefault(); }}
+            >
+              SUNGLASSES
+            </Link>
           </li>
           <li className="category-nav-item">
-            <Link to="/products?type=contacts" onClick={(e) => { if (window.innerWidth <= 900) e.preventDefault(); }}>CONTACTS&nbsp;▾</Link>
-            <div className="category-mega-menu">
-              <ContactCategories />
+            <Link 
+              to="/products?search=kids" 
+              className={currentSearch === 'kids' ? 'active-nav-box' : ''}
+              onClick={(e) => { if (window.innerWidth <= 900) e.preventDefault(); }}
+            >
+              KIDS CLUB
+            </Link>
+          </li>
+          <li className="category-nav-item has-dropdown">
+            <Link to="/products?bogo=true" className="nav-dropdown-trigger" style={{textDecoration: 'none'}}>
+              BOGO SHOP <span style={{fontSize: '10px', marginLeft: '4px', background: '#0d6b6d', color: '#fff', padding: '2px 6px', borderRadius: '4px', letterSpacing: '0'}}>BUY 1 GET 1</span>
+            </Link>
+            <div className="nav-dropdown-menu mega-menu">
+              <div className="mega-menu-ad">
+                <div className="ad-content">
+                  <h4>BOGO SALE</h4>
+                  <h2>BUY 1<br/>GET 1<br/>FREE</h2>
+                  <p>On all premium frames</p>
+                </div>
+              </div>
+              <div className="mega-menu-links">
+                <h5 style={{margin: '0 0 10px 16px', color: '#888', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px'}}>Shop By Category</h5>
+                <Link to="/products?gender=Men&bogo=true">
+                  <span className="link-icon">👨</span> Men's Collection
+                </Link>
+                <Link to="/products?gender=Women&bogo=true">
+                  <span className="link-icon">👩</span> Women's Collection
+                </Link>
+                <Link to="/products?gender=Kids&bogo=true">
+                  <span className="link-icon">👦</span> Kids Club
+                </Link>
+              </div>
             </div>
           </li>
-          <li><Link to="/try-at-home">TRY@HOME</Link></li>
-          <li><Link to="/about">ABOUT</Link></li>
         </ul>
       </div>
         <div className="nav-right">
@@ -163,26 +188,25 @@ function Navbar() {
           </div>
         </div>
         <div className="nav-icons">
-          <Link to="/wishlist" style={{ position: "relative" }}>
+          <Link to="/wishlist" className="nav-icon-link" title="Wishlist">
             <FaRegHeart />
             {totalWishlistItems > 0 && (
               <span className="cart-badge" style={{ backgroundColor: '#ff4d4f' }}>{totalWishlistItems}</span>
             )}
           </Link>
-          <Link to="/cart" style={{ position: "relative" }}>
-            <FaShoppingBag />
-            {totalItems > 0 && (
-              <span className="cart-badge">{totalItems}</span>
-            )}
-          </Link>
-            {isLoggedIn ? (
-              <>
-                <Link to="/profile" style={{ marginLeft: 12, color: 'inherit', textDecoration: 'none', fontWeight: 'bold' }}>{userName || 'Profile'}</Link>
-                <button onClick={() => { localStorage.removeItem('isLoggedIn'); localStorage.removeItem('currentUser'); window.location.href = '/'; }} style={{ marginLeft: 12, background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', fontWeight: 'bold' }}>Logout</button>
-              </>
-            ) : (
-              <Link to="/login"><FaRegUser /></Link>
-            )}
+
+          {isLoggedIn ? (
+            <Link to="/profile" className="nav-profile-badge" title="My Profile">
+              <span className="avatar-circle">
+                {userName ? userName.charAt(0).toUpperCase() : 'U'}
+              </span>
+              <span className="user-name-text">{userName || 'Profile'}</span>
+            </Link>
+          ) : (
+            <Link to="/login" className="nav-icon-link" title="Login / Register">
+              <FaRegUser />
+            </Link>
+          )}
         </div>
       </div>
 

@@ -1,93 +1,107 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { FaTimes } from "react-icons/fa";
 import "./Login.css";
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
+  const [showOtp, setShowOtp] = useState(false);
+  const navigate = useNavigate();
+
+  const handleGetOtp = () => {
+    if (phone.length < 10) {
+      alert("Please enter a valid 10-digit phone number");
+      return;
+    }
+    // Mock OTP sending
+    setShowOtp(true);
+    alert("OTP sent to your phone number! (Use 1234 for testing)");
+  };
 
   const handleLogin = () => {
-    const savedUser = JSON.parse(localStorage.getItem("user"));
-
-    if (!savedUser) {
-      alert("No account found. Please register first.");
-      return;
-    }
-
-    if (savedUser.email !== email) {
-      alert("No account found with that email");
-      return;
-    }
-
-    if (!savedUser.isVerified) {
-      alert("Please verify your account first (check OTP)");
-      return;
-    }
-
-    if (savedUser.password === password) {
+    if (otp === "1234") {
       alert("Login Successful");
       localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("currentUser", savedUser.email);
+      localStorage.setItem("currentUser", phone);
       window.location.href = "/";
     } else {
-      alert("Invalid Email or Password");
+      alert("Invalid OTP");
     }
   };
 
   return (
     <>
       <Navbar />
+      <div className="login-page-wrapper">
+        <div className="login-split-container">
+          
+          <div className="login-image-side">
+            <span className="badge">DISCOVER PREMIUM EYEWEAR</span>
+            <h4>Many stylish solutions</h4>
+            <h1>
+              <span>Lenskart</span>
+              Experience The Clarity Of Vision
+            </h1>
+            <p>Authentic premium frames with carefully sourced lenses for your daily vision and lifestyle.</p>
+          </div>
 
-      <div className="login-container">
-        <h2>Login</h2>
+          <div className="login-form-side">
+            <button className="login-close-btn" onClick={() => navigate("/")} aria-label="Close">
+              <FaTimes />
+            </button>
+            
+            <h2>Welcome To Lenskart!</h2>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="login-input"
-        />
+            {!showOtp ? (
+              <>
+                <div className="phone-input-group">
+                  <div className="country-code">
+                    <img src="https://flagcdn.com/w20/in.png" alt="India Flag" />
+                    +91
+                  </div>
+                  <input
+                    type="tel"
+                    placeholder="Enter Mobile Number"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="login-input"
+                    maxLength={10}
+                  />
+                </div>
+                <button onClick={handleGetOtp} className="login-btn">
+                  Submit
+                </button>
+              </>
+            ) : (
+              <>
+                <p style={{ textAlign: "center", marginBottom: "15px", fontSize: "14px", color: "#666" }}>
+                  OTP sent to +91 {phone} <br />
+                  <span style={{ color: "#2e7d32", cursor: "pointer", fontSize: "12px", fontWeight: "bold" }} onClick={() => setShowOtp(false)}>Change Number</span>
+                </p>
+                <input
+                  type="text"
+                  placeholder="Enter OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  className="login-input otp-input"
+                  maxLength={4}
+                />
+                <button onClick={handleLogin} className="login-btn">
+                  Verify & Login
+                </button>
+              </>
+            )}
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="login-input"
-        />
-
-        <button onClick={handleLogin} className="login-btn">
-          Login
-        </button>
-
-        <p
-          style={{
-            textAlign: "center",
-            marginTop: "15px",
-            fontSize: "14px",
-            lineHeight: "1.6"
-          }}
-        >
-          Don't have an account?{" "}
-          <Link
-            to="/register"
-            style={{
-              color: "#3A2415",
-              textDecoration: "none",
-              fontWeight: "bold",
-            }}
-          >
-            Sign up
-          </Link>
-          <br />
-          <Link to="/forgot-password" style={{ color: "#3A2415", textDecoration: "none", fontWeight: "bold" }}>Forgot Password?</Link>
-        </p>
+            <p className="login-footer-text">
+              By logging in, you're agreeing to our <Link to="#">Privacy Policy</Link> <br />
+              <Link to="#">Terms of Service</Link>
+            </p>
+          </div>
+        </div>
       </div>
-
-      <Footer />
     </>
   );
 }

@@ -19,6 +19,7 @@ import SelectLenses from "./pages/SelectLenses";
 import Analytics from "./pages/Analytics";
 import Wishlist from "./pages/Wishlist";
 import TryAtHome from "./pages/TryAtHome";
+import TrackOrder from "./pages/TrackOrder";
 
 function App() {
   const location = useLocation();
@@ -32,6 +33,7 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order-confirmed" element={<OrderConfirmed />} />
+        <Route path="/track-order" element={<TrackOrder />} />
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

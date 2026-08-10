@@ -1,203 +1,286 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-dom";
+import { useLocation as useRouterLocation, useNavigate as useRouterNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import PaymentGatewayModal from "../components/PaymentGatewayModal";
 import "./Checkout.css";
 
 function Checkout() {
   const { cartItems, totalPrice, clearCart } = useCart();
-  const [paymentMethod, setPaymentMethod] = useState("gpay");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState("");
+  const location = useRouterLocation();
+  const navigate = useRouterNavigate();
+  const buyNowProduct = location.state?.buyNowProduct;
+  
+  const checkoutItems = buyNowProduct ? [buyNowProduct] : cartItems;
+  const subTotal = buyNowProduct 
+    ? (buyNowProduct.price + (buyNowProduct.additionalPrice || 0)) * (buyNowProduct.quantity || 1) 
+    : totalPrice;
+  const tax = subTotal * 0.18; // 18% tax simulation
+  const shipping = subTotal > 1000 ? 0 : 50;
+  const checkoutTotal = subTotal + tax + shipping;
 
-  const handleSubmit = (e) => {
+  const [step, setStep] = useState(1);
+  const [paymentMethod, setPaymentMethod] = useState("gpay");
+  const [showPaymentGateway, setShowPaymentGateway] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Address Form State
+  const [address, setAddress] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    street: "",
+    city: "",
+    state: "",
+    pincode: ""
+  });
+
+  const handleAddressChange = (e) => {
+    setAddress({ ...address, [e.target.name]: e.target.value });
+  };
+
+  const handleContinueToPayment = (e) => {
     e.preventDefault();
-    if (cartItems.length === 0) {
-      alert("Your cart is empty!");
+    setStep(2);
+  };
+
+  const handlePayNow = (e) => {
+    e.preventDefault();
+    if (checkoutItems.length === 0) {
+      alert("Your order is empty!");
       return;
     }
     
-    // Simulate secure payment process
-    setIsProcessing(true);
-    setPaymentStatus("Initiating Secure Connection...");
-    
-    setTimeout(() => {
-      setPaymentStatus("Verifying Payment Details...");
-    }, 1000);
-    
-    setTimeout(() => {
-      setPaymentStatus("Payment Successful!");
-    }, 2500);
-
-    setTimeout(() => {
+    if (paymentMethod === 'cod') {
+      // Skip gateway for COD
       clearCart();
-      window.location.href = "/order-confirmed";
-    }, 3500);
+      navigate("/order-confirmed", { state: { orderId: `LK${Math.floor(10000000 + Math.random() * 90000000)}`, total: checkoutTotal } });
+    } else {
+      setShowPaymentGateway(true);
+    }
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowPaymentGateway(false);
+    clearCart();
+    navigate("/order-confirmed", { state: { orderId: `LK${Math.floor(10000000 + Math.random() * 90000000)}`, total: checkoutTotal } });
   };
 
   return (
-    <div className="page-wrapper">
+    <div className="checkout-page-wrapper">
       <Navbar />
       
-      {/* Payment Processing Modal */}
-      {isProcessing && (
-        <div className="payment-modal-overlay">
-          <div className="payment-modal">
-            <div className="spinner"></div>
-            <h2 style={{ marginTop: 20 }}>Processing Payment</h2>
-            <p style={{ color: '#6E4B34', marginTop: 10 }}>{paymentStatus}</p>
-            <div className="secure-lock">
-              🔒 128-bit Secure SSL Connection
-            </div>
-          </div>
-        </div>
-      )}
+      <PaymentGatewayModal 
+        isOpen={showPaymentGateway} 
+        amount={checkoutTotal}
+        method={paymentMethod}
+        onSuccess={handlePaymentSuccess}
+        onCancel={() => setShowPaymentGateway(false)}
+      />
 
-      <div className="checkout-container">
-        <h1>Checkout</h1>
-
-        <div className="checkout-content">
-          <form className="checkout-form" onSubmit={handleSubmit}>
+      <div className="checkout-main-container">
+        <div className="checkout-columns">
+          
+          {/* LEFT COLUMN - Forms */}
+          <div className="checkout-left">
+            <h1 className="checkout-title">Checkout</h1>
             
-            <section className="checkout-section">
-              <h2>1. Shipping Address</h2>
-              <div className="form-group">
-                <label>Full Name</label>
-                <input type="text" required placeholder="John Doe" />
-              </div>
-              <div className="form-group">
-                <label>Phone Number</label>
-                <input type="tel" required placeholder="9876543210" pattern="[0-9]{10}" />
-              </div>
-              <div className="form-group">
-                <label>Address Line</label>
-                <input type="text" required placeholder="123 Street Name, Apartment" />
-              </div>
-              <div className="form-row">
+            <div className="checkout-stepper">
+              <div className={`step-indicator ${step >= 1 ? 'active' : ''}`}>1. Shipping</div>
+              <div className="checkout-step-line"></div>
+              <div className={`step-indicator ${step >= 2 ? 'active' : ''}`}>2. Payment</div>
+            </div>
+
+            {step === 1 && (
+              <form className="checkout-form" onSubmit={handleContinueToPayment}>
+                <h2 className="section-heading">Contact Information</h2>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>First Name *</label>
+                    <input type="text" name="firstName" required value={address.firstName} onChange={handleAddressChange} />
+                  </div>
+                  <div className="form-group">
+                    <label>Last Name *</label>
+                    <input type="text" name="lastName" required value={address.lastName} onChange={handleAddressChange} />
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Email Address *</label>
+                    <input type="email" name="email" required value={address.email} onChange={handleAddressChange} />
+                  </div>
+                  <div className="form-group">
+                    <label>Phone Number *</label>
+                    <input type="tel" name="phone" required pattern="[0-9]{10}" placeholder="10-digit mobile number" value={address.phone} onChange={handleAddressChange} />
+                  </div>
+                </div>
+
+                <h2 className="section-heading" style={{ marginTop: '30px' }}>Shipping Address</h2>
                 <div className="form-group">
-                  <label>City</label>
-                  <input type="text" required placeholder="Chennai" />
+                  <label>Street Address *</label>
+                  <input type="text" name="street" required value={address.street} onChange={handleAddressChange} />
                 </div>
-                <div className="form-group">
-                  <label>Pincode</label>
-                  <input type="text" required placeholder="600001" pattern="[0-9]{6}" />
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>City *</label>
+                    <input type="text" name="city" required value={address.city} onChange={handleAddressChange} />
+                  </div>
+                  <div className="form-group">
+                    <label>State *</label>
+                    <select name="state" required value={address.state} onChange={handleAddressChange}>
+                      <option value="">Select State</option>
+                      <option value="Tamil Nadu">Tamil Nadu</option>
+                      <option value="Karnataka">Karnataka</option>
+                      <option value="Maharashtra">Maharashtra</option>
+                      <option value="Delhi">Delhi</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Pincode *</label>
+                    <input type="text" name="pincode" required pattern="[0-9]{6}" value={address.pincode} onChange={handleAddressChange} />
+                  </div>
                 </div>
-              </div>
-            </section>
 
-            <section className="checkout-section">
-              <h2>2. Secure Payment Method</h2>
-              
-              <label className={`payment-option ${paymentMethod === 'gpay' ? 'selected' : ''}`}>
-                <input 
-                  type="radio" 
-                  name="payment" 
-                  value="gpay" 
-                  checked={paymentMethod === "gpay"}
-                  onChange={() => setPaymentMethod("gpay")}
-                />
-                <span className="payment-label">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="GPay" style={{ height: '20px', marginRight: '10px' }} />
-                  Google Pay (UPI)
-                </span>
-              </label>
+                <button type="submit" className="primary-checkout-btn">
+                  Continue to Payment
+                </button>
+              </form>
+            )}
 
-              <label className={`payment-option ${paymentMethod === 'card' ? 'selected' : ''}`}>
-                <input 
-                  type="radio" 
-                  name="payment" 
-                  value="card" 
-                  checked={paymentMethod === "card"}
-                  onChange={() => setPaymentMethod("card")}
-                />
-                <span className="payment-label">
-                  Credit / Debit Card
-                </span>
-              </label>
-              
-              {paymentMethod === 'card' && (
-                <div style={{ marginTop: 15, padding: 15, background: '#f9f9f9', borderRadius: 8, border: '1px solid #eee' }}>
-                   <div className="form-group">
-                     <input type="text" placeholder="Card Number" maxLength="16" required style={{ width: '100%', padding: 10, borderRadius: 5, border: '1px solid #ccc' }} />
-                   </div>
-                   <div style={{ display: 'flex', gap: 15, marginTop: 10 }}>
-                     <input type="text" placeholder="MM/YY" maxLength="5" required style={{ width: '50%', padding: 10, borderRadius: 5, border: '1px solid #ccc' }} />
-                     <input type="password" placeholder="CVV" maxLength="3" required style={{ width: '50%', padding: 10, borderRadius: 5, border: '1px solid #ccc' }} />
-                   </div>
+            {step === 2 && (
+              <div className="checkout-payment-section">
+                <div className="address-summary">
+                  <div className="summary-row">
+                    <span className="summary-label">Contact</span>
+                    <span className="summary-value">{address.email}</span>
+                    <button className="edit-link" onClick={() => setStep(1)}>Edit</button>
+                  </div>
+                  <div className="summary-row">
+                    <span className="summary-label">Ship to</span>
+                    <span className="summary-value">{address.street}, {address.city}, {address.pincode}</span>
+                    <button className="edit-link" onClick={() => setStep(1)}>Edit</button>
+                  </div>
                 </div>
-              )}
 
-              <label className={`payment-option ${paymentMethod === 'cod' ? 'selected' : ''}`} style={{ marginTop: paymentMethod === 'card' ? 15 : 0 }}>
-                <input 
-                  type="radio" 
-                  name="payment" 
-                  value="cod" 
-                  checked={paymentMethod === "cod"}
-                  onChange={() => setPaymentMethod("cod")}
-                />
-                <span className="payment-label">
-                  Cash on Delivery (COD)
-                </span>
-              </label>
-
-            </section>
-
-            <button type="submit" className="place-order-btn">Secure Checkout</button>
-            <p style={{ textAlign: 'center', fontSize: 12, color: '#6E4B34', marginTop: 10 }}>
-               🔒 Payments are secured by 128-bit SSL encryption.
-            </p>
-          </form>
-
-          <aside className="checkout-summary">
-            <h2>Order Summary</h2>
-            <div className="summary-items">
-              {cartItems.map((item, index) => (
-                <div className="summary-item" key={index}>
-                  <img src={item.image} alt={item.name} />
-                  <div>
-                    <h4>{item.name}</h4>
-                    <p style={{ margin: "5px 0", fontSize: "13px" }}>Qty: {item.quantity}</p>
-                    {item.lensDetails && (
-                      <div style={{ marginTop: 5 }}>
-                        <p style={{ color: "#C9A66B", fontSize: "12px", margin: "2px 0", fontWeight: 'bold' }}>
-                          + {item.lensDetails.type.title}
-                        </p>
-                        {item.lensDetails.surcharge > 0 && (
-                          <p style={{ color: "#d32f2f", fontSize: "11px", margin: "2px 0", fontWeight: 'bold' }}>
-                            + High Power Surcharge
-                          </p>
-                        )}
-                        {item.lensDetails.prescription && (
-                          <p style={{ color: "#6E4B34", fontSize: "11px", margin: "2px 0" }}>
-                            Rx: {item.lensDetails.prescription.method === 'later' ? 'Provide Later' : 'Provided'}
-                          </p>
-                        )}
+                <h2 className="section-heading" style={{ marginTop: '30px' }}>Payment Method</h2>
+                <p className="payment-subtitle">All transactions are secure and encrypted.</p>
+                
+                <div className="payment-methods-accordion">
+                  {/* UPI */}
+                  <div className={`payment-method-item ${paymentMethod === 'gpay' ? 'active' : ''}`}>
+                    <label className="payment-method-header">
+                      <input type="radio" name="payment" checked={paymentMethod === 'gpay'} onChange={() => setPaymentMethod('gpay')} />
+                      <span className="method-title">UPI / Google Pay</span>
+                      <div className="method-icons">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="GPay" height="16" />
+                      </div>
+                    </label>
+                    {paymentMethod === 'gpay' && (
+                      <div className="payment-method-content">
+                        <p>You will be redirected to complete your UPI payment securely.</p>
                       </div>
                     )}
                   </div>
-                  <span>₹{item.price * item.quantity}</span>
+
+                  {/* Cards */}
+                  <div className={`payment-method-item ${paymentMethod === 'card' ? 'active' : ''}`}>
+                    <label className="payment-method-header">
+                      <input type="radio" name="payment" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} />
+                      <span className="method-title">Credit / Debit Card</span>
+                      <div className="method-icons">
+                        <span className="card-icon">💳</span>
+                      </div>
+                    </label>
+                    {paymentMethod === 'card' && (
+                      <div className="payment-method-content">
+                        <div className="card-input-wrapper">
+                          <input type="text" placeholder="Card number" maxLength="19" className="card-input" />
+                          <div className="card-icons-inline">VISA</div>
+                        </div>
+                        <div className="form-row" style={{ marginTop: '12px' }}>
+                          <input type="text" placeholder="MM / YY" maxLength="5" className="card-input" />
+                          <input type="password" placeholder="CVV" maxLength="3" className="card-input" />
+                        </div>
+                        <input type="text" placeholder="Name on card" className="card-input" style={{ marginTop: '12px' }} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* COD */}
+                  <div className={`payment-method-item ${paymentMethod === 'cod' ? 'active' : ''}`}>
+                    <label className="payment-method-header">
+                      <input type="radio" name="payment" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} />
+                      <span className="method-title">Cash on Delivery (COD)</span>
+                    </label>
+                    {paymentMethod === 'cod' && (
+                      <div className="payment-method-content">
+                        <p>Pay with cash upon delivery. An additional fee of ₹50 may apply.</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              ))}
-            </div>
+
+                <button onClick={handlePayNow} className="primary-checkout-btn submit-btn">
+                  {paymentMethod === 'cod' ? 'Complete Order' : `Pay ₹${checkoutTotal.toFixed(2)}`}
+                </button>
+              </div>
+            )}
             
-            <div className="summary-totals">
-              <div className="summary-row">
-                <span>Subtotal</span>
-                <span>₹{totalPrice}</span>
+          </div>
+
+          {/* RIGHT COLUMN - Order Summary */}
+          <div className="checkout-right">
+            <div className="order-summary-box">
+              <h3>Order Summary</h3>
+              
+              <div className="summary-items">
+                {checkoutItems.map((item, idx) => (
+                  <div key={idx} className="summary-item">
+                    <div className="summary-item-img">
+                      <img src={item.image} alt={item.name} />
+                      <span className="item-qty">{item.quantity || 1}</span>
+                    </div>
+                    <div className="summary-item-details">
+                      <h4>{item.name}</h4>
+                      <p>{item.selectedColor || 'Standard'} | {item.size || 'Medium'}</p>
+                    </div>
+                    <div className="summary-item-price">
+                      ₹{((item.price + (item.additionalPrice || 0)) * (item.quantity || 1)).toFixed(2)}
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="summary-row">
-                <span>Shipping</span>
-                <span style={{ color: 'green' }}>FREE</span>
-              </div>
-              <div className="summary-row total-row">
-                <span>Total</span>
-                <span>₹{totalPrice}</span>
+
+              <div className="summary-totals">
+                <div className="total-row">
+                  <span>Subtotal</span>
+                  <span>₹{subTotal.toFixed(2)}</span>
+                </div>
+                <div className="total-row">
+                  <span>Shipping</span>
+                  <span>{shipping === 0 ? 'FREE' : `₹${shipping.toFixed(2)}`}</span>
+                </div>
+                <div className="total-row">
+                  <span>Estimated Tax (18%)</span>
+                  <span>₹{tax.toFixed(2)}</span>
+                </div>
+                
+                <div className="total-row grand-total">
+                  <span>Total</span>
+                  <span><span className="currency">INR</span> ₹{checkoutTotal.toFixed(2)}</span>
+                </div>
               </div>
             </div>
-          </aside>
+          </div>
+
         </div>
       </div>
-
       <Footer />
     </div>
   );

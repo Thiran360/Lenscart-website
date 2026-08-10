@@ -1,17 +1,17 @@
 import sunglassImg from '../assets/sunglass.jpg';
 import customAssetImage from '../assets/image.png';
 
-const perfectSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 50,30 C 150,10 250,20 280,50 C 290,120 230,170 140,170 C 60,170 30,120 50,30 Z" fill="%23111" /><path d="M 550,30 C 450,10 350,20 320,50 C 310,120 370,170 460,170 C 540,170 570,120 550,30 Z" fill="%23111" /><path d="M 280,50 C 290,30 310,30 320,50" fill="none" stroke="%23111" stroke-width="15" /><path d="M 50,45 L 10,35" stroke="%23111" stroke-width="20" stroke-linecap="round" /><path d="M 550,45 L 590,35" stroke="%23111" stroke-width="20" stroke-linecap="round" /><path d="M 70,50 C 140,35 220,40 250,60 C 260,110 210,145 140,145 C 80,145 60,110 70,50 Z" fill="%23333" opacity="0.8"/><path d="M 530,50 C 460,35 380,40 350,60 C 340,110 390,145 460,145 C 520,145 540,110 530,50 Z" fill="%23333" opacity="0.8"/></svg>`;
-const roundSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 140,20 C 60,20 40,80 40,120 C 40,160 80,180 140,180 C 200,180 230,160 230,120 C 230,80 220,20 140,20 Z" fill="none" stroke="%23333" stroke-width="12" /><path d="M 460,20 C 380,20 370,80 370,120 C 370,160 400,180 460,180 C 520,180 560,160 560,120 C 560,80 540,20 460,20 Z" fill="none" stroke="%23333" stroke-width="12" /><path d="M 230,80 C 250,70 350,70 370,80" fill="none" stroke="%23333" stroke-width="10" /><path d="M 40,80 L 10,70" stroke="%23333" stroke-width="12" stroke-linecap="round" /><path d="M 560,80 L 590,70" stroke="%23333" stroke-width="12" stroke-linecap="round" /><path d="M 140,32 C 70,32 52,80 52,120 C 52,150 85,168 140,168 C 190,168 218,150 218,120 C 218,80 210,32 140,32 Z" fill="%236688aa" opacity="0.4"/><path d="M 460,32 C 390,32 382,80 382,120 C 382,150 410,168 460,168 C 515,168 548,150 548,120 C 548,80 530,32 460,32 Z" fill="%236688aa" opacity="0.4"/></svg>`;
-const rimlessSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 270,50 Q 300,30 330,50" fill="none" stroke="%23e5a93d" stroke-width="8" /><path d="M 50,55 L 10,40" stroke="%23e5a93d" stroke-width="10" stroke-linecap="round" /><path d="M 550,55 L 590,40" stroke="%23e5a93d" stroke-width="10" stroke-linecap="round" /><polygon points="50,55 100,20 230,20 270,55 240,160 90,160" fill="%23223344" opacity="0.85" /><polygon points="550,55 500,20 370,20 330,55 360,160 510,160" fill="%23223344" opacity="0.85" /><polygon points="60,60 100,30 130,30 90,65" fill="%23ffffff" opacity="0.2" /><polygon points="540,60 500,30 470,30 510,65" fill="%23ffffff" opacity="0.2" /></svg>`;
-const ovalSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 250,70 C 270,60 330,60 350,70" fill="none" stroke="%23444" stroke-width="8" /><path d="M 50,75 L 10,75" stroke="%23444" stroke-width="10" stroke-linecap="round" /><path d="M 550,75 L 590,75" stroke="%23444" stroke-width="10" stroke-linecap="round" /><path d="M 150,40 C 70,40 45,65 50,110 C 55,155 90,165 150,165 C 210,165 245,155 250,110 C 255,65 230,40 150,40 Z" fill="none" stroke="%23222" stroke-width="8"/><path d="M 450,40 C 370,40 345,65 350,110 C 355,155 390,165 450,165 C 510,165 545,155 550,110 C 555,65 530,40 450,40 Z" fill="none" stroke="%23222" stroke-width="8"/><path d="M 150,44 C 75,44 53,67 58,110 C 62,151 93,161 150,161 C 207,161 238,151 242,110 C 247,67 225,44 150,44 Z" fill="%23222" opacity="0.6"/><path d="M 450,44 C 375,44 353,67 358,110 C 362,151 393,161 450,161 C 507,161 538,151 542,110 C 547,67 525,44 450,44 Z" fill="%23222" opacity="0.6"/></svg>`;
-const aviatorSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 280,40 C 290,30 310,30 320,40" fill="none" stroke="%23daa520" stroke-width="6" /><path d="M 270,60 C 290,50 310,50 330,60" fill="none" stroke="%23daa520" stroke-width="8" /><path d="M 40,40 L 10,40" stroke="%23daa520" stroke-width="10" stroke-linecap="round" /><path d="M 560,40 L 590,40" stroke="%23daa520" stroke-width="10" stroke-linecap="round" /><path d="M 150,20 C 70,20 30,30 40,90 C 50,170 110,200 160,190 C 210,180 270,130 270,70 C 270,30 230,20 150,20 Z" fill="%23334433" opacity="0.8" stroke="%23daa520" stroke-width="6"/><path d="M 450,20 C 370,20 330,30 330,70 C 330,130 390,180 440,190 C 490,200 550,170 560,90 C 570,30 530,20 450,20 Z" fill="%23334433" opacity="0.8" stroke="%23daa520" stroke-width="6"/></svg>`;
+export const perfectSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 50,30 C 150,10 250,20 280,50 C 290,120 230,170 140,170 C 60,170 30,120 50,30 Z" fill="%23111" /><path d="M 550,30 C 450,10 350,20 320,50 C 310,120 370,170 460,170 C 540,170 570,120 550,30 Z" fill="%23111" /><path d="M 280,50 C 290,30 310,30 320,50" fill="none" stroke="%23111" stroke-width="15" /><path d="M 70,50 C 140,35 220,40 250,60 C 260,110 210,145 140,145 C 80,145 60,110 70,50 Z" fill="%23333" opacity="0.8"/><path d="M 530,50 C 460,35 380,40 350,60 C 340,110 390,145 460,145 C 520,145 540,110 530,50 Z" fill="%23333" opacity="0.8"/></svg>`;
+export const roundSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 140,20 C 60,20 40,80 40,120 C 40,160 80,180 140,180 C 200,180 230,160 230,120 C 230,80 220,20 140,20 Z" fill="none" stroke="%23333" stroke-width="12" /><path d="M 460,20 C 380,20 370,80 370,120 C 370,160 400,180 460,180 C 520,180 560,160 560,120 C 560,80 540,20 460,20 Z" fill="none" stroke="%23333" stroke-width="12" /><path d="M 230,80 C 250,70 350,70 370,80" fill="none" stroke="%23333" stroke-width="10" /><path d="M 140,32 C 70,32 52,80 52,120 C 52,150 85,168 140,168 C 190,168 218,150 218,120 C 218,80 210,32 140,32 Z" fill="%236688aa" opacity="0.4"/><path d="M 460,32 C 390,32 382,80 382,120 C 382,150 410,168 460,168 C 515,168 548,150 548,120 C 548,80 530,32 460,32 Z" fill="%236688aa" opacity="0.4"/></svg>`;
+export const rimlessSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 270,50 Q 300,30 330,50" fill="none" stroke="%23e5a93d" stroke-width="8" /><polygon points="50,55 100,20 230,20 270,55 240,160 90,160" fill="%23223344" opacity="0.85" /><polygon points="550,55 500,20 370,20 330,55 360,160 510,160" fill="%23223344" opacity="0.85" /><polygon points="60,60 100,30 130,30 90,65" fill="%23ffffff" opacity="0.2" /><polygon points="540,60 500,30 470,30 510,65" fill="%23ffffff" opacity="0.2" /></svg>`;
+export const ovalSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 250,70 C 270,60 330,60 350,70" fill="none" stroke="%23444" stroke-width="8" /><path d="M 150,40 C 70,40 45,65 50,110 C 55,155 90,165 150,165 C 210,165 245,155 250,110 C 255,65 230,40 150,40 Z" fill="none" stroke="%23222" stroke-width="8"/><path d="M 450,40 C 370,40 345,65 350,110 C 355,155 390,165 450,165 C 510,165 545,155 550,110 C 555,65 530,40 450,40 Z" fill="none" stroke="%23222" stroke-width="8"/><path d="M 150,44 C 75,44 53,67 58,110 C 62,151 93,161 150,161 C 207,161 238,151 242,110 C 247,67 225,44 150,44 Z" fill="%23222" opacity="0.6"/><path d="M 450,44 C 375,44 353,67 358,110 C 362,151 393,161 450,161 C 507,161 538,151 542,110 C 547,67 525,44 450,44 Z" fill="%23222" opacity="0.6"/></svg>`;
+export const aviatorSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 280,40 C 290,30 310,30 320,40" fill="none" stroke="%23daa520" stroke-width="6" /><path d="M 270,60 C 290,50 310,50 330,60" fill="none" stroke="%23daa520" stroke-width="8" /><path d="M 150,20 C 70,20 30,30 40,90 C 50,170 110,200 160,190 C 210,180 270,130 270,70 C 270,30 230,20 150,20 Z" fill="%23334433" opacity="0.8" stroke="%23daa520" stroke-width="6"/><path d="M 450,20 C 370,20 330,30 330,70 C 330,130 390,180 440,190 C 490,200 550,170 560,90 C 570,30 530,20 450,20 Z" fill="%23334433" opacity="0.8" stroke="%23daa520" stroke-width="6"/></svg>`;
 
-const featherSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 50,30 C 150,10 250,20 280,50 C 290,120 230,170 140,170 C 60,170 30,120 50,30 Z" fill="%23225588" /><path d="M 550,30 C 450,10 350,20 320,50 C 310,120 370,170 460,170 C 540,170 570,120 550,30 Z" fill="%23225588" /><path d="M 280,50 C 290,30 310,30 320,50" fill="none" stroke="%23225588" stroke-width="10" /><path d="M 50,45 L 10,35" stroke="%23225588" stroke-width="12" stroke-linecap="round" /><path d="M 550,45 L 590,35" stroke="%23225588" stroke-width="12" stroke-linecap="round" /><path d="M 70,50 C 140,35 220,40 250,60 C 260,110 210,145 140,145 C 80,145 60,110 70,50 Z" fill="%234477aa" opacity="0.6"/><path d="M 530,50 C 460,35 380,40 350,60 C 340,110 390,145 460,145 C 520,145 540,110 530,50 Z" fill="%234477aa" opacity="0.6"/></svg>`;
-const miniRoundSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 240,80 Q 300,50 360,80" fill="none" stroke="%23b0b0b0" stroke-width="6" /><path d="M 60,85 L 10,75" stroke="%23b0b0b0" stroke-width="8" stroke-linecap="round" /><path d="M 540,85 L 590,75" stroke="%23b0b0b0" stroke-width="8" stroke-linecap="round" /><circle cx="150" cy="100" r="90" fill="none" stroke="%23222222" stroke-width="12" /><circle cx="450" cy="100" r="90" fill="none" stroke="%23222222" stroke-width="12" /><circle cx="150" cy="100" r="85" fill="%2334495e" opacity="0.85"/><circle cx="450" cy="100" r="85" fill="%2334495e" opacity="0.85"/><path d="M 90,50 Q 150,20 210,50" stroke="%23ffffff" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.15" /><path d="M 390,50 Q 450,20 510,50" stroke="%23ffffff" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.15" /></svg>`;
-const boldSquareSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 270,60 C 290,45 310,45 330,60" fill="none" stroke="%231a1a1a" stroke-width="15" /><path d="M 40,65 L 10,50" stroke="%231a1a1a" stroke-width="20" stroke-linecap="round" /><path d="M 560,65 L 590,50" stroke="%231a1a1a" stroke-width="20" stroke-linecap="round" /><path d="M 40,40 C 130,20 250,30 270,60 C 280,120 250,170 150,170 C 60,170 30,120 40,40 Z" fill="%231a1a1a" /><path d="M 560,40 C 470,20 350,30 330,60 C 320,120 350,170 450,170 C 540,170 570,120 560,40 Z" fill="%231a1a1a" /><path d="M 60,55 C 130,40 220,45 240,70 C 250,110 220,150 150,150 C 80,150 55,110 60,55 Z" fill="%232c3e50" /><path d="M 540,55 C 470,40 380,45 360,70 C 350,110 380,150 450,150 C 520,150 545,110 540,55 Z" fill="%232c3e50" /><path d="M 80,60 Q 150,45 220,60" stroke="%23ffffff" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.1" /><path d="M 380,60 Q 450,45 520,60" stroke="%23ffffff" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.1" /></svg>`;
-const halfRimSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 40,40 C 130,20 250,30 270,60" fill="none" stroke="%23333333" stroke-width="20" stroke-linecap="round" /><path d="M 560,40 C 470,20 350,30 330,60" fill="none" stroke="%23333333" stroke-width="20" stroke-linecap="round" /><path d="M 270,55 Q 300,40 330,55" fill="none" stroke="%23aaaaaa" stroke-width="8" /><path d="M 40,45 L 10,40" stroke="%23333333" stroke-width="12" stroke-linecap="round" /><path d="M 560,45 L 590,40" stroke="%23333333" stroke-width="12" stroke-linecap="round" /><path d="M 265,60 C 280,120 250,170 150,170 C 60,170 30,120 45,40" fill="none" stroke="%23cccccc" stroke-width="4" /><path d="M 335,60 C 320,120 350,170 450,170 C 540,170 570,120 555,40" fill="none" stroke="%23cccccc" stroke-width="4" /><path d="M 45,45 C 130,25 240,35 265,60 C 275,115 245,165 150,165 C 65,165 35,115 45,45 Z" fill="%232980b9" opacity="0.6"/><path d="M 555,45 C 470,25 360,35 335,60 C 325,115 355,165 450,165 C 535,165 565,115 555,45 Z" fill="%232980b9" opacity="0.6"/><path d="M 70,60 Q 140,40 210,60" stroke="%23ffffff" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.25" /><path d="M 390,60 Q 460,40 530,60" stroke="%23ffffff" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.25" /></svg>`;
-const clearWayfarerSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 40,30 L 260,40 C 270,90 240,160 150,160 C 60,160 30,90 40,30 Z" fill="none" stroke="%23dcdde1" stroke-width="16" stroke-linejoin="round" /><path d="M 560,30 L 340,40 C 330,90 360,160 450,160 C 540,160 570,90 560,30 Z" fill="none" stroke="%23dcdde1" stroke-width="16" stroke-linejoin="round" /><path d="M 255,50 Q 300,30 345,50" fill="none" stroke="%23dcdde1" stroke-width="14" /><path d="M 40,40 L 5,30" stroke="%23b2bec3" stroke-width="14" stroke-linecap="round" /><path d="M 560,40 L 595,30" stroke="%23b2bec3" stroke-width="14" stroke-linecap="round" /><path d="M 50,45 L 245,55 C 255,95 230,145 150,145 C 70,145 45,95 50,45 Z" fill="none" stroke="%23ffffff" stroke-width="4" /><path d="M 550,45 L 355,55 C 345,95 370,145 450,145 C 530,145 555,95 550,45 Z" fill="none" stroke="%23ffffff" stroke-width="4" /><path d="M 50,45 L 245,55 C 255,95 230,145 150,145 C 70,145 45,95 50,45 Z" fill="%2374b9ff" opacity="0.2" /><path d="M 550,45 L 355,55 C 345,95 370,145 450,145 C 530,145 555,95 550,45 Z" fill="%2374b9ff" opacity="0.2" /><path d="M 30,30 L 60,35" stroke="%23ffffff" stroke-width="6" stroke-linecap="round" /><path d="M 570,30 L 540,35" stroke="%23ffffff" stroke-width="6" stroke-linecap="round" /></svg>`;
+export const featherSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 50,30 C 150,10 250,20 280,50 C 290,120 230,170 140,170 C 60,170 30,120 50,30 Z" fill="%23225588" /><path d="M 550,30 C 450,10 350,20 320,50 C 310,120 370,170 460,170 C 540,170 570,120 550,30 Z" fill="%23225588" /><path d="M 280,50 C 290,30 310,30 320,50" fill="none" stroke="%23225588" stroke-width="10" /><path d="M 70,50 C 140,35 220,40 250,60 C 260,110 210,145 140,145 C 80,145 60,110 70,50 Z" fill="%234477aa" opacity="0.6"/><path d="M 530,50 C 460,35 380,40 350,60 C 340,110 390,145 460,145 C 520,145 540,110 530,50 Z" fill="%234477aa" opacity="0.6"/></svg>`;
+export const miniRoundSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 240,80 Q 300,50 360,80" fill="none" stroke="%23b0b0b0" stroke-width="6" /><circle cx="150" cy="100" r="90" fill="none" stroke="%23222222" stroke-width="12" /><circle cx="450" cy="100" r="90" fill="none" stroke="%23222222" stroke-width="12" /><circle cx="150" cy="100" r="85" fill="%2334495e" opacity="0.85"/><circle cx="450" cy="100" r="85" fill="%2334495e" opacity="0.85"/><path d="M 90,50 Q 150,20 210,50" stroke="%23ffffff" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.15" /><path d="M 390,50 Q 450,20 510,50" stroke="%23ffffff" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.15" /></svg>`;
+export const boldSquareSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 270,60 C 290,45 310,45 330,60" fill="none" stroke="%231a1a1a" stroke-width="15" /><path d="M 40,40 C 130,20 250,30 270,60 C 280,120 250,170 150,170 C 60,170 30,120 40,40 Z" fill="%231a1a1a" /><path d="M 560,40 C 470,20 350,30 330,60 C 320,120 350,170 450,170 C 540,170 570,120 560,40 Z" fill="%231a1a1a" /><path d="M 60,55 C 130,40 220,45 240,70 C 250,110 220,150 150,150 C 80,150 55,110 60,55 Z" fill="%23ffffff" opacity="0.2" /><path d="M 540,55 C 470,40 380,45 360,70 C 350,110 380,150 450,150 C 520,150 545,110 540,55 Z" fill="%23ffffff" opacity="0.2" /><path d="M 80,60 Q 150,45 220,60" stroke="%23ffffff" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.3" /><path d="M 380,60 Q 450,45 520,60" stroke="%23ffffff" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.3" /></svg>`;
+export const halfRimSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 40,40 C 130,20 250,30 270,60" fill="none" stroke="%23333333" stroke-width="20" stroke-linecap="round" /><path d="M 560,40 C 470,20 350,30 330,60" fill="none" stroke="%23333333" stroke-width="20" stroke-linecap="round" /><path d="M 270,55 Q 300,40 330,55" fill="none" stroke="%23aaaaaa" stroke-width="8" /><path d="M 265,60 C 280,120 250,170 150,170 C 60,170 30,120 45,40" fill="none" stroke="%23cccccc" stroke-width="4" /><path d="M 335,60 C 320,120 350,170 450,170 C 540,170 570,120 555,40" fill="none" stroke="%23cccccc" stroke-width="4" /><path d="M 45,45 C 130,25 240,35 265,60 C 275,115 245,165 150,165 C 65,165 35,115 45,45 Z" fill="%232980b9" opacity="0.6"/><path d="M 555,45 C 470,25 360,35 335,60 C 325,115 355,165 450,165 C 535,165 565,115 555,45 Z" fill="%232980b9" opacity="0.6"/><path d="M 70,60 Q 140,40 210,60" stroke="%23ffffff" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.25" /><path d="M 390,60 Q 460,40 530,60" stroke="%23ffffff" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.25" /></svg>`;
+export const clearWayfarerSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><path d="M 40,30 L 260,40 C 270,90 240,160 150,160 C 60,160 30,90 40,30 Z" fill="none" stroke="%23dcdde1" stroke-width="16" stroke-linejoin="round" /><path d="M 560,30 L 340,40 C 330,90 360,160 450,160 C 540,160 570,90 560,30 Z" fill="none" stroke="%23dcdde1" stroke-width="16" stroke-linejoin="round" /><path d="M 255,50 Q 300,30 345,50" fill="none" stroke="%23dcdde1" stroke-width="14" /><path d="M 50,45 L 245,55 C 255,95 230,145 150,145 C 70,145 45,95 50,45 Z" fill="none" stroke="%23ffffff" stroke-width="4" /><path d="M 550,45 L 355,55 C 345,95 370,145 450,145 C 530,145 555,95 550,45 Z" fill="none" stroke="%23ffffff" stroke-width="4" /><path d="M 50,45 L 245,55 C 255,95 230,145 150,145 C 70,145 45,95 50,45 Z" fill="%2374b9ff" opacity="0.2" /><path d="M 550,45 L 355,55 C 345,95 370,145 450,145 C 530,145 555,95 550,45 Z" fill="%2374b9ff" opacity="0.2" /></svg>`;
 
 export const productsData = [
 
@@ -28,7 +28,7 @@ export const productsData = [
     price: 1800, 
     oldPrice: 2800, 
     discount: 35, 
-    image: "/sun1.jpg",
+    image: "/sun1.png",
     description: "Classic sunglass one.",
     colors: ["black", "red", "pink", "gold"]
   },
@@ -45,7 +45,7 @@ export const productsData = [
     price: 3200, 
     oldPrice: 4500, 
     discount: 28, 
-    image: "/sun2.jpg",
+    image: "/sun2.png",
     description: "Premium sunglass two.",
     colors: ["gold", "black", "grey", "brown"]
   },
@@ -62,7 +62,7 @@ export const productsData = [
     price: 1500, 
     oldPrice: 2000, 
     discount: 25, 
-    image: "/sun3.avif",
+    image: "/sun3.png",
     description: "Classic sunglass three.",
     colors: ["brown", "gold", "green", "black"]
   },
@@ -79,7 +79,7 @@ export const productsData = [
     price: 2800, 
     oldPrice: 4000, 
     discount: 30, 
-    image: "/sun4.webp",
+    image: "/sun4.png",
     description: "Premium sunglass four.",
     colors: ["blue", "pink", "silver", "black"]
   },
@@ -96,7 +96,7 @@ export const productsData = [
     price: 2100, 
     oldPrice: 3100, 
     discount: 32, 
-    image: "/sun5.avif",
+    image: "/sun5.png",
     description: "Classic sunglass five.",
     colors: ["grey", "red", "silver", "transparent"]
   },
@@ -113,7 +113,7 @@ export const productsData = [
     price: 3500, 
     oldPrice: 5000, 
     discount: 30, 
-    image: "/sun6.jpg",
+    image: "/sun6.png",
     description: "Premium sunglass six.",
     colors: ["black", "gold", "pink", "brown"]
   },
@@ -130,7 +130,7 @@ export const productsData = [
     price: 1900, 
     oldPrice: 2900, 
     discount: 34, 
-    image: "/sun7.webp",
+    image: "/sun7.png",
     description: "Classic sunglass seven.",
     colors: ["red", "black", "green", "pink"]
   },
@@ -147,7 +147,7 @@ export const productsData = [
     price: 3000, 
     oldPrice: 4000, 
     discount: 25, 
-    image: perfectSVG,
+    image: "/classic_rectangle.png",
     description: "Premium lightweight frame with a classic rectangular shape. Ideal for professionals and daily wear.",
     colors: ["black", "grey", "green", "brown", "blue"]
   },
@@ -164,7 +164,7 @@ export const productsData = [
     price: 2500, 
     oldPrice: 3500, 
     discount: 28, 
-    image: roundSVG,
+    image: "/round_transparent.png",
     description: "Ultralight transparent round frames. Perfect for a subtle, modern aesthetic without the heavy feel.",
     colors: ["white", "blue", "black", "red", "green"]
   },
@@ -181,7 +181,7 @@ export const productsData = [
     price: 4000, 
     oldPrice: 5000, 
     discount: 20, 
-    image: rimlessSVG,
+    image: "/rimless_elegance.png",
     description: "Sleek and sophisticated rimless glasses. Provides a wide field of vision with minimal weight.",
     colors: ["grey", "brown", "black", "red"]
   },
@@ -198,7 +198,7 @@ export const productsData = [
     price: 1500, 
     oldPrice: 3000, 
     discount: 50, 
-    image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&q=80",
+    image: "/sun1.png",
     description: "Iconic Wayfarer style with thick frames for a bold statement. Suitable for all occasions.",
     colors: ["black", "red", "gold", "brown", "transparent"]
   },
@@ -215,7 +215,7 @@ export const productsData = [
     price: 2000, 
     oldPrice: 2500, 
     discount: 20, 
-    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&q=80",
+    image: "/sun_aviator.png",
     description: "Unbreakable flex material suitable for sports and active lifestyles.",
     colors: ["black", "green", "transparent", "pink"]
   },
@@ -232,7 +232,7 @@ export const productsData = [
     price: 3500, 
     oldPrice: 5000, 
     discount: 30, 
-    image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&q=80",
+    image: "/sun1.png",
     description: "Timeless gold-rimmed aviators. Gives a premium classic vibe for both men and women.",
     colors: ["gold", "grey", "brown", "pink", "blue"]
   },
@@ -249,7 +249,7 @@ export const productsData = [
     price: 1800, 
     oldPrice: 3600, 
     discount: 50, 
-    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&q=80",
+    image: "/sun_aviator.png",
     description: "Trendy cat-eye shape for a glamorous look. Available in vibrant colors.",
     colors: ["pink", "black", "blue", "silver", "grey"]
   },
@@ -266,7 +266,7 @@ export const productsData = [
     price: 4500, 
     oldPrice: 6000, 
     discount: 25, 
-    image: ovalSVG,
+    image: "/metal_oval.png",
     description: "Premium titanium frame that is rust-resistant and hypoallergenic.",
     colors: ["grey", "gold", "black", "silver"]
   },
@@ -284,7 +284,7 @@ export const productsData = [
     price: 3200, 
     oldPrice: 4200, 
     discount: 23, 
-    image: aviatorSVG,
+    image: "/golden_aviator.png",
     description: "Classic aviator eyeglasses for a bold retro look.",
     colors: ["black", "gold", "silver", "green", "brown"]
   },
@@ -301,7 +301,7 @@ export const productsData = [
     price: 2800, 
     oldPrice: 3800, 
     discount: 26, 
-    image: featherSVG,
+    image: "/ultralight_feather.png",
     description: "Incredibly light TR90 material for all-day comfort.",
     colors: ["blue", "grey", "silver", "black", "gold"]
   },
@@ -318,7 +318,7 @@ export const productsData = [
     price: 3500, 
     oldPrice: 4500, 
     discount: 22, 
-    image: miniRoundSVG,
+    image: "/mini_round.png",
     description: "Elegant round frames with a minimalist design.",
     colors: ["pink", "gold", "transparent", "green", "black"]
   },
@@ -335,7 +335,7 @@ export const productsData = [
     price: 1999, 
     oldPrice: 3000, 
     discount: 33, 
-    image: boldSquareSVG,
+    image: "/bold_square.png",
     description: "Thick square frames for a strong intellectual aesthetic.",
     colors: ["black", "gold", "brown", "grey"]
   },
@@ -352,7 +352,7 @@ export const productsData = [
     price: 4500, 
     oldPrice: 6000, 
     discount: 25, 
-    image: halfRimSVG,
+    image: "/half_rim.png",
     description: "Sophisticated half-rim glasses made from pure titanium.",
     colors: ["silver", "grey", "red", "brown", "transparent"]
   },
@@ -369,7 +369,7 @@ export const productsData = [
     price: 2200, 
     oldPrice: 3000, 
     discount: 26, 
-    image: clearWayfarerSVG,
+    image: "/clear_wayfarer.png",
     description: "Trendy transparent wayfarer frames that match any outfit.",
     colors: ["white", "brown", "pink", "gold"]
   },
@@ -386,7 +386,7 @@ export const productsData = [
     price: 1800, 
     oldPrice: 2500, 
     discount: 28, 
-    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&q=80",
+    image: "/sun_aviator.png",
     description: "Vintage round sunglasses for a cool, timeless aesthetic.",
     colors: ["black", "gold", "transparent", "green", "pink"]
   },
@@ -403,7 +403,7 @@ export const productsData = [
     price: 3200, 
     oldPrice: 4000, 
     discount: 20, 
-    image: "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=600&q=80",
+    image: "/clear_wayfarer.png",
     description: "High-performance polarized sunglasses for outdoor activities.",
     colors: ["black", "blue", "pink", "red", "transparent"]
   },
@@ -420,7 +420,7 @@ export const productsData = [
     price: 4000, 
     oldPrice: 5500, 
     discount: 27, 
-    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&q=80",
+    image: "/sun_aviator.png",
     description: "Luxurious oversized sunglasses for a bold fashion statement.",
     colors: ["brown", "black", "transparent", "red", "blue"]
   },
@@ -437,7 +437,7 @@ export const productsData = [
     price: 2100, 
     oldPrice: 3000, 
     discount: 30, 
-    image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&q=80",
+    image: "/sun1.png",
     description: "Ultra-lightweight shield sunglasses providing maximum UV protection.",
     colors: ["silver", "grey", "red", "brown", "green"]
   },
@@ -454,7 +454,7 @@ export const productsData = [
     price: 2500, 
     oldPrice: 3500, 
     discount: 28, 
-    image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&q=80",
+    image: "/sun1.png",
     description: "Classic clubmaster design with premium materials.",
     colors: ["black", "gold", "pink", "silver", "green"]
   },
@@ -471,7 +471,7 @@ export const productsData = [
     price: 3600, 
     oldPrice: 4800, 
     discount: 25, 
-    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&q=80",
+    image: "/sun_aviator.png",
     description: "Elegant cat-eye sunglasses with tinted gradient lenses.",
     colors: ["pink", "black", "gold", "transparent", "brown"]
   },
@@ -488,7 +488,7 @@ export const productsData = [
     price: 2999, 
     oldPrice: 4000, 
     discount: 25, 
-    image: "/lens1.avif",
+    image: "/lens1.png",
     description: "A special edition premium lens added by user request.",
     colors: ["black", "blue", "gold", "silver", "brown"]
   },
@@ -522,7 +522,7 @@ export const productsData = [
     price: 2500, 
     oldPrice: 3500, 
     discount: 28, 
-    image: "/lens2.jpg",
+    image: "/lens2.png",
     description: "New addition lens 2.",
     colors: ["black", "gold", "silver", "green"]
   },
@@ -539,7 +539,7 @@ export const productsData = [
     price: 1800, 
     oldPrice: 2500, 
     discount: 28, 
-    image: "/lens3.jpg",
+    image: "/lens3.png",
     description: "New addition lens 3.",
     colors: ["blue", "pink", "gold", "grey"]
   },
@@ -573,7 +573,7 @@ export const productsData = [
     price: 2000, 
     oldPrice: 3000, 
     discount: 33, 
-    image: "/lens6.jpg",
+    image: "/lens6.png",
     description: "New addition lens 6.",
     colors: ["black", "silver", "gold", "pink"]
   },
@@ -590,7 +590,7 @@ export const productsData = [
     price: 3500, 
     oldPrice: 5000, 
     discount: 30, 
-    image: "/lens8.webp",
+    image: "/lens8.png",
     description: "New addition lens 8.",
     colors: ["grey", "black", "green", "red"]
   },
@@ -607,7 +607,7 @@ export const productsData = [
     price: 2200, 
     oldPrice: 3200, 
     discount: 31, 
-    image: "/lens9.jpg",
+    image: "/lens9.png",
     description: "New addition lens 9.",
     colors: ["blue", "gold", "brown", "red"]
   },
@@ -624,8 +624,56 @@ export const productsData = [
     price: 2800, 
     oldPrice: 3800, 
     discount: 26, 
-    image: "/lens11.jpg",
+    image: "/lens11.png",
     description: "New addition lens 11.",
     colors: ["brown", "black", "pink", "blue"]
+  },
+  {
+    id: 901,
+    name: "Hooper Kids Flexible Square",
+    category: "Kids",
+    brand: "Hooper Kids",
+    gender: "Unisex",
+    shape: "Square",
+    size: "S",
+    rating: 4.8,
+    price: 1200,
+    oldPrice: 1999,
+    discount: 40,
+    image: "/tortoise_square.png",
+    description: "Durable and flexible square glasses for kids. Perfect for school and play.",
+    colors: ["blue", "pink", "black"]
+  },
+  {
+    id: 902,
+    name: "Lenskart Junior Round",
+    category: "Kids",
+    brand: "Lenskart Junior",
+    gender: "Unisex",
+    shape: "Round",
+    size: "S",
+    rating: 4.9,
+    price: 1500,
+    oldPrice: 2200,
+    discount: 31,
+    image: "/mini_round.png",
+    description: "Super cute round glasses for your little ones. Unbreakable TR90 material.",
+    colors: ["red", "blue", "transparent"]
+  },
+  {
+    id: 903,
+    name: "Hooper Kids Aviator Sunnies",
+    category: "Kids",
+    brand: "Hooper Kids",
+    gender: "Unisex",
+    shape: "Aviator",
+    size: "S",
+    rating: 4.7,
+    price: 1800,
+    oldPrice: 2500,
+    discount: 28,
+    image: "/sun_aviator.png",
+    description: "Stylish aviator sunglasses for kids with 100% UV protection.",
+    colors: ["black", "gold", "silver"]
   }
 ];
