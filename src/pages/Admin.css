@@ -1,0 +1,42 @@
+.admin-page {
+  min-height: 100vh;
+  background-color: #F6F1E8;
+  display: flex;
+  flex-direction: column;
+  color: #3A2415;
+  font-family: 'Poppins', sans-serif;
+}
+
+.admin-container {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 30px 20px 80px;
+  flex: 1;
+}
+
+.admin-header {
+  margin-bottom: 25px;
+}
+
+.admin-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #3A2415;
+  margin: 0 0 6px 0;
+  font-family: 'Playfair Display', serif;
+}
+
+.admin-header p {
+  font-size: 14px;
+  color: #6E4B34;
+  margin: 0;
+}
+
+.admin-main-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 30px;
+  border: 1px solid rgba(224, 216, 200, 0.6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}

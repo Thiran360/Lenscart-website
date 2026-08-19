@@ -18,6 +18,7 @@ import Stores from "./pages/Stores";
 
 import SelectLenses from "./pages/SelectLenses";
 import Analytics from "./pages/Analytics";
+import Admin from "./pages/Admin";
 import Wishlist from "./pages/Wishlist";
 import TryAtHome from "./pages/TryAtHome";
 import TrackOrder from "./pages/TrackOrder";
@@ -59,6 +60,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/analytics" element={<Analytics />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/try-at-home" element={<TryAtHome />} />
           <Route path="/stores" element={<Stores />} />

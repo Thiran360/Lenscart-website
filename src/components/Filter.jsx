@@ -103,7 +103,7 @@ function Filter({ filters, onApplyFilters, sortOrder, onSortChange, onTry3dToggl
             <span>Shape & Style</span>
             <span className="chevron">{openAccordion === "Shape" ? <FaChevronUp /> : <FaChevronDown />}</span>
           </div>
-          {openAccordion === "Shape" && renderCheckboxes("shape", ["Rectangle", "Round", "Aviator", "Wayfarer", "Cat Eye", "Square", "Oval"])}
+          {openAccordion === "Shape" && renderCheckboxes("shape", ["Full Rim", "Half Rim", "Rimless", "Rectangle", "Round", "Aviator", "Wayfarer", "Cat Eye", "Square", "Oval"])}
 
           <div className={`accordion-item ${openAccordion === "LensPower" ? "active" : ""}`} onClick={() => toggleAccordion("LensPower")}>
             <span>Lens Power</span>
