@@ -1,5 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { FaTruck } from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import { productsData } from "../data/products";
 import { useWishlist } from "../context/WishlistContext";
@@ -155,8 +156,8 @@ function ProductDetails() {
     );
   }
 
-  const handleBuyNow = () => {
-    navigate("/checkout", { state: { buyNowProduct: { ...product, selectedColor, quantity: 1 } } });
+  const handleSelectLenses = () => {
+    navigate(`/select-lenses/${product.id}`, { state: { product, selectedColor } });
   };
 
   const handleNextAngle = () => {
@@ -281,48 +282,103 @@ function ProductDetails() {
             </div>
 
             {/* Delivery Pincode */}
-            <div style={{ marginBottom: '30px' }}>
-              <div style={{ display: 'flex', alignItems: 'stretch', height: '48px', maxWidth: '400px' }}>
-                <input 
-                  type="text" 
-                  placeholder="Enter Pincode" 
-                  value={pincode}
-                  onChange={(e) => setPincode(e.target.value)}
-                  maxLength={6}
-                  style={{ 
-                    flex: 1, 
-                    border: '1px solid #dcdcdc', 
-                    borderRight: 'none',
-                    borderRadius: '8px 0 0 8px', 
-                    padding: '0 16px', 
-                    fontSize: '16px',
-                    color: '#333',
-                    outline: 'none'
-                  }} 
-                />
-                <button 
-                  onClick={handleCheckPincode}
-                  style={{ 
-                    background: '#222', 
-                    color: '#fff', 
-                    border: 'none', 
-                    padding: '0 32px', 
-                    borderRadius: '0 8px 8px 0', 
-                    cursor: 'pointer',
-                    fontWeight: '800',
-                    fontSize: '14px',
-                    letterSpacing: '0.5px'
-                  }}
-                >
-                  CHECK
-                </button>
-              </div>
-              {deliveryDate && (
-                <div style={{ color: '#007a68', fontWeight: 'bold', fontSize: '15px', marginTop: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '16px' }}>✓</span> Get it as early as {deliveryDate}
+            {(() => {
+              const isPincodeValid = Boolean(pincode && pincode.trim().length === 6 && !isNaN(pincode));
+              return (
+                <div style={{ marginBottom: '30px' }}>
+                  <div style={{ fontSize: '15px', fontWeight: '700', color: '#3A2415', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FaTruck style={{ color: '#0d6b6d', fontSize: '17px' }} /> Check Delivery Date
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'stretch', height: '48px', maxWidth: '400px' }}>
+                    <input 
+                      type="text" 
+                      placeholder="Enter Pincode" 
+                      value={pincode}
+                      onChange={(e) => setPincode(e.target.value.replace(/\D/g, ""))}
+                      maxLength={6}
+                      style={{ 
+                        flex: 1, 
+                        border: '1px solid #dcdcdc', 
+                        borderRight: 'none',
+                        borderRadius: '8px 0 0 8px', 
+                        padding: '0 16px', 
+                        fontSize: '16px',
+                        color: '#333',
+                        outline: 'none'
+                      }} 
+                    />
+                    <button 
+                      onClick={handleCheckPincode}
+                      disabled={!isPincodeValid}
+                      style={{ 
+                        background: isPincodeValid ? '#222' : '#cccccc', 
+                        color: isPincodeValid ? '#fff' : '#888888', 
+                        border: 'none', 
+                        padding: '0 32px', 
+                        borderRadius: '0 8px 8px 0', 
+                        cursor: isPincodeValid ? 'pointer' : 'not-allowed',
+                        fontWeight: '800',
+                        fontSize: '14px',
+                        letterSpacing: '0.5px',
+                        opacity: isPincodeValid ? 1 : 0.7,
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      CHECK
+                    </button>
+                  </div>
+                  {deliveryDate && (
+                    <div style={{ color: '#007a68', fontWeight: 'bold', fontSize: '15px', marginTop: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '16px' }}>✓</span> Get it as early as {deliveryDate}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              );
+            })()}
+
+            {/* GET ASSURED YOU Section */}
+            {(() => {
+              const isSunglass = Boolean(
+                product?.type?.toLowerCase().includes('sunglasses') || 
+                product?.name?.toLowerCase().includes('sunglass') || 
+                product?.category?.toLowerCase().includes('sunglasses')
+              );
+
+              return (
+                <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #eaeaea', marginBottom: '25px' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: '800', color: '#3A2415', marginBottom: '14px', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                    GET ASSURED YOU
+                  </h4>
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#fcfbfa', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(224, 216, 200, 0.6)', flex: '1', minWidth: '130px' }}>
+                      <span style={{ fontSize: '20px' }}>📦</span>
+                      <div>
+                        <div style={{ fontSize: '12.5px', fontWeight: '700', color: '#3A2415' }}>
+                          {isSunglass ? "14 Days Return" : "14 Days Return"}
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#666' }}>Full Money Back</div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#fcfbfa', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(224, 216, 200, 0.6)', flex: '1', minWidth: '130px' }}>
+                      <span style={{ fontSize: '20px' }}>🔄</span>
+                      <div>
+                        <div style={{ fontSize: '12.5px', fontWeight: '700', color: '#3A2415' }}>14 Days Exchange</div>
+                        <div style={{ fontSize: '11px', color: '#666' }}>Hassle-Free Replacement</div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#fcfbfa', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(224, 216, 200, 0.6)', flex: '1', minWidth: '130px' }}>
+                      <span style={{ fontSize: '20px' }}>🛡️</span>
+                      <div>
+                        <div style={{ fontSize: '12.5px', fontWeight: '700', color: '#3A2415' }}>1 Year Warranty</div>
+                        <div style={{ fontSize: '11px', color: '#666' }}>Brand Protection</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Offers & Discounts */}
             <div className="offers-container" style={{ marginBottom: '20px', borderTop: '1px solid #eaeaea', paddingTop: '20px' }}>
@@ -353,12 +409,14 @@ function ProductDetails() {
               </div>
             </div>
 
-            {/* Customize / Buy Button */}
+            {/* Select Lenses Button */}
             <button 
-              onClick={handleBuyNow} 
-              style={{ width: '100%', padding: '20px', background: '#0d6b6d', color: '#fff', border: 'none', borderRadius: '30px', fontSize: '22px', fontWeight: 'bold', cursor: 'pointer', display: 'block', textTransform: 'uppercase' }}
+              onClick={handleSelectLenses} 
+              style={{ width: '100%', padding: '18px', background: '#0d6b6d', color: '#fff', border: 'none', borderRadius: '30px', fontSize: '20px', fontWeight: 'bold', cursor: 'pointer', display: 'block', textTransform: 'uppercase', letterSpacing: '1.5px', boxShadow: '0 6px 20px rgba(13, 107, 109, 0.3)', transition: 'all 0.3s ease' }}
+              onMouseOver={(e) => { e.target.style.background = '#094d4f'; e.target.style.transform = 'translateY(-2px)'; }}
+              onMouseOut={(e) => { e.target.style.background = '#0d6b6d'; e.target.style.transform = 'translateY(0)'; }}
             >
-              BUY NOW
+              SELECT LENSES
             </button>
 
 

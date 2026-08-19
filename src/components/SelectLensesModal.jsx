@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { FaCloudUploadAlt, FaCheckCircle, FaFileAlt } from "react-icons/fa";
+import { SPH_OPTIONS, CYL_OPTIONS, AXIS_OPTIONS } from "../utils/rxOptions";
 import "./SelectLensesModal.css";
 
 function SelectLensesModal({ isOpen, onClose, onConfirm, basePrice }) {
@@ -9,10 +11,53 @@ function SelectLensesModal({ isOpen, onClose, onConfirm, basePrice }) {
   // Step 3 state
   const [rxMethod, setRxMethod] = useState(null); // 'manual', 'upload', 'later'
   const [rxData, setRxData] = useState({
+    name: "",
+    birthYear: "",
     rightSph: "", rightCyl: "", rightAxis: "",
     leftSph: "", leftCyl: "", leftAxis: ""
   });
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const processFile = (file) => {
+    if (!file) return;
+    const isImage = file.type.startsWith("image/");
+    const fileData = {
+      name: file.name,
+      size: (file.size / 1024).toFixed(1) + " KB",
+      type: file.type,
+      url: isImage ? URL.createObjectURL(file) : null
+    };
+    setUploadedFile(fileData);
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      processFile(e.target.files[0]);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processFile(e.dataTransfer.files[0]);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -124,34 +169,134 @@ function SelectLensesModal({ isOpen, onClose, onConfirm, basePrice }) {
               </div>
 
               {rxMethod === 'upload' && (
-                <div className="rx-upload-area" onClick={() => setUploadedFile("prescription_image.jpg")}>
-                  {uploadedFile ? (
-                    <div style={{ color: '#C9A66B', fontWeight: 'bold' }}>✓ File Selected: {uploadedFile}</div>
+                <div>
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    accept="image/*,.pdf" 
+                    style={{ display: "none" }} 
+                    onChange={handleFileChange} 
+                  />
+
+                  {!uploadedFile ? (
+                    <div 
+                      className="rx-upload-area" 
+                      onClick={() => fileInputRef.current?.click()}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                      style={{
+                        border: isDragging ? "2px dashed #9B7038" : "2px dashed #C5A059",
+                        backgroundColor: isDragging ? "#F4EDE2" : "#FAF6F0",
+                        borderRadius: "12px",
+                        padding: "30px 20px",
+                        textAlign: "center",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      <FaCloudUploadAlt size={42} color="#C5A059" style={{ marginBottom: 8 }} />
+                      <p style={{ margin: "0 0 6px 0", color: "#3A2415", fontWeight: "bold", fontSize: 16 }}>
+                        Click to Upload or Drag & Drop Prescription
+                      </p>
+                      <span style={{ fontSize: 13, color: "#6E4B34" }}>Supported formats: JPG, PNG, PDF</span>
+                    </div>
                   ) : (
-                    <>
-                      <p style={{ margin: 0, color: '#C9A66B', fontWeight: 'bold', fontSize: 18 }}>📷 Click to Upload Prescription Image/PDF</p>
-                      <span style={{ fontSize: 13, color: '#6E4B34' }}>Supported formats: JPG, PNG, PDF</span>
-                    </>
+                    <div 
+                      style={{
+                        border: "1px solid #C5A059",
+                        backgroundColor: "#FAF6F0",
+                        borderRadius: "12px",
+                        padding: "16px 20px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between"
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        {uploadedFile.url ? (
+                          <img src={uploadedFile.url} alt="Rx preview" style={{ width: 48, height: 48, objectFit: "cover", borderRadius: 8, border: "1px solid #ccc" }} />
+                        ) : (
+                          <FaFileAlt size={32} color="#C5A059" />
+                        )}
+                        <div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: "bold", color: "#3A2415", fontSize: 14 }}>
+                            <FaCheckCircle color="#2e7d32" /> {uploadedFile.name}
+                          </div>
+                          <span style={{ fontSize: 12, color: "#6E4B34" }}>File Size: {uploadedFile.size}</span>
+                        </div>
+                      </div>
+                      <button 
+                        type="button"
+                        onClick={() => setUploadedFile(null)}
+                        style={{ background: "none", border: "1px solid #d32f2f", color: "#d32f2f", borderRadius: "6px", padding: "6px 12px", cursor: "pointer", fontWeight: "bold", fontSize: "12px" }}
+                      >
+                        Remove File
+                      </button>
+                    </div>
                   )}
                 </div>
               )}
 
               {rxMethod === 'manual' && (
                 <div className="rx-manual-form">
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: 15 }}>
+                    <div className="rx-eye-section" style={{ margin: 0 }}>
+                      <label style={{ display: 'block', marginBottom: 5, fontSize: 13, fontWeight: 600, color: '#333' }}>Name</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. John" 
+                        value={rxData.name} 
+                        onChange={e => setRxData({...rxData, name: e.target.value.replace(/[^a-zA-Z\s]/g, "")})} 
+                        style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px' }}
+                      />
+                    </div>
+                    <div className="rx-eye-section" style={{ margin: 0 }}>
+                      <label style={{ display: 'block', marginBottom: 5, fontSize: 13, fontWeight: 600, color: '#333' }}>Birth Year</label>
+                      <select 
+                        value={rxData.birthYear} 
+                        onChange={e => setRxData({...rxData, birthYear: e.target.value})} 
+                        style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', backgroundColor: '#fff' }}
+                      >
+                        <option value="">Select Birth Year</option>
+                        {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                          <option key={year} value={year}>{year}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                   <div className="rx-eye-section">
                     <h4>Right Eye (OD)</h4>
                     <div className="rx-grid">
-                      <input type="text" placeholder="SPH" value={rxData.rightSph} onChange={e => setRxData({...rxData, rightSph: e.target.value})} />
-                      <input type="text" placeholder="CYL" value={rxData.rightCyl} onChange={e => setRxData({...rxData, rightCyl: e.target.value})} />
-                      <input type="text" placeholder="AXIS" value={rxData.rightAxis} onChange={e => setRxData({...rxData, rightAxis: e.target.value})} />
+                      <select value={rxData.rightSph} onChange={e => setRxData({...rxData, rightSph: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '14px' }}>
+                        <option value="">SPH</option>
+                        {SPH_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                      </select>
+                      <select value={rxData.rightCyl} onChange={e => setRxData({...rxData, rightCyl: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '14px' }}>
+                        <option value="">CYL</option>
+                        {CYL_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                      </select>
+                      <select value={rxData.rightAxis} onChange={e => setRxData({...rxData, rightAxis: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '14px' }}>
+                        <option value="">AXIS</option>
+                        {AXIS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                      </select>
                     </div>
                   </div>
                   <div className="rx-eye-section">
                     <h4>Left Eye (OS)</h4>
                     <div className="rx-grid">
-                      <input type="text" placeholder="SPH" value={rxData.leftSph} onChange={e => setRxData({...rxData, leftSph: e.target.value})} />
-                      <input type="text" placeholder="CYL" value={rxData.leftCyl} onChange={e => setRxData({...rxData, leftCyl: e.target.value})} />
-                      <input type="text" placeholder="AXIS" value={rxData.leftAxis} onChange={e => setRxData({...rxData, leftAxis: e.target.value})} />
+                      <select value={rxData.leftSph} onChange={e => setRxData({...rxData, leftSph: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '14px' }}>
+                        <option value="">SPH</option>
+                        {SPH_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                      </select>
+                      <select value={rxData.leftCyl} onChange={e => setRxData({...rxData, leftCyl: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '14px' }}>
+                        <option value="">CYL</option>
+                        {CYL_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                      </select>
+                      <select value={rxData.leftAxis} onChange={e => setRxData({...rxData, leftAxis: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '14px' }}>
+                        <option value="">AXIS</option>
+                        {AXIS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                      </select>
                     </div>
                   </div>
                 </div>

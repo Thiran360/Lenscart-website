@@ -1,36 +1,44 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import CustomPhoneInput from "../components/CustomPhoneInput";
 import { FaTimes } from "react-icons/fa";
 import "./Login.css";
 
 function Login() {
   const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
-  const [showOtp, setShowOtp] = useState(false);
+  const [countryInfo, setCountryInfo] = useState(null);
   const navigate = useNavigate();
 
-  const handleGetOtp = () => {
-    if (phone.length < 10) {
-      alert("Please enter a valid 10-digit phone number");
-      return;
-    }
-    // Mock OTP sending
-    setShowOtp(true);
-    alert("OTP sent to your phone number! (Use 1234 for testing)");
+  const handlePhoneChange = (val, countryData) => {
+    setPhone(val);
+    if (countryData) setCountryInfo(countryData);
   };
 
-  const handleLogin = () => {
-    if (otp === "1234") {
-      alert("Login Successful");
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("currentUser", phone);
-      window.location.href = "/";
-    } else {
-      alert("Invalid OTP");
+  const handleGetOtp = (e) => {
+    if (e) e.preventDefault();
+    if (!phone || phone.length < 7) {
+      alert("Please enter a valid mobile phone number");
+      return;
     }
+
+    const dialCode = countryInfo?.dialCode ? `+${countryInfo.dialCode}` : "+91";
+    const formattedPhone = phone.startsWith("+") ? phone : `${dialCode} ${phone}`;
+    
+    // Check if existing user profile exists in localStorage
+    const existingUser = JSON.parse(localStorage.getItem("user"));
+    if (existingUser && existingUser.name) {
+      localStorage.setItem("pendingName", existingUser.name);
+    }
+
+    localStorage.setItem("pendingPhone", formattedPhone);
+    localStorage.setItem("otpFlow", "login");
+    localStorage.setItem("otp", "1234");
+
+    navigate("/verify-otp");
   };
+
+  const isPhoneValid = Boolean(phone && phone.trim().length >= 7);
 
   return (
     <>
@@ -54,50 +62,36 @@ function Login() {
             </button>
             
             <h2>Welcome To Lenskart!</h2>
+            <p style={{ textAlign: "center", color: "#666", marginTop: "-25px", marginBottom: "30px", fontSize: "14px" }}>
+              Sign in with your mobile phone number
+            </p>
 
-            {!showOtp ? (
-              <>
-                <div className="phone-input-group">
-                  <div className="country-code">
-                    <img src="https://flagcdn.com/w20/in.png" alt="India Flag" />
-                    +91
-                  </div>
-                  <input
-                    type="tel"
-                    placeholder="Enter Mobile Number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="login-input"
-                    maxLength={10}
-                  />
-                </div>
-                <button onClick={handleGetOtp} className="login-btn">
-                  Submit
-                </button>
-              </>
-            ) : (
-              <>
-                <p style={{ textAlign: "center", marginBottom: "15px", fontSize: "14px", color: "#666" }}>
-                  OTP sent to +91 {phone} <br />
-                  <span style={{ color: "#2e7d32", cursor: "pointer", fontSize: "12px", fontWeight: "bold" }} onClick={() => setShowOtp(false)}>Change Number</span>
-                </p>
-                <input
-                  type="text"
-                  placeholder="Enter OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  className="login-input otp-input"
-                  maxLength={4}
+            <form onSubmit={handleGetOtp}>
+              <div style={{ marginBottom: "30px" }}>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#3A2415", marginBottom: "6px" }}>
+                  Select Country & Mobile Number
+                </label>
+                <CustomPhoneInput
+                  value={phone}
+                  onChange={handlePhoneChange}
+                  defaultCountry="in"
                 />
-                <button onClick={handleLogin} className="login-btn">
-                  Verify & Login
-                </button>
-              </>
-            )}
+              </div>
+
+              <button 
+                type="submit" 
+                className={`login-btn ${!isPhoneValid ? 'disabled' : ''}`}
+                disabled={!isPhoneValid}
+              >
+                Get OTP
+              </button>
+            </form>
 
             <p className="login-footer-text">
-              By logging in, you're agreeing to our <Link to="#">Privacy Policy</Link> <br />
-              <Link to="#">Terms of Service</Link>
+              New to LensKart?{" "}
+              <Link to="/register" style={{ color: "#0d6b6d", fontWeight: "bold" }}>
+                Create an Account
+              </Link>
             </p>
           </div>
         </div>

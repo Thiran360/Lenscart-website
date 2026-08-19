@@ -1,55 +1,143 @@
 .trending-videos-container {
-  padding: 20px 0;
-  margin-bottom: 30px;
-}
-
-.trending-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 0 20px;
-}
-
-.trending-videos-title {
-  color: #3A2415;
-  font-size: 24px;
-  font-weight: bold;
-  margin: 0;
+  position: relative;
+  width: 100%;
+  padding: 10px 0 20px 0;
 }
 
 .trending-videos-scroll {
   display: flex;
   overflow-x: auto;
   width: 100%;
-  padding: 0 20px 20px 20px;
+  padding: 15px 5px 25px 5px;
   scroll-behavior: smooth;
   scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
 }
 
 .trending-videos-scroll::-webkit-scrollbar {
-  display: none; /* Chrome */
+  display: none; /* Chrome & Safari */
 }
 
 .trending-videos-track {
   display: flex;
-  gap: 15px;
+  gap: 20px;
+  width: 100%;
 }
 
+.trending-card {
+  /* Exactly 5 cards per row on desktop */
+  flex: 0 0 calc((100% - 80px) / 5);
+  min-width: calc((100% - 80px) / 5);
+  height: 295px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(224, 216, 200, 0.7);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-sizing: border-box;
+}
+
+.trending-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 32px rgba(13, 107, 109, 0.15);
+  border-color: #0d6b6d;
+}
+
+.trending-card-image-box {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  background: #fbf9f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+.trending-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #ffffff;
+  color: #3A2415;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(224, 216, 200, 0.5);
+  z-index: 2;
+}
+
+.trending-card-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.4s ease;
+}
+
+.trending-card:hover .trending-card-img {
+  transform: scale(1.08);
+}
+
+.trending-card-content {
+  padding: 12px 14px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(224, 216, 200, 0.4);
+  flex: 1;
+  box-sizing: border-box;
+}
+
+.trending-card-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #3A2415;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 110px;
+}
+
+.trending-action-btn {
+  background: #0d6b6d;
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.trending-card:hover .trending-action-btn {
+  background: #094d4e;
+  box-shadow: 0 4px 12px rgba(13, 107, 109, 0.3);
+}
+
+/* Navigation Arrow Buttons */
 .carousel-button {
   position: absolute;
-  top: 50%;
+  top: 48%;
   transform: translateY(-50%);
-  background: white;
-  border: none;
+  background: #ffffff;
+  border: 1.5px solid rgba(224, 216, 200, 0.8);
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 20px;
-  color: #333;
+  width: 44px;
+  height: 44px;
+  font-size: 18px;
+  color: #3A2415;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  z-index: 20;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  z-index: 25;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,78 +145,45 @@
 }
 
 .carousel-button:hover {
-  background: #F6F1E8;
+  background: #0d6b6d;
+  color: #ffffff;
+  border-color: #0d6b6d;
   transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 8px 25px rgba(13, 107, 109, 0.35);
 }
 
 .carousel-button.left {
-  left: 10px;
+  left: -22px;
 }
 
 .carousel-button.right {
-  right: 10px;
+  right: -22px;
 }
 
-.trending-video-card {
-  position: relative;
-  min-width: 200px;
-  width: 200px;
-  height: 300px;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  flex-shrink: 0;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-/* Dim all cards when track is hovered */
-.trending-videos-track:hover .trending-video-card {
-  opacity: 0.6;
-  filter: grayscale(30%);
-}
-
-/* Highlight and expand the hovered card */
-.trending-videos-track .trending-video-card:hover {
-  opacity: 1;
-  filter: grayscale(0%);
-  width: 260px;
-  min-width: 260px;
-  transform: scale(1.05) translateY(-5px);
-  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-  z-index: 10;
-}
-
-.trending-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background: #F6F1E8;
-}
-
-.trending-video-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  padding: 40px 15px 15px 15px;
-  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  color: white;
-  font-weight: 600;
-  font-size: 15px;
-}
-
-@media (max-width: 768px) {
-  .trending-video-card {
-    min-width: 160px;
-    width: 160px;
-    height: 240px;
+@media (max-width: 1024px) {
+  .trending-card {
+    flex: 0 0 calc((100% - 40px) / 3);
+    min-width: calc((100% - 40px) / 3);
   }
-  .trending-videos-title {
-    font-size: 20px;
+  .carousel-button.left { left: 5px; }
+  .carousel-button.right { right: 5px; }
+}
+
+@media (max-width: 640px) {
+  .trending-card {
+    flex: 0 0 calc((100% - 16px) / 2);
+    min-width: calc((100% - 16px) / 2);
+    height: 260px;
+  }
+  .trending-card-image-box {
+    height: 180px;
+  }
+  .trending-card-name {
+    font-size: 12px;
+    max-width: 80px;
+  }
+  .trending-action-btn {
+    font-size: 10.5px;
+    padding: 5px 10px;
   }
 }
-

@@ -87,6 +87,9 @@ const ProductInfoTabs = ({ product, onOpenSizeGuide }) => {
               <li>Spring hinges for a comfortable, flexible fit</li>
               <li>Adjustable nose pads (on select styles)</li>
               <li>Includes premium case and cleaning cloth</li>
+              {product.lensPower && Array.isArray(product.lensPower) && product.lensPower.length > 0 && (
+                <li>Available Lens Powers: {product.lensPower.join(", ")}</li>
+              )}
             </ul>
           </div>
         )}

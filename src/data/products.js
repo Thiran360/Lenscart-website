@@ -30,7 +30,8 @@ export const productsData = [
     discount: 35, 
     image: "/sun1.png",
     description: "Classic sunglass one.",
-    colors: ["black", "red", "pink", "gold"]
+    colors: ["black", "red", "pink", "gold"],
+    lensPower: ["-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   { 
     id: 40, 
@@ -47,7 +48,8 @@ export const productsData = [
     discount: 28, 
     image: "/sun2.png",
     description: "Premium sunglass two.",
-    colors: ["gold", "black", "grey", "brown"]
+    colors: ["gold", "black", "grey", "brown"],
+    lensPower: ["-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "0.00", "+1.00", "+1.50", "+2.00", "+2.50", "+3.00"]
   },
   { 
     id: 41, 
@@ -64,7 +66,8 @@ export const productsData = [
     discount: 25, 
     image: "/sun3.png",
     description: "Classic sunglass three.",
-    colors: ["brown", "gold", "green", "black"]
+    colors: ["brown", "gold", "green", "black"],
+    lensPower: ["-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   { 
     id: 42, 
@@ -81,7 +84,8 @@ export const productsData = [
     discount: 30, 
     image: "/sun4.png",
     description: "Premium sunglass four.",
-    colors: ["blue", "pink", "silver", "black"]
+    colors: ["blue", "pink", "silver", "black"],
+    lensPower: ["-4.00", "-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "0.00", "+1.00", "+1.50", "+2.00", "+2.50"]
   },
   { 
     id: 43, 
@@ -98,7 +102,8 @@ export const productsData = [
     discount: 32, 
     image: "/sun5.png",
     description: "Classic sunglass five.",
-    colors: ["grey", "red", "silver", "transparent"]
+    colors: ["grey", "red", "silver", "transparent"],
+    lensPower: ["-3.00", "-2.00", "-1.00", "0.00", "+1.00", "+2.00", "+3.00"]
   },
   { 
     id: 44, 
@@ -115,7 +120,8 @@ export const productsData = [
     discount: 30, 
     image: "/sun6.png",
     description: "Premium sunglass six.",
-    colors: ["black", "gold", "pink", "brown"]
+    colors: ["black", "gold", "pink", "brown"],
+    lensPower: ["-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00", "+2.50"]
   },
   { 
     id: 45, 
@@ -132,7 +138,8 @@ export const productsData = [
     discount: 34, 
     image: "/sun7.png",
     description: "Classic sunglass seven.",
-    colors: ["red", "black", "green", "pink"]
+    colors: ["red", "black", "green", "pink"],
+    lensPower: ["-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   { 
     id: 1, 
@@ -149,7 +156,8 @@ export const productsData = [
     discount: 25, 
     image: "/classic_rectangle.png",
     description: "Premium lightweight frame with a classic rectangular shape. Ideal for professionals and daily wear.",
-    colors: ["black", "grey", "green", "brown", "blue"]
+    colors: ["black", "grey", "green", "brown", "blue"],
+    lensPower: ["-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50"]
   },
   { 
     id: 2, 
@@ -166,7 +174,8 @@ export const productsData = [
     discount: 28, 
     image: "/round_transparent.png",
     description: "Ultralight transparent round frames. Perfect for a subtle, modern aesthetic without the heavy feel.",
-    colors: ["white", "blue", "black", "red", "green"]
+    colors: ["white", "blue", "black", "red", "green"],
+    lensPower: ["-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+1.00", "+2.00", "+2.50"]
   },
   { 
     id: 3, 
@@ -183,7 +192,8 @@ export const productsData = [
     discount: 20, 
     image: "/rimless_elegance.png",
     description: "Sleek and sophisticated rimless glasses. Provides a wide field of vision with minimal weight.",
-    colors: ["grey", "brown", "black", "red"]
+    colors: ["grey", "brown", "black", "red"],
+    lensPower: ["-4.00", "-3.00", "-2.00", "-1.00", "0.00", "+0.50", "+1.00", "+2.00", "+3.00"]
   },
   { 
     id: 4, 
@@ -200,7 +210,8 @@ export const productsData = [
     discount: 50, 
     image: "/sun1.png",
     description: "Iconic Wayfarer style with thick frames for a bold statement. Suitable for all occasions.",
-    colors: ["black", "red", "gold", "brown", "transparent"]
+    colors: ["black", "red", "gold", "brown", "transparent"],
+    lensPower: ["-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50"]
   },
   { 
     id: 5, 
@@ -217,7 +228,8 @@ export const productsData = [
     discount: 20, 
     image: "/sun_aviator.png",
     description: "Unbreakable flex material suitable for sports and active lifestyles.",
-    colors: ["black", "green", "transparent", "pink"]
+    colors: ["black", "green", "transparent", "pink"],
+    lensPower: ["-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   { 
     id: 6, 
@@ -234,7 +246,8 @@ export const productsData = [
     discount: 30, 
     image: "/sun1.png",
     description: "Timeless gold-rimmed aviators. Gives a premium classic vibe for both men and women.",
-    colors: ["gold", "grey", "brown", "pink", "blue"]
+    colors: ["gold", "grey", "brown", "pink", "blue"],
+    lensPower: ["-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00", "+2.50"]
   },
   { 
     id: 7, 
@@ -251,7 +264,8 @@ export const productsData = [
     discount: 50, 
     image: "/sun_aviator.png",
     description: "Trendy cat-eye shape for a glamorous look. Available in vibrant colors.",
-    colors: ["pink", "black", "blue", "silver", "grey"]
+    colors: ["pink", "black", "blue", "silver", "grey"],
+    lensPower: ["-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50"]
   },
   { 
     id: 8, 
@@ -268,7 +282,8 @@ export const productsData = [
     discount: 25, 
     image: "/metal_oval.png",
     description: "Premium titanium frame that is rust-resistant and hypoallergenic.",
-    colors: ["grey", "gold", "black", "silver"]
+    colors: ["grey", "gold", "black", "silver"],
+    lensPower: ["-4.00", "-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
 
   { 
@@ -286,7 +301,8 @@ export const productsData = [
     discount: 23, 
     image: "/golden_aviator.png",
     description: "Classic aviator eyeglasses for a bold retro look.",
-    colors: ["black", "gold", "silver", "green", "brown"]
+    colors: ["black", "gold", "silver", "green", "brown"],
+    lensPower: ["-4.00", "-3.00", "-2.00", "-1.00", "0.00", "+1.00", "+2.00", "+3.00", "+4.00"]
   },
   { 
     id: 12, 
@@ -303,7 +319,8 @@ export const productsData = [
     discount: 26, 
     image: "/ultralight_feather.png",
     description: "Incredibly light TR90 material for all-day comfort.",
-    colors: ["blue", "grey", "silver", "black", "gold"]
+    colors: ["blue", "grey", "silver", "black", "gold"],
+    lensPower: ["-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   { 
     id: 13, 
@@ -320,7 +337,8 @@ export const productsData = [
     discount: 22, 
     image: "/mini_round.png",
     description: "Elegant round frames with a minimalist design.",
-    colors: ["pink", "gold", "transparent", "green", "black"]
+    colors: ["pink", "gold", "transparent", "green", "black"],
+    lensPower: ["-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   { 
     id: 14, 
@@ -337,7 +355,8 @@ export const productsData = [
     discount: 33, 
     image: "/bold_square.png",
     description: "Thick square frames for a strong intellectual aesthetic.",
-    colors: ["black", "gold", "brown", "grey"]
+    colors: ["black", "gold", "brown", "grey"],
+    lensPower: ["-4.00", "-3.00", "-2.00", "-1.00", "-0.50", "0.00", "+1.00", "+2.00"]
   },
   { 
     id: 15, 
@@ -354,7 +373,8 @@ export const productsData = [
     discount: 25, 
     image: "/half_rim.png",
     description: "Sophisticated half-rim glasses made from pure titanium.",
-    colors: ["silver", "grey", "red", "brown", "transparent"]
+    colors: ["silver", "grey", "red", "brown", "transparent"],
+    lensPower: ["-4.00", "-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00", "+2.50"]
   },
   { 
     id: 16, 
@@ -371,7 +391,8 @@ export const productsData = [
     discount: 26, 
     image: "/clear_wayfarer.png",
     description: "Trendy transparent wayfarer frames that match any outfit.",
-    colors: ["white", "brown", "pink", "gold"]
+    colors: ["white", "brown", "pink", "gold"],
+    lensPower: ["-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   { 
     id: 17, 
@@ -388,7 +409,8 @@ export const productsData = [
     discount: 28, 
     image: "/sun_aviator.png",
     description: "Vintage round sunglasses for a cool, timeless aesthetic.",
-    colors: ["black", "gold", "transparent", "green", "pink"]
+    colors: ["black", "gold", "transparent", "green", "pink"],
+    lensPower: ["-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   { 
     id: 18, 
@@ -405,7 +427,8 @@ export const productsData = [
     discount: 20, 
     image: "/clear_wayfarer.png",
     description: "High-performance polarized sunglasses for outdoor activities.",
-    colors: ["black", "blue", "pink", "red", "transparent"]
+    colors: ["black", "blue", "pink", "red", "transparent"],
+    lensPower: ["-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   { 
     id: 19, 
@@ -422,7 +445,8 @@ export const productsData = [
     discount: 27, 
     image: "/sun_aviator.png",
     description: "Luxurious oversized sunglasses for a bold fashion statement.",
-    colors: ["brown", "black", "transparent", "red", "blue"]
+    colors: ["brown", "black", "transparent", "red", "blue"],
+    lensPower: ["-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00", "+2.50"]
   },
   { 
     id: 20, 
@@ -439,7 +463,8 @@ export const productsData = [
     discount: 30, 
     image: "/sun1.png",
     description: "Ultra-lightweight shield sunglasses providing maximum UV protection.",
-    colors: ["silver", "grey", "red", "brown", "green"]
+    colors: ["silver", "grey", "red", "brown", "green"],
+    lensPower: ["-4.00", "-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   { 
     id: 21, 
@@ -456,7 +481,8 @@ export const productsData = [
     discount: 28, 
     image: "/sun1.png",
     description: "Classic clubmaster design with premium materials.",
-    colors: ["black", "gold", "pink", "silver", "green"]
+    colors: ["black", "gold", "pink", "silver", "green"],
+    lensPower: ["-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00", "+2.50", "+3.00"]
   },
   { 
     id: 22, 
@@ -473,7 +499,8 @@ export const productsData = [
     discount: 25, 
     image: "/sun_aviator.png",
     description: "Elegant cat-eye sunglasses with tinted gradient lenses.",
-    colors: ["pink", "black", "gold", "transparent", "brown"]
+    colors: ["pink", "black", "gold", "transparent", "brown"],
+    lensPower: ["-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   { 
     id: 23, 
@@ -490,7 +517,8 @@ export const productsData = [
     discount: 25, 
     image: "/lens1.png",
     description: "A special edition premium lens added by user request.",
-    colors: ["black", "blue", "gold", "silver", "brown"]
+    colors: ["black", "blue", "gold", "silver", "brown"],
+    lensPower: ["-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00", "+2.50", "+3.00"]
   },
   { 
     id: 24, 
@@ -507,7 +535,8 @@ export const productsData = [
     discount: 30, 
     image: customAssetImage,
     description: "Featured product added from local assets.",
-    colors: ["grey", "blue", "transparent", "pink"]
+    colors: ["grey", "blue", "transparent", "pink"],
+    lensPower: ["-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   { 
     id: 25, 
@@ -524,7 +553,8 @@ export const productsData = [
     discount: 28, 
     image: "/lens2.png",
     description: "New addition lens 2.",
-    colors: ["black", "gold", "silver", "green"]
+    colors: ["black", "gold", "silver", "green"],
+    lensPower: ["-4.00", "-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00", "+2.50", "+3.00", "+3.50", "+4.00"]
   },
   { 
     id: 26, 
@@ -541,7 +571,8 @@ export const productsData = [
     discount: 28, 
     image: "/lens3.png",
     description: "New addition lens 3.",
-    colors: ["blue", "pink", "gold", "grey"]
+    colors: ["blue", "pink", "gold", "grey"],
+    lensPower: ["-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00", "+2.50", "+3.00"]
   },
   { 
     id: 27, 
@@ -558,7 +589,8 @@ export const productsData = [
     discount: 20, 
     image: "/lens5.png",
     description: "New addition lens 5.",
-    colors: ["red", "silver", "gold", "grey"]
+    colors: ["red", "silver", "gold", "grey"],
+    lensPower: ["-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   { 
     id: 28, 
@@ -575,7 +607,8 @@ export const productsData = [
     discount: 33, 
     image: "/lens6.png",
     description: "New addition lens 6.",
-    colors: ["black", "silver", "gold", "pink"]
+    colors: ["black", "silver", "gold", "pink"],
+    lensPower: ["-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00", "+2.50"]
   },
   { 
     id: 29, 
@@ -592,7 +625,8 @@ export const productsData = [
     discount: 30, 
     image: "/lens8.png",
     description: "New addition lens 8.",
-    colors: ["grey", "black", "green", "red"]
+    colors: ["grey", "black", "green", "red"],
+    lensPower: ["-4.00", "-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00", "+2.50", "+3.00"]
   },
   { 
     id: 30, 
@@ -609,7 +643,8 @@ export const productsData = [
     discount: 31, 
     image: "/lens9.png",
     description: "New addition lens 9.",
-    colors: ["blue", "gold", "brown", "red"]
+    colors: ["blue", "gold", "brown", "red"],
+    lensPower: ["-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   { 
     id: 31, 
@@ -626,7 +661,8 @@ export const productsData = [
     discount: 26, 
     image: "/lens11.png",
     description: "New addition lens 11.",
-    colors: ["brown", "black", "pink", "blue"]
+    colors: ["brown", "black", "pink", "blue"],
+    lensPower: ["-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00", "+2.50"]
   },
   {
     id: 901,
@@ -642,7 +678,8 @@ export const productsData = [
     discount: 40,
     image: "/tortoise_square.png",
     description: "Durable and flexible square glasses for kids. Perfect for school and play.",
-    colors: ["blue", "pink", "black"]
+    colors: ["blue", "pink", "black"],
+    lensPower: ["-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00"]
   },
   {
     id: 902,
@@ -658,7 +695,8 @@ export const productsData = [
     discount: 31,
     image: "/mini_round.png",
     description: "Super cute round glasses for your little ones. Unbreakable TR90 material.",
-    colors: ["red", "blue", "transparent"]
+    colors: ["red", "blue", "transparent"],
+    lensPower: ["-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50"]
   },
   {
     id: 903,
@@ -674,6 +712,7 @@ export const productsData = [
     discount: 28,
     image: "/sun_aviator.png",
     description: "Stylish aviator sunglasses for kids with 100% UV protection.",
-    colors: ["black", "gold", "silver"]
+    colors: ["black", "gold", "silver"],
+    lensPower: ["-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   }
 ];

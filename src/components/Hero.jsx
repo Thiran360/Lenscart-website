@@ -1,14 +1,57 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import "./Hero.css";
 
 const sliderData = [
-  { video: "/slider1.mp4", title: "BEACH CLUB", estText: "EST.", brand: "JOHN 🌴 JACOBS", year: "2024" },
-  { video: "/slider2.mp4", title: "VISION PERFECTED", estText: "PREMIUM", brand: "CRAFTED LENSES", year: "EDITION" },
-  { video: "/slider3.mp4", title: "URBAN CHIC", estText: "NEW", brand: "MODERN FRAMES", year: "STYLE" },
-  { video: "/slider4.mp4", title: "SUMMER VIBES", estText: "HOT", brand: "SUNGLASSES", year: "COLLECTION" },
-  { video: "/slider5.mp4", title: "CLEAR VISION", estText: "TOP", brand: "CONTACT LENSES", year: "QUALITY" },
-  { video: "/slider6.mp4", title: "KIDS FASHION", estText: "FUN", brand: "PLAYFUL FRAMES", year: "TRENDS" }
+  { 
+    id: 1,
+    image: "/hero-1.jpg",
+    title: "ELEGANT EYEGLASSES",
+    estText: "EST.",
+    brand: "JOHN 🌴 JACOBS",
+    year: "2024"
+  },
+  { 
+    id: 2,
+    image: "/hero-2.jpg",
+    title: "SUNGLASSES CLUB",
+    estText: "PREMIUM",
+    brand: "UV PROTECTED SUNGLASSES",
+    year: "EDITION"
+  },
+  { 
+    id: 3,
+    image: "/hero-3.jpg",
+    title: "KIDS GLASSES",
+    estText: "FUN",
+    brand: "PLAYFUL & DURABLE FRAMES",
+    year: "TRENDS"
+  },
+  { 
+    id: 4,
+    image: "/hero-4.jpg",
+    title: "POWER GLASSES",
+    estText: "CUSTOM",
+    brand: "PRECISION PRESCRIPTION LENSES",
+    year: "SERIES"
+  },
+  { 
+    id: 5,
+    image: "/hero-5.jpg",
+    title: "COMPUTER GLASSES",
+    estText: "TOP",
+    brand: "BLUE LIGHT BLOCKING",
+    year: "QUALITY"
+  },
+  { 
+    id: 6,
+    image: "/hero-6.jpg",
+    title: "LUXURY FRAMES",
+    estText: "NEW",
+    brand: "GOLD & AVIATOR COLLECTION",
+    year: "2024"
+  }
 ];
 
 function Hero() {
@@ -17,25 +60,38 @@ function Hero() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % sliderData.length);
-    }, 4000); // Change image every 4 seconds
+    }, 5000); // Change slide every 5 seconds
 
     return () => clearInterval(timer);
   }, []);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % sliderData.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + sliderData.length) % sliderData.length);
+  };
 
   return (
     <section className="hero-banner">
       <div className="hero-overlay"></div>
       
-      {/* Background Video Slider */}
-      <video 
-        src={sliderData[currentSlide].video} 
-        className="hero-bg" 
-        autoPlay
-        muted
-        loop
-        playsInline
-      />
+      {/* 6 Downloaded Local Image Slides with Ken Burns Zoom Animation */}
+      {sliderData.map((slide, index) => (
+        <div 
+          key={slide.id}
+          className={`hero-slide ${currentSlide === index ? 'active' : ''}`}
+        >
+          <img 
+            src={slide.image} 
+            alt={slide.title} 
+            className="hero-slide-img" 
+          />
+        </div>
+      ))}
 
+      {/* Hero Content Overlay */}
       <div className="hero-content-center" key={`content-${currentSlide}`}>
         <h1 className="campaign-title">{sliderData[currentSlide].title}</h1>
         
@@ -50,6 +106,23 @@ function Hero() {
         </Link>
       </div>
 
+      {/* Navigation Arrows */}
+      <button 
+        className="hero-nav-btn prev" 
+        onClick={prevSlide}
+        aria-label="Previous Slide"
+      >
+        <FaChevronLeft />
+      </button>
+      <button 
+        className="hero-nav-btn next" 
+        onClick={nextSlide}
+        aria-label="Next Slide"
+      >
+        <FaChevronRight />
+      </button>
+
+      {/* Carousel Dots */}
       <div className="carousel-dots">
         {sliderData.map((_, index) => (
           <span 

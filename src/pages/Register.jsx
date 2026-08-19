@@ -1,197 +1,126 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import CustomPhoneInput from "../components/CustomPhoneInput";
+import { FaTimes } from "react-icons/fa";
+import "./Login.css";
 
 function Register() {
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [countryInfo, setCountryInfo] = useState(null);
+  const navigate = useNavigate();
 
-  const [showCoupon, setShowCoupon] = useState(false);
+  const handlePhoneChange = (val, countryData) => {
+    setPhone(val);
+    if (countryData) setCountryInfo(countryData);
+  };
 
-  const handleRegister = () => {
-    if (name === "" || email === "" || password === "") {
-      alert("Please fill all fields");
+  const handleGetOtp = (e) => {
+    if (e) e.preventDefault();
+    if (!name.trim()) {
+      alert("Please enter your full name");
+      return;
+    }
+    if (!phone || phone.length < 7) {
+      alert("Please enter a valid mobile phone number");
       return;
     }
 
-    const user = { name, email, password, isVerified: true };
+    const dialCode = countryInfo?.dialCode ? `+${countryInfo.dialCode}` : "+91";
+    const formattedPhone = phone.startsWith("+") ? phone : `${dialCode} ${phone}`;
+    localStorage.setItem("pendingName", name);
+    localStorage.setItem("pendingPhone", formattedPhone);
+    localStorage.setItem("otpFlow", "register");
+    localStorage.setItem("otp", "1234");
 
-    localStorage.setItem("user", JSON.stringify(user));
-    
-    // Show coupon instead of immediately redirecting
-    setShowCoupon(true);
+    navigate("/verify-otp");
   };
+
+  const isFormValid = Boolean(name.trim().length > 0 && phone && phone.trim().length >= 7);
 
   return (
     <>
       <Navbar />
-
-      <div
-        style={{
-          maxWidth: "400px",
-          width: "90%",
-          margin: "40px auto",
-          padding: "20px",
-          background: "#fff",
-          borderRadius: "10px",
-          boxShadow: "0 2px 10px rgba(0,0,0,.2)",
-          boxSizing: "border-box"
-        }}
-      >
-        <h2>Create Account</h2>
-
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginTop: "15px",
-            boxSizing: "border-box",
-            fontSize: "14px"
-          }}
-        />
-
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginTop: "15px",
-            boxSizing: "border-box",
-            fontSize: "14px"
-          }}
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginTop: "15px",
-            boxSizing: "border-box",
-            fontSize: "14px"
-          }}
-        />
-
-        <button
-          onClick={handleRegister}
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginTop: "20px",
-            background: "#3A2415",
-            color: "#fff",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "15px",
-            fontWeight: "bold",
-          }}
-        >
-          Sign Up
-        </button>
-
-        <p
-          style={{
-            textAlign: "center",
-            marginTop: "15px",
-            fontSize: "14px",
-            lineHeight: "1.6"
-          }}
-        >
-          Already have an account?{" "}
-          <Link
-            to="/login"
-            style={{
-              color: "#3A2415",
-              textDecoration: "none",
-              fontWeight: "bold",
-            }}
-          >
-            Login
-          </Link>
-        </p>
-      </div>
-
-      {showCoupon && (
-        <div style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: "rgba(0,0,0,0.6)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 1000
-        }}>
-          <div style={{
-            background: "#fff",
-            padding: "40px",
-            borderRadius: "16px",
-            textAlign: "center",
-            maxWidth: "400px",
-            width: "90%",
-            boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-            animation: "slideInText 0.5s ease-out"
-          }}>
-            <h2 style={{ color: "#0d6b6d", marginBottom: "10px", fontSize: "28px" }}>🎉 Welcome! 🎉</h2>
-            <p style={{ color: "#666", marginBottom: "20px", fontSize: "16px", lineHeight: "1.5" }}>
-              Thank you for registering! Here is your exclusive first-time user coupon:
-            </p>
-            <div style={{
-              background: "#ffea00",
-              border: "2px dashed #333",
-              padding: "15px 20px",
-              fontSize: "24px",
-              fontWeight: "900",
-              letterSpacing: "2px",
-              color: "#333",
-              display: "inline-block",
-              marginBottom: "20px",
-              borderRadius: "8px"
-            }}>
-              WELCOME50
-            </div>
-            <p style={{ color: "#0d6b6d", fontWeight: "bold", marginBottom: "30px" }}>
-              Get 50% OFF your first order!
-            </p>
-            <button
-              onClick={() => window.location.href = "/login"}
-              style={{
-                width: "100%",
-                padding: "12px",
-                background: "#0d6b6d",
-                color: "#fff",
-                border: "none",
-                borderRadius: "8px",
-                cursor: "pointer",
-                fontSize: "16px",
-                fontWeight: "bold",
-                transition: "background 0.3s"
-              }}
-              onMouseOver={(e) => e.target.style.background = "#094d4f"}
-              onMouseOut={(e) => e.target.style.background = "#0d6b6d"}
-            >
-              Claim & Login
-            </button>
+      <div className="login-page-wrapper">
+        <div className="login-split-container">
+          
+          <div className="login-image-side">
+            <span className="badge">JOIN LENSKART CLUB</span>
+            <h4>Exclusive Benefits & Offers</h4>
+            <h1>
+              <span>Create Account</span>
+              Experience The Future Of Eyewear
+            </h1>
+            <p>Get exclusive first-time user discounts, 3D Virtual Try-On access, and 1-Year warranty on all frames.</p>
           </div>
-        </div>
-      )}
 
-      <Footer />
+          <div className="login-form-side">
+            <button className="login-close-btn" onClick={() => navigate("/")} aria-label="Close">
+              <FaTimes />
+            </button>
+            
+            <h2>Create Your Account</h2>
+            <p style={{ textAlign: "center", color: "#666", marginTop: "-25px", marginBottom: "30px", fontSize: "14px" }}>
+              Quick 1-step signup with Mobile OTP
+            </p>
+
+            <form onSubmit={handleGetOtp}>
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#3A2415", marginBottom: "6px" }}>
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter Full Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "14px 18px",
+                    borderRadius: "10px",
+                    border: "1.5px solid #e0e0e0",
+                    fontSize: "15px",
+                    outline: "none",
+                    boxSizing: "border-box",
+                    transition: "border-color 0.3s"
+                  }}
+                  required
+                />
+              </div>
+
+              <div style={{ marginBottom: "30px" }}>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#3A2415", marginBottom: "6px" }}>
+                  Select Country & Mobile Number
+                </label>
+                <CustomPhoneInput
+                  value={phone}
+                  onChange={handlePhoneChange}
+                  defaultCountry="in"
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                className={`login-btn ${!isFormValid ? 'disabled' : ''}`}
+                disabled={!isFormValid}
+              >
+                Get OTP
+              </button>
+            </form>
+
+            <p className="login-footer-text">
+              Already have an account?{" "}
+              <Link to="/login" style={{ color: "#0d6b6d", fontWeight: "bold" }}>
+                Login Here
+              </Link>
+            </p>
+          </div>
+
+        </div>
+      </div>
     </>
   );
 }
 
 export default Register;
-

@@ -2,6 +2,11 @@ import { useState, useEffect } from "react";
 import { FaChevronDown, FaChevronUp, FaSortAmountDown, FaFilter } from "react-icons/fa";
 import "./Filter.css";
 
+const LENS_POWER_OPTIONS = [
+  "-4.00", "-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50",
+  "0.00", "+0.50", "+1.00", "+1.50", "+2.00", "+2.50", "+3.00", "+3.50", "+4.00"
+];
+
 function Filter({ filters, onApplyFilters, sortOrder, onSortChange, onTry3dToggle }) {
   const [openAccordion, setOpenAccordion] = useState("Gender"); // Default open
   const [localFilters, setLocalFilters] = useState(filters);
@@ -20,7 +25,7 @@ function Filter({ filters, onApplyFilters, sortOrder, onSortChange, onTry3dToggl
   const handleCheckboxChange = (category, value) => {
     setLocalFilters(prev => {
       const currentValues = prev[category] || [];
-      const newValues = currentValues.includes(value) 
+      const newValues = currentValues.includes(value)
         ? currentValues.filter(v => v !== value)
         : [...currentValues, value];
       const updatedFilters = { ...prev, [category]: newValues };
@@ -50,9 +55,9 @@ function Filter({ filters, onApplyFilters, sortOrder, onSortChange, onTry3dToggl
       <div className="filter-header">
         <FaSortAmountDown className="sort-icon" />
         <h3 className="filter-title-text">Sort By</h3>
-        <select 
-          className="sort-select" 
-          value={sortOrder} 
+        <select
+          className="sort-select"
+          value={sortOrder}
           onChange={(e) => onSortChange(e.target.value)}
         >
           <option value="Recommended">Recommended</option>
@@ -100,6 +105,12 @@ function Filter({ filters, onApplyFilters, sortOrder, onSortChange, onTry3dToggl
           </div>
           {openAccordion === "Shape" && renderCheckboxes("shape", ["Rectangle", "Round", "Aviator", "Wayfarer", "Cat Eye", "Square", "Oval"])}
 
+          <div className={`accordion-item ${openAccordion === "LensPower" ? "active" : ""}`} onClick={() => toggleAccordion("LensPower")}>
+            <span>Lens Power</span>
+            <span className="chevron">{openAccordion === "LensPower" ? <FaChevronUp /> : <FaChevronDown />}</span>
+          </div>
+          {openAccordion === "LensPower" && renderCheckboxes("lensPower", LENS_POWER_OPTIONS)}
+
           <div className={`accordion-item ${openAccordion === "Size" ? "active" : ""}`} onClick={() => toggleAccordion("Size")}>
             <span>Size</span>
             <span className="chevron">{openAccordion === "Size" ? <FaChevronUp /> : <FaChevronDown />}</span>
@@ -118,7 +129,6 @@ function Filter({ filters, onApplyFilters, sortOrder, onSortChange, onTry3dToggl
           </div>
           {openAccordion === "Price" && renderCheckboxes("price", ["Under ₹2000", "₹2000 - ₹4000", "Above ₹4000"])}
         </div>
-        <button className="apply-btn" onClick={() => onApplyFilters(localFilters)}>View Results</button>
       </div>
     </div>
   );

@@ -24,6 +24,9 @@ function CartItem({ item }) {
             {item.lensDetails.prescription && (
               <p className="cart-item-prescription">
                 Prescription: {item.lensDetails.prescription.method === 'later' ? 'Provide Later' : 'Provided'}
+                {item.lensDetails.prescription.data?.name && ` (${item.lensDetails.prescription.data.name}`}
+                {item.lensDetails.prescription.data?.birthYear && `${item.lensDetails.prescription.data?.name ? ', ' : ' ('}Birth Year: ${item.lensDetails.prescription.data.birthYear}`}
+                {(item.lensDetails.prescription.data?.name || item.lensDetails.prescription.data?.birthYear) && `)`}
               </p>
             )}
           </div>

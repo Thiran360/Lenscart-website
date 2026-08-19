@@ -50,6 +50,49 @@ function Checkout() {
     setStep(2);
   };
 
+  const saveOrderAndAddress = (orderId) => {
+    const newOrder = {
+      id: orderId,
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      status: 'In Transit',
+      total: `₹${Math.round(checkoutTotal)}`,
+      items: checkoutItems.map(item => ({
+        name: item.name || item.title || "Lenskart Eyewear",
+        image: item.image || "/frame-image1.jpg",
+        price: item.price || 2000,
+        color: item.selectedColor || "Black"
+      })),
+      address: {
+        name: `${address.firstName} ${address.lastName}`.trim() || "Valued Customer",
+        phone: address.phone || "",
+        street: address.street || "",
+        city: address.city || "",
+        state: address.state || "",
+        pincode: address.pincode || ""
+      }
+    };
+
+    // Save to order history
+    const existingOrders = JSON.parse(localStorage.getItem("placedOrders")) || [];
+    localStorage.setItem("placedOrders", JSON.stringify([newOrder, ...existingOrders]));
+
+    // Save address
+    if (address.street && address.city) {
+      const existingAddresses = JSON.parse(localStorage.getItem("savedAddresses")) || [];
+      const newAddr = {
+        id: Date.now(),
+        name: `${address.firstName} ${address.lastName}`.trim() || "Delivery Address",
+        phone: address.phone || "",
+        street: address.street || "",
+        city: address.city || "",
+        state: address.state || "",
+        pincode: address.pincode || "",
+        isDefault: existingAddresses.length === 0
+      };
+      localStorage.setItem("savedAddresses", JSON.stringify([newAddr, ...existingAddresses]));
+    }
+  };
+
   const handlePayNow = (e) => {
     e.preventDefault();
     if (checkoutItems.length === 0) {
@@ -58,18 +101,21 @@ function Checkout() {
     }
     
     if (paymentMethod === 'cod') {
-      // Skip gateway for COD
+      const orderId = `LK${Math.floor(10000000 + Math.random() * 90000000)}`;
+      saveOrderAndAddress(orderId);
       clearCart();
-      navigate("/order-confirmed", { state: { orderId: `LK${Math.floor(10000000 + Math.random() * 90000000)}`, total: checkoutTotal } });
+      navigate("/order-confirmed", { state: { orderId, total: checkoutTotal } });
     } else {
       setShowPaymentGateway(true);
     }
   };
 
   const handlePaymentSuccess = () => {
+    const orderId = `LK${Math.floor(10000000 + Math.random() * 90000000)}`;
+    saveOrderAndAddress(orderId);
     setShowPaymentGateway(false);
     clearCart();
-    navigate("/order-confirmed", { state: { orderId: `LK${Math.floor(10000000 + Math.random() * 90000000)}`, total: checkoutTotal } });
+    navigate("/order-confirmed", { state: { orderId, total: checkoutTotal } });
   };
 
   return (

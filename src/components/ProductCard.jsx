@@ -179,12 +179,12 @@ function ProductCard({ product, is3DMode }) {
             boxShadow: '0 4px 10px rgba(13, 107, 109, 0.2)'
           }} onClick={(e) => { 
             e.preventDefault(); 
-            navigate("/checkout", { state: { buyNowProduct: { ...p, selectedColor, quantity: 1 } } });
+            navigate(`/select-lenses/${p.id}`, { state: { product: p, selectedColor, quantity: 1 } });
           }}
           onMouseOver={(e) => { e.target.style.background = '#094d4f'; e.target.style.transform = 'translateY(-2px)'; }}
           onMouseOut={(e) => { e.target.style.background = '#0d6b6d'; e.target.style.transform = 'translateY(0)'; }}
           >
-            BUY NOW
+            SELECT LENSES
           </button>
         </div>
       </div>

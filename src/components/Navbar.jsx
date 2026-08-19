@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FaSearch, FaRegHeart, FaShoppingBag, FaRegUser, FaBars, FaCamera, FaMicrophone } from "react-icons/fa";
+import { FaSearch, FaRegHeart, FaShoppingBag, FaRegUser, FaBars, FaCamera, FaMicrophone, FaSignOutAlt } from "react-icons/fa";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
 
@@ -21,6 +21,8 @@ function Navbar() {
   const urlParams = new URLSearchParams(location.search);
   const currentType = urlParams.get('type');
   const currentSearch = urlParams.get('search');
+  const isBogo = urlParams.get('bogo') === 'true';
+  const currentMaxPrice = urlParams.get('maxPrice');
 
   useEffect(() => {
     const logged = localStorage.getItem("isLoggedIn") === "true";
@@ -28,6 +30,14 @@ function Navbar() {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user && user.name) setUserName(user.name);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setUserName("");
+    navigate("/login");
+  };
 
   const handleSearch = (e) => {
     if (e) e.preventDefault();
@@ -37,7 +47,7 @@ function Navbar() {
       navigate(`/products`);
     }
   };
-  
+
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       handleSearch(e);
@@ -81,34 +91,14 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="nav-left">
-        
-        {/* Hamburger Menu - Navigate directly to Profile */}
-        <div className="hamburger-container">
-          <Link to="/profile" style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
-            <FaBars className="hamburger-icon" />
-          </Link>
-        </div>
 
-        <Link to="/" className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {/* Custom Modern Lens/Eye Logo */}
-          <svg width="34" height="24" viewBox="0 0 100 70" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ color: '#0d6b6d' }}>
-            {/* The Eye Shape */}
-            <path d="M5 35 C 30 5, 70 5, 95 35 C 70 65, 30 65, 5 35 Z" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
-            {/* The Lens / Iris */}
-            <circle cx="50" cy="35" r="16" stroke="currentColor" strokeWidth="6"/>
-            {/* The Pupil / Shutter */}
-            <circle cx="50" cy="35" r="6" fill="currentColor"/>
-            {/* Sparkle / Reflection */}
-            <circle cx="55" cy="28" r="3" fill="#fff"/>
-          </svg>
-          <span style={{ fontSize: '18px', fontWeight: '900', letterSpacing: '1px', whiteSpace: 'nowrap', fontFamily: "'Outfit', 'Poppins', sans-serif" }}>
-            LENS<span style={{ color: '#0d6b6d' }}>HUB</span>
-          </span>
+        <Link to="/" className="logo" style={{ display: 'flex', alignItems: 'center' }}>
+          <img src="/lenskartlogo.png" alt="LensKart" style={{ height: '52px', objectFit: 'contain' }} />
         </Link>
         <ul className="nav-links">
           <li className="category-nav-item">
-            <Link 
-              to="/products?type=eyeglasses" 
+            <Link
+              to="/products?type=eyeglasses"
               className={currentType === 'eyeglasses' ? 'active-nav-box' : ''}
               onClick={(e) => { if (window.innerWidth <= 900) e.preventDefault(); }}
             >
@@ -116,8 +106,8 @@ function Navbar() {
             </Link>
           </li>
           <li className="category-nav-item">
-            <Link 
-              to="/products?type=sunglasses" 
+            <Link
+              to="/products?type=sunglasses"
               className={currentType === 'sunglasses' ? 'active-nav-box' : ''}
               onClick={(e) => { if (window.innerWidth <= 900) e.preventDefault(); }}
             >
@@ -125,8 +115,8 @@ function Navbar() {
             </Link>
           </li>
           <li className="category-nav-item">
-            <Link 
-              to="/products?search=kids" 
+            <Link
+              to="/products?search=kids"
               className={currentSearch === 'kids' ? 'active-nav-box' : ''}
               onClick={(e) => { if (window.innerWidth <= 900) e.preventDefault(); }}
             >
@@ -134,19 +124,24 @@ function Navbar() {
             </Link>
           </li>
           <li className="category-nav-item has-dropdown">
-            <Link to="/products?bogo=true" className="nav-dropdown-trigger" style={{textDecoration: 'none'}}>
-              BOGO SHOP <span style={{fontSize: '10px', marginLeft: '4px', background: '#0d6b6d', color: '#fff', padding: '2px 6px', borderRadius: '4px', letterSpacing: '0'}}>BUY 1 GET 1</span>
+            <Link
+              to="/products?bogo=true"
+              className={`nav-dropdown-trigger ${isBogo ? 'active-nav-box' : ''}`}
+              style={{ textDecoration: 'none' }}
+              onClick={(e) => { if (window.innerWidth <= 900) e.preventDefault(); }}
+            >
+              BUY 1 GET 1 SHOP
             </Link>
             <div className="nav-dropdown-menu mega-menu">
               <div className="mega-menu-ad">
                 <div className="ad-content">
                   <h4>BOGO SALE</h4>
-                  <h2>BUY 1<br/>GET 1<br/>FREE</h2>
+                  <h2>BUY 1<br />GET 1<br />FREE</h2>
                   <p>On all premium frames</p>
                 </div>
               </div>
               <div className="mega-menu-links">
-                <h5 style={{margin: '0 0 10px 16px', color: '#888', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px'}}>Shop By Category</h5>
+                <h5 style={{ margin: '0 0 10px 16px', color: '#888', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px' }}>Shop By Category</h5>
                 <Link to="/products?gender=Men&bogo=true">
                   <span className="link-icon">👨</span> Men's Collection
                 </Link>
@@ -159,29 +154,38 @@ function Navbar() {
               </div>
             </div>
           </li>
+          <li className="category-nav-item">
+            <Link
+              to="/products?maxPrice=1200"
+              className={currentMaxPrice === '1200' ? 'active-nav-box' : ''}
+              onClick={(e) => { if (window.innerWidth <= 900) e.preventDefault(); }}
+            >
+              ₹1200 STORE
+            </Link>
+          </li>
         </ul>
       </div>
-        <div className="nav-right">
+      <div className="nav-right">
         <div className="search-box">
           <FaSearch className="search-icon" onClick={handleSearch} style={{ cursor: 'pointer' }} />
-          <input 
-            type="text" 
-            placeholder='Search "unbreakable glasses for kids"' 
-            style={{ flex: 1 }} 
+          <input
+            type="text"
+            placeholder='Search "unbreakable glasses for kids"'
+            style={{ flex: 1 }}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={handleKeyDown}
           />
           <div className="search-extra-icons">
-            <FaMicrophone 
-              className="search-action-icon" 
-              title="Voice Search" 
+            <FaMicrophone
+              className="search-action-icon"
+              title="Voice Search"
               onClick={handleVoiceSearch}
               style={{ color: isListening ? '#ff4d4f' : '#3A2415', cursor: 'pointer' }}
             />
-            <FaCamera 
-              className="search-action-icon" 
-              title="Virtual Try-On" 
+            <FaCamera
+              className="search-action-icon"
+              title="Virtual Try-On"
               onClick={() => setIsTryOnOpen(true)}
               style={{ color: '#3A2415', cursor: 'pointer', marginLeft: '10px' }}
             />
@@ -195,24 +199,68 @@ function Navbar() {
             )}
           </Link>
 
-          {isLoggedIn ? (
-            <Link to="/profile" className="nav-profile-badge" title="My Profile">
-              <span className="avatar-circle">
-                {userName ? userName.charAt(0).toUpperCase() : 'U'}
-              </span>
-              <span className="user-name-text">{userName || 'Profile'}</span>
-            </Link>
-          ) : (
-            <Link to="/login" className="nav-icon-link" title="Login / Register">
-              <FaRegUser />
-            </Link>
-          )}
+          <div className="profile-dropdown-container">
+            {isLoggedIn ? (
+              <Link to="/profile" className="nav-profile-badge" title="My Profile">
+                <span className="avatar-circle">
+                  {userName ? userName.charAt(0).toUpperCase() : 'U'}
+                </span>
+                <span className="user-name-text">{userName || 'Profile'}</span>
+              </Link>
+            ) : (
+              <Link to="/login" className="nav-icon-link" title="Account">
+                <FaRegUser />
+              </Link>
+            )}
+
+            <div className="profile-dropdown-menu">
+              {isLoggedIn ? (
+                <>
+                  <div className="profile-dropdown-header">
+                    <div className="dropdown-user-name">👋 Hi, {userName || 'User'}</div>
+                    <div className="dropdown-user-sub">Welcome back to Mr. Lens Maker</div>
+                  </div>
+                  <div className="profile-dropdown-divider"></div>
+                  <Link to="/profile?tab=profile" className="profile-dropdown-item">
+                    👤 My Profile
+                  </Link>
+                  <Link to="/profile?tab=orders" className="profile-dropdown-item">
+                    📦 Order History
+                  </Link>
+                  <Link to="/profile?tab=address" className="profile-dropdown-item">
+                    🏠 Saved Addresses
+                  </Link>
+                  <Link to="/profile?tab=prescriptions" className="profile-dropdown-item">
+                    📜 My Prescriptions
+                  </Link>
+                  <div className="profile-dropdown-divider"></div>
+                  <button onClick={handleLogout} className="profile-dropdown-logout-btn" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <FaSignOutAlt style={{ color: '#ff4d4f', fontSize: '15px' }} /> Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="profile-dropdown-header">
+                    <div className="dropdown-user-name">Welcome Guest</div>
+                    <div className="dropdown-user-sub">Login to access your profile & orders</div>
+                  </div>
+                  <div className="profile-dropdown-divider"></div>
+                  <Link to="/login" className="profile-dropdown-action-btn primary">
+                    Login
+                  </Link>
+                  <Link to="/register" className="profile-dropdown-action-btn secondary">
+                    Register / Sign Up
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
-      <VirtualTryOn 
-        isOpen={isTryOnOpen} 
-        onClose={() => setIsTryOnOpen(false)} 
+      <VirtualTryOn
+        isOpen={isTryOnOpen}
+        onClose={() => setIsTryOnOpen(false)}
       />
     </nav>
   );

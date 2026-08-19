@@ -8,7 +8,7 @@ import "./ProductsLayout.css";
 
 function Products() {
   const [activeTab, setActiveTab] = useState("All");
-  const [filters, setFilters] = useState({ gender: [], brand: [], shape: [], size: [], color: [], price: [], material: [], bestSellers: [], sales: [] });
+  const [filters, setFilters] = useState({ gender: [], brand: [], shape: [], size: [], color: [], price: [], material: [], bestSellers: [], sales: [], lensPower: [] });
   const [sortOrder, setSortOrder] = useState("Recommended");
   const [is3DMode, setIs3DMode] = useState(false);
   
@@ -25,17 +25,20 @@ function Products() {
 
   useEffect(() => {
     setActiveTab("All");
-    setFilters({ gender: [], brand: [], shape: [], size: [], color: [], price: [], material: [], bestSellers: [], sales: [] });
+    setFilters({ gender: [], brand: [], shape: [], size: [], color: [], price: [], material: [], bestSellers: [], sales: [], lensPower: [] });
   }, [filterType]);
 
   const isBogoShop = searchParams.get("bogo") === "true";
   const isKidsClub = searchQuery === "kids";
+  const maxPriceQuery = searchParams.get("maxPrice");
+  const is1200Store = maxPriceQuery === "1200";
 
-  const getCategoryStats = (type, bogo, kids) => {
+  const getCategoryStats = (type, bogo, kids, is1200) => {
     let items = productsData;
     if (type) items = items.filter(p => p.type === type);
     if (kids) items = items.filter(p => p.category?.toLowerCase().includes('kids') || p.name?.toLowerCase().includes('kids'));
-    
+    if (is1200) items = items.filter(p => p.price <= 1200);
+
     if (!items.length) return { minPrice: 1000, maxPrice: 5000, maxDiscount: 50 };
     const minPrice = Math.min(...items.map(p => p.price));
     const maxPrice = Math.max(...items.map(p => p.price));
@@ -43,12 +46,13 @@ function Products() {
     return { minPrice, maxPrice, maxDiscount };
   };
 
-  const showBanner = filterType || isKidsClub || isBogoShop;
-  const categoryStats = showBanner ? getCategoryStats(filterType, isBogoShop, isKidsClub) : null;
+  const showBanner = filterType || isKidsClub || isBogoShop || is1200Store;
+  const categoryStats = showBanner ? getCategoryStats(filterType, isBogoShop, isKidsClub, is1200Store) : null;
 
-  const getCategoryTitle = (type, bogo, kids) => {
-    if (bogo) return 'BOGO Exclusive';
+  const getCategoryTitle = (type, bogo, kids, is1200) => {
+    if (bogo) return 'Buy 1 Get 1 Exclusive';
     if (kids) return 'Kids Club';
+    if (is1200) return '₹1200 Store';
     switch (type) {
       case 'eyeglasses': return 'Eyeglasses';
       case 'sunglasses': return 'Sunglasses';
@@ -63,6 +67,14 @@ function Products() {
   // 0. URL Query Filter (Eyeglasses vs Sunglasses)
   if (filterType) {
     processedProducts = processedProducts.filter(p => p.type === filterType);
+  }
+
+  // 0.2 Max Price Filter (e.g. ₹1200 Store)
+  if (maxPriceQuery) {
+    const maxVal = Number(maxPriceQuery);
+    if (!isNaN(maxVal)) {
+      processedProducts = processedProducts.filter(p => p.price <= maxVal);
+    }
   }
 
   // 0.5 Search Query Filter
@@ -91,7 +103,7 @@ function Products() {
     processedProducts = processedProducts.filter(p => filters.shape.includes(p.shape));
   }
 
-  // 3. New Sidebar Filters (Size, Color, Price, Material, Best Sellers, Sales)
+  // 3. New Sidebar Filters (Size, Color, Price, Material, Best Sellers, Sales, Lens Power)
   if (filters.size?.length > 0) {
     processedProducts = processedProducts.filter(p => filters.size.includes(p.size));
   }
@@ -127,6 +139,12 @@ function Products() {
     processedProducts = processedProducts.filter(p => p.material && filters.material.includes(p.material));
   }
 
+  if (filters.lensPower?.length > 0) {
+    processedProducts = processedProducts.filter(p => 
+      p.lensPower && Array.isArray(p.lensPower) && filters.lensPower.some(power => p.lensPower.includes(power))
+    );
+  }
+
   // 3. Sorting
   if (sortOrder === "Price: Low to High") {
     processedProducts.sort((a, b) => a.price - b.price);
@@ -154,7 +172,7 @@ function Products() {
             <div className={`category-offer-banner ${isBogoShop ? 'bogo-poster-banner' : ''}`}>
               <div className="banner-content">
                 <div className="banner-badge">🎉 {isBogoShop ? "MEGA BOGO SALE" : isKidsClub ? "Kids Special Offer" : "Limited Time Offer"}</div>
-                <h2>{isBogoShop ? "BUY 1 GET 1 FREE" : `Explore Our ${getCategoryTitle(filterType, isBogoShop, isKidsClub)} Collection`}</h2>
+                <h2>{isBogoShop ? "BUY 1 GET 1 FREE" : `Explore Our ${getCategoryTitle(filterType, isBogoShop, isKidsClub, is1200Store)} Collection`}</h2>
                 <div className="offer-details">
                   <span className="offer-highlight">{isBogoShop ? "Mix & Match Any Frames" : `Up To ${categoryStats.maxDiscount}% OFF!`}</span>
                 </div>

@@ -4,43 +4,43 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(0, 0, 0, 0.85);
   z-index: 10000;
   display: flex;
   justify-content: center;
   align-items: center;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(8px);
 }
 
 .tryon-container {
   width: 100%;
-  max-width: 900px;
-  height: 90vh;
-  background: #111;
+  max-width: 960px;
+  height: 92vh;
+  background: #121212;
   border-radius: 20px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   position: relative;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .tryon-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 25px;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 14px 24px;
+  background: rgba(255, 255, 255, 0.04);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .tryon-header h2 {
-  color: #fff;
+  color: #ffffff;
   margin: 0;
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 600;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 .close-btn {
@@ -59,13 +59,14 @@
 
 .close-btn:hover {
   background: #F6F1E8;
+  color: #111;
   transform: scale(1.1);
 }
 
 .tryon-view-area {
   flex: 1;
   position: relative;
-  background: #000;
+  background: #181818;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -76,20 +77,42 @@
   width: 100%;
   height: 100%;
   position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #181818;
 }
 
-.hidden-webcam {
+/* Natural Brightness Video Stream — bright, clear professional camera feed */
+.tryon-video {
   position: absolute;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.output-canvas {
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  z-index: 1;
+  opacity: 1 !important;
+  filter: brightness(1.25) contrast(1.05) saturate(1.05) !important;
+  mix-blend-mode: normal !important;
+}
+
+/* Transparent 3D Three.js Overlay Layer directly over camera video */
+.tryon-three-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.tryon-webgl-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .captured-image-container {
@@ -98,6 +121,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  background: #111;
 }
 
 .captured-image {
@@ -112,7 +136,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(15, 15, 15, 0.75);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -124,7 +148,7 @@
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid rgba(255, 255, 255, 0.3);
+  border: 4px solid rgba(255, 255, 255, 0.2);
   border-top-color: #329999; /* Lenskart teal */
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -151,8 +175,8 @@
   height: 50px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   color: white;
   font-size: 20px;
   display: flex;
@@ -160,6 +184,7 @@
   align-items: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
 .tool-btn:hover {
@@ -185,16 +210,35 @@
   background: #45a049;
 }
 
+.tryon-reset-btn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 5px 0;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.tryon-reset-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
 .tryon-footer {
-  padding: 15px 20px;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.04);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   height: 140px;
 }
 
 .tryon-footer h3 {
   color: #ccc;
-  font-size: 14px;
+  font-size: 13px;
   margin: 0 0 10px 0;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -259,7 +303,7 @@
   width: 100%;
 }
 
-/* Responsive */
+/* Responsive Layout */
 @media (max-width: 768px) {
   .tryon-container {
     height: 100vh;
@@ -267,15 +311,23 @@
   }
   
   .tryon-toolbar {
-    right: 50%;
+    right: 20px;
     top: auto;
-    bottom: 20px;
-    transform: translateX(50%);
-    flex-direction: row;
+    bottom: 150px;
+    transform: none;
+    flex-direction: column;
+    gap: 10px;
   }
   
   .tryon-footer {
-    height: 120px;
-    padding-bottom: 70px; /* Space for toolbar */
+    height: 130px;
+  }
+  
+  .tryon-controls {
+    top: 10px !important;
+    left: 10px !important;
+    width: 140px !important;
+    padding: 8px 12px !important;
   }
 }
+

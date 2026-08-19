@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { FaUser, FaBoxOpen, FaGlasses, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
+import { FaUser, FaBoxOpen, FaGlasses, FaHome, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./Profile.css";
 import PrescriptionManager from "../components/PrescriptionManager";
 import OrderHistory from "../components/OrderHistory";
+import AddressManager from "../components/AddressManager";
 
 function Profile() {
   const location = useLocation();
@@ -19,19 +20,30 @@ function Profile() {
   const [editEmail, setEditEmail] = useState(savedUser.email || "");
   const navigate = useNavigate();
 
+  const changeTab = (tabName) => {
+    setActiveTab(tabName);
+    navigate(`/profile?tab=${tabName}`, { replace: true });
+  };
+
   useEffect(() => {
-    // If the URL changes (e.g. from navbar click), update the tab
-    const tab = new URLSearchParams(location.search).get("tab");
-    if (tab) setActiveTab(tab);
+    const tab = new URLSearchParams(location.search).get("tab") || "profile";
+    setActiveTab(tab);
   }, [location.search]);
 
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("currentUser");
-    navigate("/");
+    localStorage.removeItem("user");
+    navigate("/login");
   };
 
+  const isProfileValid = Boolean(
+    editName?.trim() && 
+    editEmail?.trim() && 
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editEmail.trim())
+  );
+
   const handleUpdateProfile = () => {
+    if (!isProfileValid) return;
     const updatedUser = { ...savedUser, name: editName, email: editEmail };
     localStorage.setItem("user", JSON.stringify(updatedUser));
     setSavedUser(updatedUser);
@@ -49,25 +61,31 @@ function Profile() {
             <FaUserCircle size={45} color="#3A2415" />
             <div>
               <h3 style={{ margin: 0, color: "#6E4B34", fontSize: "14px", fontWeight: "normal" }}>Welcome back,</h3>
-              <h2 style={{ margin: "2px 0 0 0", color: "#3A2415", fontSize: "20px" }}>{savedUser.name || "Guest"}</h2>
+              <h2 style={{ margin: "2px 0 0 0", color: "#3A2415", fontSize: "20px" }}>{savedUser.name || "User"}</h2>
             </div>
           </div>
           
           <div 
             className={`sidebar-item ${activeTab === 'profile' ? 'active' : ''}`}
-            onClick={() => setActiveTab('profile')}
+            onClick={() => changeTab('profile')}
           >
             <FaUser className="sidebar-icon" /> My Profile
           </div>
           <div 
             className={`sidebar-item ${activeTab === 'orders' ? 'active' : ''}`}
-            onClick={() => setActiveTab('orders')}
+            onClick={() => changeTab('orders')}
           >
-            <FaBoxOpen className="sidebar-icon" /> My Orders
+            <FaBoxOpen className="sidebar-icon" /> Order History
+          </div>
+          <div 
+            className={`sidebar-item ${activeTab === 'address' ? 'active' : ''}`}
+            onClick={() => changeTab('address')}
+          >
+            <FaHome className="sidebar-icon" /> Saved Addresses
           </div>
           <div 
             className={`sidebar-item ${activeTab === 'prescriptions' ? 'active' : ''}`}
-            onClick={() => setActiveTab('prescriptions')}
+            onClick={() => changeTab('prescriptions')}
           >
             <FaGlasses className="sidebar-icon" /> My Prescriptions
           </div>
@@ -87,17 +105,17 @@ function Profile() {
               
               <div className="form-grid" style={{ maxWidth: '600px', marginTop: '30px' }}>
                 <div style={{ marginBottom: 25 }}>
-                  <label style={{ display: 'block', color: "#6E4B34", marginBottom: 8, fontSize: '14px', fontWeight: 'bold' }}>Full Name</label>
+                  <label style={{ display: 'block', color: "#6E4B34", marginBottom: 8, fontSize: '14px', fontWeight: 'bold' }}>Full Name *</label>
                   <input 
                     type="text" 
                     value={editName} 
-                    onChange={(e) => setEditName(e.target.value)}
+                    onChange={(e) => setEditName(e.target.value.replace(/[^a-zA-Z\s]/g, ""))}
                     className="prof-input editable-input"
                     placeholder="Enter your full name"
                   />
                 </div>
                 <div style={{ marginBottom: 25 }}>
-                  <label style={{ display: 'block', color: "#6E4B34", marginBottom: 8, fontSize: '14px', fontWeight: 'bold' }}>Email Address</label>
+                  <label style={{ display: 'block', color: "#6E4B34", marginBottom: 8, fontSize: '14px', fontWeight: 'bold' }}>Email Address *</label>
                   <input 
                     type="email" 
                     value={editEmail} 
@@ -107,17 +125,38 @@ function Profile() {
                   />
                 </div>
                 
-                <div style={{ display: 'flex', gap: '15px', marginTop: 10 }}>
-                  <button className="btn-primary" onClick={handleUpdateProfile}>Update Profile</button>
-                  <Link to="/change-password">
-                    <button className="btn-secondary">Change Password</button>
-                  </Link>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 10 }}>
+                  <button 
+                    className="btn-primary" 
+                    onClick={handleUpdateProfile}
+                    disabled={!isProfileValid}
+                    style={{
+                      background: isProfileValid ? '#C5A059' : '#D9C8A9',
+                      color: '#ffffff',
+                      cursor: isProfileValid ? 'pointer' : 'not-allowed',
+                      opacity: isProfileValid ? 1 : 0.6,
+                      padding: '12px 24px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      fontWeight: 'bold',
+                      width: 'fit-content'
+                    }}
+                  >
+                    Update Profile
+                  </button>
+                  {!isProfileValid && (
+                    <span style={{ fontSize: 13, color: '#A07844', fontStyle: 'italic' }}>
+                      * Valid name (letters only) and valid email are required.
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
           )}
 
           {activeTab === 'orders' && <OrderHistory initialAction={initialAction} />}
+
+          {activeTab === 'address' && <AddressManager />}
           
           {activeTab === 'prescriptions' && <PrescriptionManager />}
         </main>
@@ -131,5 +170,3 @@ function Profile() {
 }
 
 export default Profile;
-
-
