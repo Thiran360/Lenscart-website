@@ -163,6 +163,15 @@ function Navbar() {
               ₹1200 STORE
             </Link>
           </li>
+          <li className="category-nav-item">
+            <Link
+              to="/admin"
+              className={location.pathname === '/admin' || location.pathname === '/analytics' ? 'active-nav-box' : ''}
+              onClick={(e) => { if (window.innerWidth <= 900) e.preventDefault(); }}
+            >
+              ADMIN
+            </Link>
+          </li>
         </ul>
       </div>
       <div className="nav-right">
@@ -232,6 +241,9 @@ function Navbar() {
                   </Link>
                   <Link to="/profile?tab=prescriptions" className="profile-dropdown-item">
                     📜 My Prescriptions
+                  </Link>
+                  <Link to="/admin" className="profile-dropdown-item">
+                    📊 Admin Dashboard
                   </Link>
                   <div className="profile-dropdown-divider"></div>
                   <button onClick={handleLogout} className="profile-dropdown-logout-btn" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>

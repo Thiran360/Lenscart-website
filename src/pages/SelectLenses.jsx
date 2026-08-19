@@ -395,7 +395,7 @@ function SelectLenses() {
           <div className="summary-product">
             <img src={product.image} alt={product.name} />
             <div className="summary-details">
-              <h3>{product.brand} - {product.name}</h3>
+              <h3>{product.name}</h3>
               <p>Size: {product.size}</p>
             </div>
           </div>

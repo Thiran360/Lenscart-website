@@ -132,7 +132,6 @@ function ProductCard({ product, is3DMode }) {
       </div>
 
       <div className="card-details">
-        <h3 className="brand-name">{p.brand}</h3>
         <h4 className="product-name">{p.name}</h4>
         
         <div className="color-swatches" style={{ margin: '12px 0', display: 'flex', gap: '8px' }}>
@@ -161,8 +160,6 @@ function ProductCard({ product, is3DMode }) {
         <div className="price-row" style={{ marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span className="current-price">₹{p.price}</span>
-            <span className="old-price">₹{p.oldPrice}</span>
-            <span className="discount">({p.discount}% OFF)</span>
           </div>
           <button className="buy-now-btn" style={{ 
             background: '#0d6b6d', 

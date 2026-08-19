@@ -33,8 +33,11 @@ function Products() {
   const maxPriceQuery = searchParams.get("maxPrice");
   const is1200Store = maxPriceQuery === "1200";
 
+  const customProds = JSON.parse(localStorage.getItem("customProducts") || "[]");
+  const allProductsList = [...customProds, ...productsData];
+
   const getCategoryStats = (type, bogo, kids, is1200) => {
-    let items = productsData;
+    let items = allProductsList;
     if (type) items = items.filter(p => p.type === type);
     if (kids) items = items.filter(p => p.category?.toLowerCase().includes('kids') || p.name?.toLowerCase().includes('kids'));
     if (is1200) items = items.filter(p => p.price <= 1200);
@@ -62,7 +65,7 @@ function Products() {
   };
 
   // Filtering Logic
-  let processedProducts = productsData;
+  let processedProducts = allProductsList;
 
   // 0. URL Query Filter (Eyeglasses vs Sunglasses)
   if (filterType) {
