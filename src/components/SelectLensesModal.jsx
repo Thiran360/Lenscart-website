@@ -273,11 +273,11 @@ function SelectLensesModal({ isOpen, onClose, onConfirm, basePrice }) {
                         {SPH_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                       </select>
                       <select value={rxData.rightCyl} onChange={e => setRxData({...rxData, rightCyl: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '14px' }}>
-                        <option value="">CYL</option>
+                        <option value="">CYL (Optional)</option>
                         {CYL_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                       </select>
                       <select value={rxData.rightAxis} onChange={e => setRxData({...rxData, rightAxis: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '14px' }}>
-                        <option value="">AXIS</option>
+                        <option value="">AXIS (Optional)</option>
                         {AXIS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                       </select>
                     </div>
@@ -290,11 +290,11 @@ function SelectLensesModal({ isOpen, onClose, onConfirm, basePrice }) {
                         {SPH_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                       </select>
                       <select value={rxData.leftCyl} onChange={e => setRxData({...rxData, leftCyl: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '14px' }}>
-                        <option value="">CYL</option>
+                        <option value="">CYL (Optional)</option>
                         {CYL_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                       </select>
                       <select value={rxData.leftAxis} onChange={e => setRxData({...rxData, leftAxis: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '14px' }}>
-                        <option value="">AXIS</option>
+                        <option value="">AXIS (Optional)</option>
                         {AXIS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                       </select>
                     </div>

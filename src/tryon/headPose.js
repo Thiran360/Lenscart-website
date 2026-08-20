@@ -73,9 +73,9 @@ export function computeHeadPose(landmarks, transformMatrix, videoWidth, videoHei
   const faceWidth   = Math.hypot(screenRightTemple.x - screenLeftTemple.x, screenRightTemple.y - screenLeftTemple.y) || 1;
 
   // ── Glasses anchor position ───────────────────────────────────────────────
-  // Sits right on nose bridge at pupil baseline
-  const bridgeX = eyeMidX;
-  const bridgeY = eyeMidY * 0.85 + noseBridge.y * 0.15;
+  // Anchors right on upper nose bridge between eyes (landmark 168)
+  const bridgeX = noseBridge.x * 0.5 + eyeMidX * 0.5;
+  const bridgeY = eyeMidY * 0.68 + noseBridge.y * 0.32;
 
   const cx = videoWidth  / 2;
   const cy = videoHeight / 2;
@@ -83,7 +83,7 @@ export function computeHeadPose(landmarks, transformMatrix, videoWidth, videoHei
   const position = {
     x:  bridgeX - cx,
     y: -(bridgeY - cy), // Three.js Y is UP (+Y)
-    z: -(noseBridge.z * 0.5),
+    z: -(noseBridge.z * 0.35) + 6,
   };
 
   // ── Scale ─────────────────────────────────────────────────────────────────

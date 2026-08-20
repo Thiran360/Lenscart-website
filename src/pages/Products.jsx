@@ -3,7 +3,9 @@ import { useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Filter from "../components/Filter";
 import ProductCard from "../components/ProductCard";
+import VirtualTryOn from "../components/VirtualTryOn";
 import { productsData } from "../data/products";
+import { FaSearchMinus, FaRedo } from "react-icons/fa";
 import "./ProductsLayout.css";
 
 function Products() {
@@ -11,6 +13,17 @@ function Products() {
   const [filters, setFilters] = useState({ gender: [], brand: [], shape: [], size: [], color: [], price: [], material: [], bestSellers: [], sales: [], lensPower: [] });
   const [sortOrder, setSortOrder] = useState("Recommended");
   const [is3DMode, setIs3DMode] = useState(false);
+  
+  // AR Virtual Try-On Modal State
+  const [isTryOnOpen, setIsTryOnOpen] = useState(false);
+  const [tryOnProduct, setTryOnProduct] = useState(null);
+  const [tryOnColor, setTryOnColor] = useState("black");
+
+  const handleOpenTryOn = (product, selectedColor) => {
+    setTryOnProduct(product);
+    setTryOnColor(selectedColor || product?.colors?.[0] || "black");
+    setIsTryOnOpen(true);
+  };
   
   // Use location to get query params (e.g. ?type=sunglasses)
   const location = useLocation();
@@ -249,17 +262,45 @@ function Products() {
 
           <div className="products-grid">
             {processedProducts.length === 0 ? (
-              <div style={{ padding: '40px', width: '100%', textAlign: 'center', color: '#6E4B34' }}>
-                <h3>No products match your filters.</h3>
+              <div className="no-products-container">
+                <div className="no-products-icon-wrapper">
+                  <FaSearchMinus className="no-products-icon" />
+                </div>
+                <h3 className="no-products-title">No products match your filters.</h3>
+                <p className="no-products-subtitle">
+                  We couldn't find any eyewear matching your selected filters or price range. Try adjusting or clearing your filters to explore more options.
+                </p>
+                <button 
+                  type="button" 
+                  className="no-products-reset-btn"
+                  onClick={() => {
+                    setFilters({ gender: [], brand: [], shape: [], size: [], color: [], price: [], material: [], bestSellers: [], sales: [], lensPower: [] });
+                    setActiveTab("All");
+                  }}
+                >
+                  <FaRedo style={{ marginRight: '8px' }} /> Clear All Filters
+                </button>
               </div>
             ) : (
               processedProducts.map((product) => (
-                <ProductCard key={product.id} product={product} is3DMode={is3DMode} />
+                <ProductCard 
+                  key={product.id} 
+                  product={product} 
+                  is3DMode={is3DMode} 
+                  onTryOn={handleOpenTryOn}
+                />
               ))
             )}
           </div>
         </section>
       </div>
+
+      <VirtualTryOn
+        isOpen={isTryOnOpen}
+        onClose={() => setIsTryOnOpen(false)}
+        initialProduct={tryOnProduct}
+        selectedColor={tryOnColor}
+      />
     </div>
   );
 }

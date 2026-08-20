@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaHome, FaPlus, FaTrash, FaCheckCircle } from 'react-icons/fa';
+import './AddressManager.css';
 
 function AddressManager() {
   const [addresses, setAddresses] = useState([]);
@@ -65,30 +66,18 @@ function AddressManager() {
 
   return (
     <div className="address-manager-wrapper">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
+      <div className="address-manager-header">
         <h2 className="dash-header" style={{ margin: 0 }}>Saved Addresses</h2>
         <button 
           onClick={() => setShowAddModal(true)} 
-          style={{
-            background: '#C5A059',
-            color: '#fff',
-            border: 'none',
-            padding: '10px 18px',
-            borderRadius: '8px',
-            fontWeight: '700',
-            fontSize: '13.5px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}
+          className="address-add-btn"
         >
           <FaPlus /> Add New Address
         </button>
       </div>
 
       {addresses.length === 0 ? (
-        <div style={{ background: '#FAF6F0', padding: '40px 20px', borderRadius: '16px', textAlign: 'center', border: '1px dashed #E2D7C5' }}>
+        <div className="empty-address-box">
           <FaHome size={48} color="#C5A059" style={{ marginBottom: '15px' }} />
           <h3 style={{ margin: '0 0 8px 0', color: '#3A2415', fontSize: '18px' }}>No Saved Addresses Found</h3>
           <p style={{ color: '#6E4B34', fontSize: '14px', marginBottom: '20px' }}>
@@ -96,13 +85,14 @@ function AddressManager() {
           </p>
           <button 
             onClick={() => setShowAddModal(true)} 
-            style={{ background: '#C5A059', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+            className="address-add-btn"
+            style={{ margin: '0 auto' }}
           >
             Add Address Now
           </button>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+        <div className="addresses-grid">
           {addresses.map((addr) => (
             <div 
               key={addr.id} 
@@ -153,98 +143,93 @@ function AddressManager() {
 
       {/* Add Address Modal */}
       {showAddModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: '#FAF6F0', borderRadius: '16px', padding: '30px', width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto', border: '1px solid #E2D7C5', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #E2D7C5', paddingBottom: '12px' }}>
-              <h3 style={{ margin: 0, color: '#3A2415', fontSize: '22px', fontFamily: "'Playfair Display', 'Georgia', serif" }}>Add Delivery Address</h3>
+        <div className="address-modal-overlay" onClick={() => setShowAddModal(false)}>
+          <div className="address-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="address-modal-topbar">
+              <h3>Add Delivery Address</h3>
               <button 
-                onClick={() => setShowAddModal(false)} 
-                style={{ background: '#E5DAC9', border: 'none', borderRadius: '50%', width: '32px', height: '32px', fontSize: '18px', cursor: 'pointer', color: '#3A2415', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                type="button"
+                className="address-modal-close"
+                onClick={() => setShowAddModal(false)}
               >
                 ×
               </button>
             </div>
-            <form onSubmit={handleAddAddress} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#3A2415', marginBottom: '4px' }}>Full Name * (Letters only)</label>
+
+            <form onSubmit={handleAddAddress} className="address-modal-body">
+              <div className="form-group">
+                <label className="form-label">Full Name *</label>
                 <input 
                   type="text" 
-                  placeholder="Full Name" 
+                  className="form-input"
+                  placeholder="Full Name (Letters only)" 
                   value={newAddr.name} 
                   onChange={(e) => setNewAddr({ ...newAddr, name: e.target.value.replace(/[^a-zA-Z\s]/g, "") })}
-                  style={{ width: '100%', padding: '12px', border: '1px solid #E2D7C5', borderRadius: '8px', fontSize: '14px', background: '#F4EDE2', color: '#3A2415', boxSizing: 'border-box' }}
                 />
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#3A2415', marginBottom: '4px' }}>Mobile Number (10 digits) *</label>
+
+              <div className="form-group">
+                <label className="form-label">Mobile Number *</label>
                 <input 
                   type="text" 
-                  placeholder="Mobile Number" 
+                  className="form-input"
+                  placeholder="Mobile Number (10 digits)" 
                   value={newAddr.phone} 
                   onChange={(e) => setNewAddr({ ...newAddr, phone: e.target.value.replace(/\D/g, "") })}
                   maxLength={10}
-                  style={{ width: '100%', padding: '12px', border: '1px solid #E2D7C5', borderRadius: '8px', fontSize: '14px', background: '#F4EDE2', color: '#3A2415', boxSizing: 'border-box' }}
                 />
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#3A2415', marginBottom: '4px' }}>Street Address *</label>
+
+              <div className="form-group">
+                <label className="form-label">Street Address *</label>
                 <input 
                   type="text" 
+                  className="form-input"
                   placeholder="Flat / Building / Street Address" 
                   value={newAddr.street} 
                   onChange={(e) => setNewAddr({ ...newAddr, street: e.target.value })}
-                  style={{ width: '100%', padding: '12px', border: '1px solid #E2D7C5', borderRadius: '8px', fontSize: '14px', background: '#F4EDE2', color: '#3A2415', boxSizing: 'border-box' }}
                 />
               </div>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#3A2415', marginBottom: '4px' }}>City * (Letters only)</label>
+
+              <div className="form-row-2col">
+                <div className="form-group">
+                  <label className="form-label">City *</label>
                   <input 
                     type="text" 
+                    className="form-input"
                     placeholder="City" 
                     value={newAddr.city} 
                     onChange={(e) => setNewAddr({ ...newAddr, city: e.target.value.replace(/[^a-zA-Z\s]/g, "") })}
-                    style={{ width: '100%', padding: '12px', border: '1px solid #E2D7C5', borderRadius: '8px', fontSize: '14px', background: '#F4EDE2', color: '#3A2415', boxSizing: 'border-box' }}
                   />
                 </div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#3A2415', marginBottom: '4px' }}>State * (Letters only)</label>
+                <div className="form-group">
+                  <label className="form-label">State *</label>
                   <input 
                     type="text" 
+                    className="form-input"
                     placeholder="State" 
                     value={newAddr.state} 
                     onChange={(e) => setNewAddr({ ...newAddr, state: e.target.value.replace(/[^a-zA-Z\s]/g, "") })}
-                    style={{ width: '100%', padding: '12px', border: '1px solid #E2D7C5', borderRadius: '8px', fontSize: '14px', background: '#F4EDE2', color: '#3A2415', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#3A2415', marginBottom: '4px' }}>Pincode (6 digits) *</label>
+
+              <div className="form-group">
+                <label className="form-label">Pincode *</label>
                 <input 
                   type="text" 
-                  placeholder="Pincode" 
+                  className="form-input"
+                  placeholder="Pincode (6 digits)" 
                   value={newAddr.pincode} 
                   onChange={(e) => setNewAddr({ ...newAddr, pincode: e.target.value.replace(/\D/g, "") })}
                   maxLength={6}
-                  style={{ width: '100%', padding: '12px', border: '1px solid #E2D7C5', borderRadius: '8px', fontSize: '14px', background: '#F4EDE2', color: '#3A2415', boxSizing: 'border-box' }}
                 />
               </div>
               
               <button 
                 type="submit" 
                 disabled={!isAddrValid}
-                style={{ 
-                  background: isAddrValid ? '#C5A059' : '#D9C8A9', 
-                  color: '#fff', 
-                  border: 'none', 
-                  padding: '14px', 
-                  borderRadius: '8px', 
-                  fontWeight: 'bold', 
-                  fontSize: '15px', 
-                  cursor: isAddrValid ? 'pointer' : 'not-allowed', 
-                  opacity: isAddrValid ? 1 : 0.6,
-                  marginTop: '10px' 
-                }}
+                className="modal-submit-btn"
               >
                 Save Address
               </button>

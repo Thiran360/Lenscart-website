@@ -62,8 +62,8 @@ function createFrameMaterial(color) {
   const metal = isMetalColor(color);
   return new THREE.MeshStandardMaterial({
     color,
-    metalness: metal ? 0.85 : 0.08,
-    roughness: metal ? 0.22 : 0.38,
+    metalness: metal ? 0.85 : 0.12,
+    roughness: metal ? 0.22 : 0.32,
   });
 }
 
@@ -72,23 +72,123 @@ function createLensMaterial(isSunglasses, sunTintColor) {
     return new THREE.MeshStandardMaterial({
       color: sunTintColor ?? 0x0a1018,
       transparent: true,
-      opacity: 0.65,
+      opacity: 0.68,
       depthWrite: false,
       side: THREE.DoubleSide,
       metalness: 0.1,
-      roughness: 0.08,
+      roughness: 0.05,
     });
   }
-  // Clear optical lens: subtle glass tint, 100% pupil/face visibility
+  // Clear optical lens: subtle AR coating cyan/blue tint, 100% pupil/face visibility
   return new THREE.MeshStandardMaterial({
-    color: 0xd0e8ff,
+    color: 0xd0f0ff,
     transparent: true,
-    opacity: 0.10,
+    opacity: 0.14,
     depthWrite: false,
     side: THREE.DoubleSide,
     metalness: 0.0,
-    roughness: 0.05,
+    roughness: 0.03,
   });
+}
+
+// ─── Dynamic Canvas Textures for Photorealism ─────────────────────────────────
+
+let cachedShadowTexture = null;
+function getShadowTexture() {
+  if (cachedShadowTexture) return cachedShadowTexture;
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+
+  // Dual radial shadow (soft drop shadows under left and right lenses/bridge)
+  const gradL = ctx.createRadialGradient(160, 128, 10, 160, 128, 140);
+  gradL.addColorStop(0, 'rgba(0, 0, 0, 0.45)');
+  gradL.addColorStop(0.5, 'rgba(0, 0, 0, 0.18)');
+  gradL.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = gradL;
+  ctx.beginPath();
+  ctx.arc(160, 128, 140, 0, Math.PI * 2);
+  ctx.fill();
+
+  const gradR = ctx.createRadialGradient(352, 128, 10, 352, 128, 140);
+  gradR.addColorStop(0, 'rgba(0, 0, 0, 0.45)');
+  gradR.addColorStop(0.5, 'rgba(0, 0, 0, 0.18)');
+  gradR.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = gradR;
+  ctx.beginPath();
+  ctx.arc(352, 128, 140, 0, Math.PI * 2);
+  ctx.fill();
+
+  cachedShadowTexture = new THREE.CanvasTexture(canvas);
+  return cachedShadowTexture;
+}
+
+let cachedGlareTexture = null;
+function getGlareTexture() {
+  if (cachedGlareTexture) return cachedGlareTexture;
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+
+  // Anti-reflective glare sheen across glass
+  const grad = ctx.createLinearGradient(0, 0, 256, 256);
+  grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+  grad.addColorStop(0.40, 'rgba(255, 255, 255, 0.05)');
+  grad.addColorStop(0.50, 'rgba(255, 255, 255, 0.35)');
+  grad.addColorStop(0.60, 'rgba(255, 255, 255, 0.05)');
+  grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 256, 256);
+
+  cachedGlareTexture = new THREE.CanvasTexture(canvas);
+  return cachedGlareTexture;
+}
+
+function createFacialDropShadowMesh() {
+  const geo = new THREE.PlaneGeometry(2.4, 1.2);
+  const mat = new THREE.MeshBasicMaterial({
+    map: getShadowTexture(),
+    transparent: true,
+    opacity: 0.40,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+  });
+  const shadowMesh = new THREE.Mesh(geo, mat);
+  shadowMesh.position.set(0, -0.05, -0.04);
+  shadowMesh.name = 'face-drop-shadow';
+  return shadowMesh;
+}
+
+function createGlassReflectionMesh(centerX, radius, isSunglasses, sunTint) {
+  const group = new THREE.Group();
+  group.position.set(centerX, 0, 0.008);
+
+  // Curved Glass Lens Base
+  const lensGeo = new THREE.SphereGeometry(radius * 1.1, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.42);
+  const lensMat = createLensMaterial(isSunglasses, sunTint);
+  const lensMesh = new THREE.Mesh(lensGeo, lensMat);
+  lensMesh.rotation.x = Math.PI / 2;
+  lensMesh.scale.z = 0.25;
+  group.add(lensMesh);
+
+  // Anti-reflective Specular Glare Ring
+  const glareGeo = new THREE.PlaneGeometry(radius * 2.1, radius * 2.1);
+  const glareMat = new THREE.MeshBasicMaterial({
+    map: getGlareTexture(),
+    transparent: true,
+    opacity: isSunglasses ? 0.35 : 0.55,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+    blending: THREE.AdditiveBlending,
+  });
+  const glareMesh = new THREE.Mesh(glareGeo, glareMat);
+  glareMesh.position.set(0, 0, 0.003);
+  group.add(glareMesh);
+
+  return group;
 }
 
 // ─── Lens Shape Paths (Centered at pupil origin 0,0) ───────────────────────────
@@ -102,7 +202,6 @@ function buildLensPath(profile) {
       return shape;
     }
     case 'aviator': {
-      // Classic Aviator teardrop shape
       const shape = new THREE.Shape();
       const w = r * 1.05;
       const h = r * 0.95;
@@ -148,7 +247,6 @@ function buildLensPath(profile) {
       return shape;
     }
     default: {
-      // Rectangle with rounded corners
       const shape = new THREE.Shape();
       const w = r * 1.05;
       const h = r * 0.78;
@@ -180,7 +278,7 @@ function createShapeRim(lensShape, rimRadius, material) {
     'catmullrom',
     0.0
   );
-  const tubeGeo = new THREE.TubeGeometry(curve3D, pts2D.length, rimRadius, 8, true);
+  const tubeGeo = new THREE.TubeGeometry(curve3D, pts2D.length, rimRadius, 10, true);
   return new THREE.Mesh(tubeGeo, material);
 }
 
@@ -190,22 +288,18 @@ function createTempleArm(side, frameMat, hingeX, armLen) {
   const group = new THREE.Group();
   group.name = side < 0 ? 'temple-left' : 'temple-right';
 
-  // Start at hinge (outer edge of front frame).
-  // Curve gently INWARD (-side * offset) to wrap around temples toward ears,
-  // then hook downward at the ear tip.
   const p0 = new THREE.Vector3(hingeX,                  0.005,      0.01);
   const p1 = new THREE.Vector3(hingeX - side * 0.03,   -0.008,     -armLen * 0.30);
   const p2 = new THREE.Vector3(hingeX - side * 0.06,   -0.025,     -armLen * 0.68);
   const p3 = new THREE.Vector3(hingeX - side * 0.08,   -0.075,     -armLen * 0.95);
 
   const curve = new THREE.CatmullRomCurve3([p0, p1, p2, p3], false, 'chordal', 0.5);
-  const tubeRadius = 0.013;
-  const tubeGeo = new THREE.TubeGeometry(curve, 20, tubeRadius, 8, false);
+  const tubeRadius = 0.014;
+  const tubeGeo = new THREE.TubeGeometry(curve, 24, tubeRadius, 8, false);
   const arm = new THREE.Mesh(tubeGeo, frameMat.clone());
   group.add(arm);
 
-  // Hinge joint sphere
-  const hingeGeo = new THREE.SphereGeometry(tubeRadius * 1.3, 8, 8);
+  const hingeGeo = new THREE.SphereGeometry(tubeRadius * 1.3, 10, 10);
   const hinge = new THREE.Mesh(hingeGeo, frameMat.clone());
   hinge.position.copy(p0);
   group.add(hinge);
@@ -217,28 +311,110 @@ function createTempleArm(side, frameMat, hingeX, armLen) {
 
 function createNoseBridge(leftInnerX, rightInnerX, bridgeY, frameMat) {
   const span = rightInnerX - leftInnerX;
-  const sagitta = span * 0.22; // slight upward arch
+  const sagitta = span * 0.22;
 
   const p0 = new THREE.Vector3(leftInnerX,  bridgeY,           0.015);
   const p1 = new THREE.Vector3(0,           bridgeY + sagitta, 0.022);
   const p2 = new THREE.Vector3(rightInnerX, bridgeY,           0.015);
 
   const curve = new THREE.QuadraticBezierCurve3(p0, p1, p2);
-  const tubeGeo = new THREE.TubeGeometry(curve, 20, 0.013, 8, false);
+  const tubeGeo = new THREE.TubeGeometry(curve, 20, 0.014, 8, false);
   return new THREE.Mesh(tubeGeo, frameMat);
 }
 
-// ─── Main Procedural AR Glasses Model ─────────────────────────────────────────
+// ─── Zenni-Style Photorealistic HD Frame Model ────────────────────────────────
 
-/**
- * Construct a 3D AR glasses model.
- * Model Space Normalization:
- *   Left lens center is placed at X = -0.50
- *   Right lens center is placed at X = +0.50
- *   Distance between lens centers = exactly 1.0 unit (IPD = 1.0).
- *   When renderer sets scale = eyeDistancePx, the 3D lens centers land
- *   exactly over the user's pupils!
- */
+export async function createHDTexturedGlasses(product, selectedColor) {
+  const profile = resolveProfile(product);
+  const isSunglasses = product?.type === 'sunglasses';
+  const sunTint = resolveSunTint(selectedColor);
+  const frameColor = resolveColor(product, selectedColor);
+
+  const group = new THREE.Group();
+  group.name = 'glasses-root';
+
+  // 1. Add Facial Drop Shadow Plane (casts dark shadow on nose & cheeks)
+  group.add(createFacialDropShadowMesh());
+
+  // 2. Add 3D Curved Glass Lenses & Anti-Reflective Specular Glare (Left & Right Pupils)
+  const leftCenterX = -0.50;
+  const rightCenterX = 0.50;
+  const lensRadius = profile.lensRadius || 0.28;
+
+  group.add(createGlassReflectionMesh(leftCenterX, lensRadius, isSunglasses, sunTint));
+  group.add(createGlassReflectionMesh(rightCenterX, lensRadius, isSunglasses, sunTint));
+
+  // 3. Load High-Resolution Catalog Product Texture
+  try {
+    const loader = new THREE.TextureLoader();
+    const texture = await loader.loadAsync(product.image);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+
+    const imgW = texture.image?.width || 600;
+    const imgH = texture.image?.height || 200;
+    const aspect = imgW / imgH;
+
+    // Normalize so lens centers sit exactly at X = -0.50 and X = +0.50 (IPD = 1.0 unit)
+    const planeWidth = 2.05;
+    const planeHeight = planeWidth / aspect;
+
+    const frontGeo = new THREE.PlaneGeometry(planeWidth, planeHeight);
+    const frontMat = new THREE.MeshStandardMaterial({
+      map: texture,
+      transparent: true,
+      alphaTest: 0.02,
+      depthWrite: true,
+      side: THREE.DoubleSide,
+      roughness: 0.25,
+      metalness: isMetalColor(frameColor) ? 0.6 : 0.05,
+    });
+
+    const frontMesh = new THREE.Mesh(frontGeo, frontMat);
+    frontMesh.position.set(0, 0, 0.012);
+    frontMesh.name = 'hd-front-frame';
+    group.add(frontMesh);
+
+  } catch (err) {
+    console.warn('[TryOn] HD Product texture load failed, building procedural frame:', err);
+  }
+
+  // 4. Add 3D Temple Arms (Side arms wrapping around ears with depth occlusion)
+  const frameMat = createFrameMaterial(frameColor);
+  const leftOuterX = leftCenterX - lensRadius * 1.15;
+  const rightOuterX = rightCenterX + lensRadius * 1.15;
+  const armLength = 0.95;
+
+  group.add(createTempleArm(-1, frameMat, leftOuterX, armLength));
+  group.add(createTempleArm(1, frameMat, rightOuterX, armLength));
+
+  // 5. Add Translucent Silicone Nose Pads
+  const padMat = new THREE.MeshStandardMaterial({
+    color: 0xfffffe,
+    transparent: true,
+    opacity: 0.65,
+    roughness: 0.2,
+  });
+  [-1, 1].forEach((side) => {
+    const pad = new THREE.Mesh(new THREE.SphereGeometry(0.018, 8, 8), padMat);
+    pad.position.set(side * 0.18, -lensRadius * 0.35, 0.022);
+    group.add(pad);
+  });
+
+  group.userData = {
+    type: 'hd-textured',
+    profile,
+    frameColor,
+    isSunglasses,
+    ipdModel: 1.0, // 1.0 unit between lens centers
+  };
+
+  return group;
+}
+
+// ─── Procedural 3D Model Fallback ─────────────────────────────────────────────
+
 export function createProceduralGlasses(product, selectedColor) {
   const profile = resolveProfile(product);
   const frameColor = resolveColor(product, selectedColor);
@@ -249,85 +425,44 @@ export function createProceduralGlasses(product, selectedColor) {
   group.name = 'glasses-root';
 
   const frameMat = createFrameMaterial(frameColor);
-  const lensMat = createLensMaterial(isSunglasses, isSunglasses ? sunTint : null);
 
-  // Lens centers at -0.50 and +0.50 → IPD = 1.0 unit
+  // Facial Drop Shadow
+  group.add(createFacialDropShadowMesh());
+
   const leftCenterX  = -0.50;
   const rightCenterX =  0.50;
+  const lensRadius = profile.lensRadius || 0.26;
 
+  // Lenses & Reflections
+  group.add(createGlassReflectionMesh(leftCenterX, lensRadius, isSunglasses, sunTint));
+  group.add(createGlassReflectionMesh(rightCenterX, lensRadius, isSunglasses, sunTint));
+
+  // Rims
   const lensShape = buildLensPath(profile);
-  const lensGeo   = new THREE.ShapeGeometry(lensShape, 64);
-
-  // ── Lenses ──
-  const leftLens = new THREE.Mesh(lensGeo, lensMat.clone());
-  leftLens.position.set(leftCenterX, 0, 0.005);
-  leftLens.name = 'lens-left';
-  group.add(leftLens);
-
-  const rightLens = new THREE.Mesh(lensGeo.clone(), lensMat.clone());
-  rightLens.position.set(rightCenterX, 0, 0.005);
-  rightLens.name = 'lens-right';
-  group.add(rightLens);
-
-  // ── Rims ──
   if (profile.lensShape !== 'rimless') {
-    const rimTubeR = 0.018;
+    const rimTubeR = 0.020;
     const leftRim = createShapeRim(lensShape, rimTubeR, frameMat.clone());
-    leftRim.position.set(leftCenterX, 0, 0.012);
+    leftRim.position.set(leftCenterX, 0, 0.014);
     leftRim.name = 'rim-left';
     group.add(leftRim);
 
     const rightRim = createShapeRim(lensShape, rimTubeR, frameMat.clone());
-    rightRim.position.set(rightCenterX, 0, 0.012);
+    rightRim.position.set(rightCenterX, 0, 0.014);
     rightRim.name = 'rim-right';
     group.add(rightRim);
-  } else {
-    // Rimless screw mounts
-    const dotMat = frameMat.clone();
-    [leftCenterX, rightCenterX].forEach((cx) => {
-      const dot1 = new THREE.Mesh(new THREE.SphereGeometry(0.012, 6, 6), dotMat.clone());
-      dot1.position.set(cx - 0.18, 0, 0.015);
-      group.add(dot1);
-      const dot2 = dot1.clone();
-      dot2.position.set(cx + 0.18, 0, 0.015);
-      group.add(dot2);
-    });
   }
 
-  // ── Inner & Outer rim boundaries ──
-  const lensRadius = profile.lensRadius || 0.26;
-  const leftInnerX  = leftCenterX  + lensRadius * 0.85; // ~ -0.28
-  const rightInnerX = rightCenterX - lensRadius * 0.85; // ~ +0.28
-  const leftOuterX  = leftCenterX  - lensRadius * 1.15; // ~ -0.80
-  const rightOuterX = rightCenterX + lensRadius * 1.15; // ~ +0.80
-
-  // ── Nose Bridge ──
+  // Nose Bridge & Arms
+  const leftInnerX  = leftCenterX  + lensRadius * 0.85;
+  const rightInnerX = rightCenterX - lensRadius * 0.85;
   const bridgeY = profile.lensShape === 'aviator' ? lensRadius * 0.45 : lensRadius * 0.35;
-  const mainBridge = createNoseBridge(leftInnerX, rightInnerX, bridgeY, frameMat.clone());
-  group.add(mainBridge);
+  
+  group.add(createNoseBridge(leftInnerX, rightInnerX, bridgeY, frameMat.clone()));
 
-  // Double bridge top bar for Aviator style
-  if (profile.lensShape === 'aviator') {
-    const topBarY = lensRadius * 0.65;
-    const topBar = createNoseBridge(leftInnerX - 0.05, rightInnerX + 0.05, topBarY, frameMat.clone());
-    group.add(topBar);
-  }
-
-  // ── Nose Pads ──
-  const padMat = new THREE.MeshStandardMaterial({
-    color: 0xfffffe,
-    transparent: true,
-    opacity: 0.65,
-    roughness: 0.2,
-  });
-  [-1, 1].forEach((side) => {
-    const pad = new THREE.Mesh(new THREE.SphereGeometry(0.016, 8, 8), padMat);
-    pad.position.set(side * (rightInnerX * 0.7), -lensRadius * 0.25, 0.02);
-    group.add(pad);
-  });
-
-  // ── Temple Arms ──
+  const leftOuterX  = leftCenterX  - lensRadius * 1.15;
+  const rightOuterX = rightCenterX + lensRadius * 1.15;
   const armLength = 0.95;
+
   group.add(createTempleArm(-1, frameMat, leftOuterX,  armLength));
   group.add(createTempleArm( 1, frameMat, rightOuterX, armLength));
 
@@ -336,7 +471,7 @@ export function createProceduralGlasses(product, selectedColor) {
     profile,
     frameColor,
     isSunglasses,
-    ipdModel: 1.0, // exactly 1.0 unit between lens centers
+    ipdModel: 1.0,
   };
 
   return group;
@@ -366,49 +501,6 @@ export async function loadGlassesModel(url) {
   return model;
 }
 
-// ─── PNG Overlay Fallback ──────────────────────────────────────────────────────
-
-export async function createPNGGlasses(product, selectedColor) {
-  const profile = resolveProfile(product);
-  const group = new THREE.Group();
-  group.name = 'glasses-root';
-
-  try {
-    const loader = new THREE.TextureLoader();
-    const texture = await loader.loadAsync(product.image);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-
-    const imgW = texture.image?.width || 600;
-    const imgH = texture.image?.height || 200;
-    const aspect = imgW / imgH;
-
-    const planeWidth = 2.0;
-    const planeHeight = planeWidth / aspect;
-
-    const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
-    const material = new THREE.MeshBasicMaterial({
-      map: texture,
-      transparent: true,
-      alphaTest: 0.05,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
-
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(0, 0, 0.01);
-    mesh.name = 'png-front';
-    group.add(mesh);
-
-    group.userData = { type: 'png', url: product.image, ipdModel: 1.0 };
-    return group;
-  } catch (err) {
-    console.warn('[TryOn] PNG texture load failed, using procedural:', err);
-    return createProceduralGlasses(product, selectedColor);
-  }
-}
-
 // ─── Model Resolver ────────────────────────────────────────────────────────────
 
 export async function resolveGlassesModel(product, selectedColor) {
@@ -416,15 +508,18 @@ export async function resolveGlassesModel(product, selectedColor) {
     try {
       return await loadGlassesModel(product.tryOnModel);
     } catch (err) {
-      console.warn('[TryOn] GLB load failed, falling back to procedural:', err);
+      console.warn('[TryOn] GLB load failed, falling back to photorealistic HD:', err);
     }
   }
 
-  // Always use 3D procedural AR model:
-  // - 100% upright & properly proportioned
-  // - 1.0 unit IPD pupil alignment
-  // - Extruded 3D rims + nose bridge + silicone nose pads + 3D temple arms
-  // - Fully transparent optical lenses (eyes/face visible)
+  if (product?.image) {
+    try {
+      return await createHDTexturedGlasses(product, selectedColor);
+    } catch (err) {
+      console.warn('[TryOn] HD Textured load failed, using procedural fallback:', err);
+    }
+  }
+
   return createProceduralGlasses(product, selectedColor);
 }
 

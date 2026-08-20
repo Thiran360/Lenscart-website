@@ -271,6 +271,51 @@
   font-weight: 800;
 }
 
+.ar-try-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, #0d6b6d 0%, #064042 100%);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 5px 10px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(13, 107, 109, 0.35);
+  cursor: pointer;
+  z-index: 12;
+  transition: all 0.2s ease;
+  letter-spacing: 0.5px;
+}
+
+.ar-try-badge:hover {
+  transform: scale(1.08);
+  background: linear-gradient(135deg, #118a8d 0%, #094d4f 100%);
+  box-shadow: 0 6px 16px rgba(13, 107, 109, 0.5);
+}
+
+.card-tryon-btn {
+  background: #ffffff;
+  color: #0d6b6d;
+  border: 1.5px solid #0d6b6d;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+.card-tryon-btn:hover {
+  background: #eef8f8;
+  border-color: #094d4f;
+  color: #094d4f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 107, 109, 0.15);
+}
+
 @media (max-width: 600px) {
   .product-image { height: 90px; margin-bottom: 4px; }
   .card-image-section { padding: 6px 6px 0; }
@@ -306,5 +351,7 @@
   .rating-badge { font-size: 8px; padding: 2px 4px; }
   .heart-icon { font-size: 12px; }
   .floating-cart-btn { width: 22px; height: 22px; }
+  .ar-try-badge { font-size: 8px; padding: 3px 7px; top: 6px; right: 6px; }
+  .card-tryon-btn { padding: 8px 8px; font-size: 10px; }
 }
 
