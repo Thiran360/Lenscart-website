@@ -42,7 +42,7 @@ export class TryOnRenderer {
     });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setClearColor(0x000000, 0); // fully transparent
-    // NoToneMapping keeps colors accurate for face overlay
+    this.renderer.outputColorSpace    = THREE.SRGBColorSpace;
     this.renderer.toneMapping         = THREE.NoToneMapping;
     this.renderer.toneMappingExposure = 1.0;
     this.renderer.domElement.className = 'tryon-webgl-canvas';
@@ -66,17 +66,20 @@ export class TryOnRenderer {
     this.camera.position.z = 1000;
 
     // ── Lighting ──────────────────────────────────────────────────────────────
-    // Use MeshStandardMaterial which responds well to simple ambient + directional.
-    const ambient = new THREE.AmbientLight(0xffffff, 1.8);
+    const ambient = new THREE.AmbientLight(0xffffff, 1.6);
     this.scene.add(ambient);
 
-    const key = new THREE.DirectionalLight(0xffffff, 1.2);
-    key.position.set(2, 3, 4);
+    const key = new THREE.DirectionalLight(0xffffff, 1.4);
+    key.position.set(3, 4, 5);
     this.scene.add(key);
 
-    const fill = new THREE.DirectionalLight(0xd0e8ff, 0.5);
-    fill.position.set(-2, -1, 2);
+    const fill = new THREE.DirectionalLight(0xd0e8ff, 0.6);
+    fill.position.set(-3, -1, 3);
     this.scene.add(fill);
+
+    const specLight = new THREE.PointLight(0xffffff, 0.8, 1500);
+    specLight.position.set(0, 50, 600);
+    this.scene.add(specLight);
 
     // ── Face occlusion mesh ───────────────────────────────────────────────────
     // colorWrite:false means it's invisible but writes to the depth buffer.

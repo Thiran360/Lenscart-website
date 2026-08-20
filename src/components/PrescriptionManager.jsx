@@ -60,11 +60,7 @@ function PrescriptionManager() {
     rxData.birthYear?.trim() &&
     (uploadedFile || (
       rxData.rightSph?.trim() &&
-      rxData.rightCyl?.trim() &&
-      rxData.rightAxis?.trim() &&
-      rxData.leftSph?.trim() &&
-      rxData.leftCyl?.trim() &&
-      rxData.leftAxis?.trim()
+      rxData.leftSph?.trim()
     ))
   );
 
@@ -277,7 +273,7 @@ function PrescriptionManager() {
               </select>
             </div>
             <div className="rx-form-group">
-              <label style={{ fontWeight: 600 }}>CYL *</label>
+              <label style={{ fontWeight: 600 }}>CYL (Optional)</label>
               <select 
                 value={rxData.rightCyl} 
                 onChange={e => setRxData({...rxData, rightCyl: e.target.value})}
@@ -290,7 +286,7 @@ function PrescriptionManager() {
               </select>
             </div>
             <div className="rx-form-group">
-              <label style={{ fontWeight: 600 }}>AXIS *</label>
+              <label style={{ fontWeight: 600 }}>AXIS (Optional)</label>
               <select 
                 value={rxData.rightAxis} 
                 onChange={e => setRxData({...rxData, rightAxis: e.target.value})}
@@ -320,7 +316,7 @@ function PrescriptionManager() {
               </select>
             </div>
             <div className="rx-form-group">
-              <label style={{ fontWeight: 600 }}>CYL *</label>
+              <label style={{ fontWeight: 600 }}>CYL (Optional)</label>
               <select 
                 value={rxData.leftCyl} 
                 onChange={e => setRxData({...rxData, leftCyl: e.target.value})}
@@ -333,7 +329,7 @@ function PrescriptionManager() {
               </select>
             </div>
             <div className="rx-form-group">
-              <label style={{ fontWeight: 600 }}>AXIS *</label>
+              <label style={{ fontWeight: 600 }}>AXIS (Optional)</label>
               <select 
                 value={rxData.leftAxis} 
                 onChange={e => setRxData({...rxData, leftAxis: e.target.value})}
@@ -371,7 +367,7 @@ function PrescriptionManager() {
             </div>
             {!isRxValid && (
               <span style={{ fontSize: 13, color: '#A07844', fontStyle: 'italic', marginTop: 4 }}>
-                * All fields (Name, Birth Year, OD & OS SPH/CYL/AXIS) are required to enable Save button.
+                * Name, Birth Year, and SPH (OD & OS) values are required (CYL & AXIS are optional).
               </span>
             )}
           </div>

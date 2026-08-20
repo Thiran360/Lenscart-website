@@ -79,7 +79,7 @@ const getImageStyle = (imageStr, colorName) => {
 
 
 
-function ProductCard({ product, is3DMode }) {
+function ProductCard({ product, is3DMode, onTryOn }) {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { addToCart } = useCart();
   const navigate = useNavigate();
@@ -105,6 +105,14 @@ function ProductCard({ product, is3DMode }) {
     e.preventDefault();
     toggleWishlist(p);
   };
+
+  const handleTryOn = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onTryOn) {
+      onTryOn(p, selectedColor);
+    }
+  };
   
   return (
     <Link to={`/product/${p.id}`} className="product-card" style={{ textDecoration: 'none' }}>
@@ -124,6 +132,15 @@ function ProductCard({ product, is3DMode }) {
             className={`product-image ${is3DMode ? 'effect-3d' : ''}`} 
             style={{ ...getImageStyle(p.image, selectedColor), width: '100%', height: '100%', objectFit: 'contain', marginBottom: 0 }}
           />
+          {onTryOn && (
+            <div 
+              className="ar-try-badge"
+              onClick={handleTryOn}
+              title="Click for Real-time 3D Camera Try On"
+            >
+              👓 TRY ON
+            </div>
+          )}
           <div style={{ position: 'absolute', bottom: '10px', left: '10px', background: '#F8EEDC', color: '#8A6240', fontWeight: '800', fontSize: '10px', padding: '5px 10px', borderRadius: '4px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
             EXTRA 20% OFF
           </div>
@@ -157,32 +174,45 @@ function ProductCard({ product, is3DMode }) {
           ))}
         </div>
 
-        <div className="price-row" style={{ marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div className="price-row" style={{ marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span className="current-price">₹{p.price}</span>
           </div>
-          <button className="buy-now-btn" style={{ 
-            background: '#0d6b6d', 
-            color: '#fff', 
-            border: 'none', 
-            padding: '12px 15px', 
-            borderRadius: '8px', 
-            fontWeight: '900', 
-            fontSize: '14px', 
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            width: '100%',
-            letterSpacing: '1px',
-            boxShadow: '0 4px 10px rgba(13, 107, 109, 0.2)'
-          }} onClick={(e) => { 
-            e.preventDefault(); 
-            navigate(`/select-lenses/${p.id}`, { state: { product: p, selectedColor, quantity: 1 } });
-          }}
-          onMouseOver={(e) => { e.target.style.background = '#094d4f'; e.target.style.transform = 'translateY(-2px)'; }}
-          onMouseOut={(e) => { e.target.style.background = '#0d6b6d'; e.target.style.transform = 'translateY(0)'; }}
-          >
-            SELECT LENSES
-          </button>
+
+          <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+            {onTryOn && (
+              <button 
+                type="button" 
+                className="card-tryon-btn" 
+                onClick={handleTryOn}
+                title="Try on glasses in 3D AR Camera"
+              >
+                👓 TRY ON
+              </button>
+            )}
+            <button className="buy-now-btn" style={{ 
+              background: '#0d6b6d', 
+              color: '#fff', 
+              border: 'none', 
+              padding: '12px 15px', 
+              borderRadius: '8px', 
+              fontWeight: '900', 
+              fontSize: '13px', 
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              flex: 1,
+              letterSpacing: '0.5px',
+              boxShadow: '0 4px 10px rgba(13, 107, 109, 0.2)'
+            }} onClick={(e) => { 
+              e.preventDefault(); 
+              navigate(`/select-lenses/${p.id}`, { state: { product: p, selectedColor, quantity: 1 } });
+            }}
+            onMouseOver={(e) => { e.target.style.background = '#094d4f'; e.target.style.transform = 'translateY(-2px)'; }}
+            onMouseOut={(e) => { e.target.style.background = '#0d6b6d'; e.target.style.transform = 'translateY(0)'; }}
+            >
+              SELECT LENSES
+            </button>
+          </div>
         </div>
       </div>
     </Link>
