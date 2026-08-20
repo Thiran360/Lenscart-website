@@ -288,29 +288,6 @@
   color: rgba(58, 36, 21, 0.45);
 }
 
-.search-extra-icons {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-left: 8px;
-  border-left: 1px solid rgba(58, 36, 21, 0.15);
-  padding-left: 12px;
-}
-
-.search-action-icon {
-  color: #3A2415;
-  font-size: 15px;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.search-action-icon:hover {
-  opacity: 1;
-  transform: translateY(-1px);
-  color: #B38E50;
-}
-
 .nav-icons {
   display: flex;
   align-items: center;

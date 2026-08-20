@@ -1,9 +1,8 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FaSearch, FaRegHeart, FaShoppingBag, FaRegUser, FaBars, FaCamera, FaMicrophone, FaSignOutAlt } from "react-icons/fa";
+import { FaSearch, FaRegHeart, FaShoppingBag, FaRegUser, FaBars, FaSignOutAlt } from "react-icons/fa";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
 
-import VirtualTryOn from "./VirtualTryOn";
 import "./Navbar.css";
 import { useState, useEffect } from "react";
 
@@ -13,8 +12,6 @@ function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [isListening, setIsListening] = useState(false);
-  const [isTryOnOpen, setIsTryOnOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -52,40 +49,6 @@ function Navbar() {
     if (e.key === 'Enter') {
       handleSearch(e);
     }
-  };
-
-  const handleVoiceSearch = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("Your browser does not support voice search.");
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = 'en-US';
-
-    recognition.onstart = () => {
-      setIsListening(true);
-    };
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setSearchTerm(transcript);
-      navigate(`/products?search=${encodeURIComponent(transcript)}`);
-    };
-
-    recognition.onerror = (event) => {
-      console.error("Speech recognition error", event.error);
-      setIsListening(false);
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognition.start();
   };
 
   return (
@@ -185,20 +148,6 @@ function Navbar() {
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={handleKeyDown}
           />
-          <div className="search-extra-icons">
-            <FaMicrophone
-              className="search-action-icon"
-              title="Voice Search"
-              onClick={handleVoiceSearch}
-              style={{ color: isListening ? '#ff4d4f' : '#3A2415', cursor: 'pointer' }}
-            />
-            <FaCamera
-              className="search-action-icon"
-              title="Virtual Try-On"
-              onClick={() => setIsTryOnOpen(true)}
-              style={{ color: '#3A2415', cursor: 'pointer', marginLeft: '10px' }}
-            />
-          </div>
         </div>
         <div className="nav-icons">
           <Link to="/wishlist" className="nav-icon-link" title="Wishlist">
@@ -269,11 +218,6 @@ function Navbar() {
           </div>
         </div>
       </div>
-
-      <VirtualTryOn
-        isOpen={isTryOnOpen}
-        onClose={() => setIsTryOnOpen(false)}
-      />
     </nav>
   );
 }

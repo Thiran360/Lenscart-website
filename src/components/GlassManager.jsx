@@ -194,7 +194,7 @@ function GlassManager() {
             className={`glass-tab-btn ${activeTab === 'add' ? 'active' : ''}`}
             onClick={() => setActiveTab('add')}
           >
-            <FaPlus /> Add New Eyewear
+            <FaPlus /> ADD NEW EYEWEAR
           </button>
           <button
             className={`glass-tab-btn ${activeTab === 'inventory' ? 'active' : ''}`}
@@ -322,7 +322,7 @@ function GlassManager() {
               <label>Collection Tier</label>
               <select name="category" value={formData.category} onChange={handleInputChange}>
                 <option value="Classic">Classic Collection</option>
-                <option value="Premium">Executive Premium Series</option>
+                <option value="Executive">Executive Series</option>
                 <option value="Kids">Junior Eyewear</option>
                 <option value="₹1200 Store">Essential Store</option>
               </select>
@@ -353,7 +353,6 @@ function GlassManager() {
               Product Features & Guarantee Options
             </label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
-              {/* Nose Pad Checkbox Feature */}
               <label style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -374,14 +373,12 @@ function GlassManager() {
                   style={{ width: '18px', height: '18px', accentColor: '#0d6b6d', cursor: 'pointer' }}
                 />
                 <span style={{ fontSize: '13.5px', fontWeight: '700', color: '#1a1a1a' }}>
-                  Includes Adjustable Nose Pad 👃
+                  Includes Adjustable Nose Pad
                 </span>
               </label>
 
-              {/* Show Return, Exchange & Warranty ONLY when Power Glass or Sunglasses is selected */}
               {(formData.type === "power" || formData.type === "sunglasses") && (
                 <>
-                  {/* 14 Days Return Policy */}
                   <label style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -406,7 +403,6 @@ function GlassManager() {
                     </span>
                   </label>
 
-                  {/* 14 Days Exchange Policy */}
                   <label style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -431,7 +427,6 @@ function GlassManager() {
                     </span>
                   </label>
 
-                  {/* 1 Year Brand Warranty */}
                   <label style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -461,7 +456,7 @@ function GlassManager() {
           </div>
 
           {/* Submit Action Button */}
-          <div className="form-submit-row">
+          <div className="form-submit-row" style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
             <button type="submit" className="save-glass-btn">
               <FaPlus /> Add Glass Product
             </button>
@@ -471,14 +466,19 @@ function GlassManager() {
         /* Inventory Management View */
         <div className="inventory-card">
           <div className="inventory-header-bar">
-            <div className="search-filter-box">
-              <FaSearch className="search-icon" />
-              <input
-                type="text"
-                placeholder="Search catalog by title, model code, or style..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-              />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+              <div className="search-filter-box">
+                <FaSearch className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="Search catalog by title, model code, or style..."
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <button className="add-eyewear-btn" onClick={() => setActiveTab('add')}>
+                <FaPlus /> ADD NEW EYEWEAR
+              </button>
             </div>
 
             <div className="type-filter-group">
