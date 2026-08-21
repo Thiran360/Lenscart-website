@@ -23,7 +23,17 @@ body, html {
   -webkit-font-smoothing: antialiased;
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
 }
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
 html::-webkit-scrollbar, body::-webkit-scrollbar {
   display: none;
 }
@@ -46,8 +56,8 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
   color: var(--primary);
   padding: 10px 0;
   margin-bottom: 15px;
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
+  width: 100%;
+  max-width: 100%;
 }
 
 .marquee-content {

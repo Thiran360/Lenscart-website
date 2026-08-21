@@ -17,28 +17,15 @@ function Home() {
       <BrowseFrames />
       <BrowseStyles />
 
-      <section className="featured-products-section" style={{ backgroundColor: '#F6F1E8', padding: '50px 0 40px 0' }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 40px' }} className="home-content-wrapper">
+      <section className="featured-products-section" style={{ backgroundColor: '#F6F1E8', padding: '30px 0 40px 0' }}>
+        <div className="home-content-wrapper">
           
           {/* Fixed Section Header for Trending Now */}
           <div style={{ textAlign: 'center', marginBottom: '35px' }}>
-            <h2 style={{
-              fontSize: '34px',
-              fontWeight: '700',
-              color: '#3A2415',
-              fontFamily: "'Playfair Display', serif",
-              letterSpacing: '2px',
-              textTransform: 'uppercase',
-              margin: 0
-            }}>
+            <h2 className="trending-section-title">
               TRENDING NOW
             </h2>
-            <p style={{
-              fontSize: '15px',
-              color: '#6E4B34',
-              marginTop: '8px',
-              letterSpacing: '1px'
-            }}>
+            <p className="trending-section-subtitle">
               Explore our best-selling & trending eyewear collection
             </p>
           </div>

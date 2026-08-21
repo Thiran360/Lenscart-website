@@ -12,8 +12,8 @@ const frames = [
 function BrowseFrames() {
   return (
     <section className="browse-frames-section">
-      <div className="static-title-wrapper" style={{ display: 'flex', justifyContent: 'center', padding: '10px 0', marginBottom: '25px', width: '100%' }}>
-        <h2 style={{ color: 'var(--primary)', fontSize: '20px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px' }}>
+      <div className="static-title-wrapper" style={{ display: 'flex', justifyContent: 'center', padding: '10px 0', marginBottom: '20px', width: '100%' }}>
+        <h2 className="home-section-title">
           Select Your Frame Shape
         </h2>
       </div>

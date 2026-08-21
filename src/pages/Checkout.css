@@ -378,3 +378,34 @@
     max-width: 100%;
   }
 }
+
+@media (max-width: 600px) {
+  .checkout-main-container {
+    padding: 20px 10px;
+  }
+  .form-row {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .checkout-title {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  .primary-checkout-btn {
+    padding: 14px 18px;
+    font-size: 15px;
+  }
+  .order-summary-box {
+    padding: 20px 15px;
+  }
+  .total-row.grand-total {
+    font-size: 20px;
+  }
+  .payment-method-header {
+    padding: 14px 15px;
+  }
+  .payment-method-content {
+    padding: 0 15px 15px 40px;
+  }
+}

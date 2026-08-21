@@ -11,13 +11,14 @@ import {
   FaSun,
   FaChild,
   FaTag,
-  FaStore,
-  FaHome
+  FaUserShield,
+  FaTruck
 } from "react-icons/fa";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
 import "./Navbar.css";
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 function Navbar() {
   const { totalItems } = useCart();
@@ -48,15 +49,18 @@ function Navbar() {
     setIsMobileMenuOpen(false);
   }, [location.pathname, location.search]);
 
-  // Prevent background scroll when mobile drawer is open
+  // Prevent background scroll when mobile drawer is open while allowing drawer scrolling
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     }
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     };
   }, [isMobileMenuOpen]);
 
@@ -295,7 +299,7 @@ function Navbar() {
       </header>
 
       {/* Mobile Drawer Overlay */}
-      {isMobileMenuOpen && (
+      {isMobileMenuOpen && createPortal(
         <div className="mobile-menu-overlay" onClick={() => setIsMobileMenuOpen(false)}>
           <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
             <div className="mobile-drawer-header">
@@ -350,20 +354,6 @@ function Navbar() {
                 <FaTag className="mobile-link-icon" style={{ color: '#0d6b6d' }} /> ₹1200 Store
               </Link>
 
-              <h5 className="mobile-nav-heading" style={{ marginTop: '20px' }}>Services & More</h5>
-              <Link to="/try-at-home" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-                <FaHome className="mobile-link-icon" /> Try at Home
-              </Link>
-              <Link to="/stores" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-                <FaStore className="mobile-link-icon" /> Find Stores
-              </Link>
-              <Link to="/cart" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-                <FaShoppingBag className="mobile-link-icon" /> Cart ({totalItems})
-              </Link>
-              <Link to="/wishlist" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-                <FaRegHeart className="mobile-link-icon" /> Wishlist ({totalWishlistItems})
-              </Link>
-
               {isLoggedIn && (
                 <>
                   <h5 className="mobile-nav-heading" style={{ marginTop: '20px' }}>My Account</h5>
@@ -381,7 +371,8 @@ function Navbar() {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

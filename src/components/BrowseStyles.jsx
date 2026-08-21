@@ -12,8 +12,8 @@ const stylesList = [
 function BrowseStyles() {
   return (
     <section className="browse-styles-section">
-      <div className="static-title-wrapper" style={{ display: 'flex', justifyContent: 'center', padding: '10px 0', marginBottom: '25px', width: '100%' }}>
-        <h2 style={{ color: 'var(--primary, #3A2415)', fontSize: '20px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px', margin: 0 }}>
+      <div className="static-title-wrapper" style={{ display: 'flex', justifyContent: 'center', padding: '10px 0', marginBottom: '20px', width: '100%' }}>
+        <h2 className="home-section-title">
           Select Your Frame Style
         </h2>
       </div>

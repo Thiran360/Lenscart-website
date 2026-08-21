@@ -124,10 +124,12 @@
 .login-form-side h2 {
   text-align: center;
   color: #0d6b6d;
-  margin-bottom: 40px;
-  font-size: 30px;
+  margin-bottom: 30px;
+  font-size: 28px;
   font-weight: 700;
   font-family: 'Playfair Display', serif;
+  padding: 0 40px;
+  line-height: 1.25;
 }
 
 .phone-input-group {
@@ -238,9 +240,35 @@
   }
   .login-image-side {
     padding: 30px 20px;
-    min-height: 250px;
+    min-height: 200px;
   }
   .login-form-side {
-    padding: 40px 20px;
+    padding: 35px 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .login-form-side {
+    padding: 30px 16px;
+  }
+  .login-close-btn {
+    top: 14px;
+    right: 14px;
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+  .login-form-side h2 {
+    font-size: 22px;
+    margin-top: 10px;
+    margin-bottom: 24px;
+    padding: 0 32px;
+  }
+}
+
+@media (max-width: 360px) {
+  .login-form-side h2 {
+    font-size: 19px;
+    padding: 0 28px;
   }
 }

@@ -1,5 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { FaTruck } from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import { productsData } from "../data/products";
@@ -144,6 +145,17 @@ function ProductDetails() {
     window.scrollTo(0, 0);
   }, [id]);
 
+  useEffect(() => {
+    if (isOffersOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOffersOpen]);
+
   if (!product) {
     return (
       <div className="page-wrapper">
@@ -227,15 +239,15 @@ function ProductDetails() {
           </div>
 
           {/* Right Side: Product Info */}
-          <div className="info-column" style={{ padding: '0 20px', fontFamily: 'Arial, sans-serif' }}>
-            <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#000', margin: '0 0 16px 0' }}>{product.name} #{product.id}</h1>
+          <div className="info-column">
+            <h1 className="zenni-details-title">{product.name} #{product.id}</h1>
             
             <p style={{ fontSize: '14px', color: '#666', margin: '0 0 4px 0' }}>Starting at</p>
             
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-              <span style={{ fontSize: '42px', fontWeight: 'bold', color: '#000' }}>${(product.price / 80).toFixed(2)}</span>
+            <div className="zenni-price-rating-row">
+              <span className="zenni-main-price">${(product.price / 80).toFixed(2)}</span>
               
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#fffbeb', padding: '6px 16px', borderRadius: '20px' }}>
+              <div className="zenni-rating-chip">
                 <span style={{ color: '#facc15', fontSize: '20px' }}>★</span>
                 <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{product.rating}</span>
                 <a href="#" style={{ color: '#0d6b6d', textDecoration: 'underline', fontSize: '14px' }}>218 reviews</a>
@@ -243,7 +255,7 @@ function ProductDetails() {
             </div>
 
             {/* Grey Box for Size and Color */}
-            <div style={{ background: '#f7f7f7', borderRadius: '16px', padding: '24px', marginBottom: '30px' }}>
+            <div className="zenni-options-card">
               
               {/* Size Section */}
               <div className="zenni-size-block">
@@ -251,7 +263,7 @@ function ProductDetails() {
                   <div>Size: <span>{product.size === 'S' ? '48 □ 16 - 135' : product.size === 'L' ? '55 □ 20 - 145' : '52 □ 18 - 140'}</span></div>
                   <div className="zenni-size-link" style={{ cursor: 'pointer' }} onClick={(e) => { e.preventDefault(); setIsSizeGuideOpen(true); }}>Size and fit</div>
                 </div>
-                <button style={{ background: '#4a4a4a', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', marginBottom: '32px' }}>
+                <button className="zenni-size-pill-btn">
                   {product.size === 'M' ? 'Medium' : product.size === 'L' ? 'Large' : 'Small'}
                 </button>
               </div>
@@ -285,44 +297,23 @@ function ProductDetails() {
             {(() => {
               const isPincodeValid = Boolean(pincode && pincode.trim().length === 6 && !isNaN(pincode));
               return (
-                <div style={{ marginBottom: '30px' }}>
+                <div style={{ marginBottom: '30px', width: '100%' }}>
                   <div style={{ fontSize: '15px', fontWeight: '700', color: '#3A2415', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <FaTruck style={{ color: '#0d6b6d', fontSize: '17px' }} /> Check Delivery Date
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'stretch', height: '48px', maxWidth: '400px' }}>
+                  <div className="pincode-input-group">
                     <input 
                       type="text" 
                       placeholder="Enter Pincode" 
                       value={pincode}
                       onChange={(e) => setPincode(e.target.value.replace(/\D/g, ""))}
                       maxLength={6}
-                      style={{ 
-                        flex: 1, 
-                        border: '1px solid #dcdcdc', 
-                        borderRight: 'none',
-                        borderRadius: '8px 0 0 8px', 
-                        padding: '0 16px', 
-                        fontSize: '16px',
-                        color: '#333',
-                        outline: 'none'
-                      }} 
+                      className="pincode-input-field"
                     />
                     <button 
                       onClick={handleCheckPincode}
                       disabled={!isPincodeValid}
-                      style={{ 
-                        background: isPincodeValid ? '#222' : '#cccccc', 
-                        color: isPincodeValid ? '#fff' : '#888888', 
-                        border: 'none', 
-                        padding: '0 32px', 
-                        borderRadius: '0 8px 8px 0', 
-                        cursor: isPincodeValid ? 'pointer' : 'not-allowed',
-                        fontWeight: '800',
-                        fontSize: '14px',
-                        letterSpacing: '0.5px',
-                        opacity: isPincodeValid ? 1 : 0.7,
-                        transition: 'all 0.3s ease'
-                      }}
+                      className={`pincode-submit-btn ${isPincodeValid ? 'active' : ''}`}
                     >
                       CHECK
                     </button>
@@ -448,28 +439,91 @@ function ProductDetails() {
       <SizeGuideModal isOpen={isSizeGuideOpen} onClose={() => setIsSizeGuideOpen(false)} product={product} />
 
       {/* Offers Modal */}
-      {isOffersOpen && (
-        <div className="tryon-overlay" onClick={() => setIsOffersOpen(false)} style={{ zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)' }}>
-          <div className="tryon-modal" onClick={e => e.stopPropagation()} style={{ background: '#fff', padding: '30px', borderRadius: '12px', width: '90%', maxWidth: '500px', maxHeight: '80vh', overflowY: 'auto', position: 'relative' }}>
-            <button style={{ position: 'absolute', top: '20px', right: '20px', background: '#f5f5f5', border: 'none', width: '32px', height: '32px', borderRadius: '50%', fontSize: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#333' }} onClick={() => setIsOffersOpen(false)}>×</button>
-            <h2 style={{ marginBottom: '24px', fontSize: '22px', borderBottom: '1px solid #eee', paddingBottom: '16px', color: '#222' }}>All Offers & Discounts</h2>
+      {isOffersOpen && createPortal(
+        <div 
+          onClick={() => setIsOffersOpen(false)} 
+          style={{ 
+            zIndex: 99999, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            bottom: 0, 
+            width: '100%', 
+            height: '100vh', 
+            background: 'rgba(0,0,0,0.6)', 
+            backdropFilter: 'blur(4px)',
+            WebkitBackdropFilter: 'blur(4px)',
+            padding: '16px',
+            boxSizing: 'border-box'
+          }}
+        >
+          <div 
+            onClick={e => e.stopPropagation()} 
+            style={{ 
+              background: '#fff', 
+              padding: '24px 20px', 
+              borderRadius: '16px', 
+              width: '100%', 
+              maxWidth: '480px', 
+              maxHeight: '85vh', 
+              overflowY: 'auto', 
+              position: 'relative',
+              boxShadow: '0 12px 40px rgba(0,0,0,0.3)',
+              WebkitOverflowScrolling: 'touch',
+              margin: 'auto'
+            }}
+          >
+            <button 
+              style={{ 
+                position: 'absolute', 
+                top: '16px', 
+                right: '16px', 
+                background: '#f5f5f5', 
+                border: 'none', 
+                width: '32px', 
+                height: '32px', 
+                borderRadius: '50%', 
+                fontSize: '18px', 
+                cursor: 'pointer', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                color: '#333' 
+              }} 
+              onClick={() => setIsOffersOpen(false)}
+            >
+              ×
+            </button>
+            <h2 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: '800', borderBottom: '1px solid #eee', paddingBottom: '12px', color: '#222' }}>
+              All Offers & Discounts
+            </h2>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {coupons.map((coupon, idx) => (
-                <div key={idx} style={{ position: 'relative', border: idx === 0 ? '1.5px dashed #6b4c9a' : '1px dashed #ccc', padding: '20px', borderRadius: '8px', background: idx === 0 ? '#fcfaff' : '#fff' }}>
-                  <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 'bold', color: '#222' }}>{coupon.title}</h4>
-                  <p style={{ margin: '0 0 16px 0', fontSize: '14px', color: '#555', lineHeight: '1.5' }}>
+                <div key={idx} style={{ position: 'relative', border: idx === 0 ? '1.5px dashed #6b4c9a' : '1px dashed #ccc', padding: '16px', borderRadius: '10px', background: idx === 0 ? '#fcfaff' : '#fff' }}>
+                  <h4 style={{ margin: '0 0 6px 0', fontSize: '15px', fontWeight: 'bold', color: '#222' }}>{coupon.title}</h4>
+                  <p style={{ margin: '0 0 14px 0', fontSize: '13px', color: '#555', lineHeight: '1.4' }}>
                     {coupon.desc}
                   </p>
-                  <div style={{ color: '#6b4c9a', fontWeight: 'bold', fontSize: '14px', background: '#f0eaff', display: 'inline-block', padding: '4px 8px', borderRadius: '4px' }}>Code: {coupon.code}</div>
-                  <button onClick={() => { alert("Coupon applied!"); setIsOffersOpen(false); }} style={{ position: 'absolute', bottom: '20px', right: '20px', background: '#6b4c9a', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold' }}>
-                    Apply
-                  </button>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    <div style={{ color: '#6b4c9a', fontWeight: 'bold', fontSize: '13px', background: '#f0eaff', padding: '4px 10px', borderRadius: '6px' }}>Code: {coupon.code}</div>
+                    <button 
+                      onClick={() => { alert("Coupon applied!"); setIsOffersOpen(false); }} 
+                      style={{ background: '#6b4c9a', color: '#fff', border: 'none', padding: '8px 18px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold' }}
+                    >
+                      Apply
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <VirtualTryOn 
