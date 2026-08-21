@@ -95,9 +95,19 @@
   margin: 0;
 }
 
+.home-section-title {
+  color: #3A2415;
+  font-size: 20px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+  text-align: center;
+}
+
 @media (max-width: 768px) {
   .browse-frames-section {
-    padding: 40px 20px;
+    padding: 30px 15px;
   }
   
   .frames-grid {
@@ -123,44 +133,62 @@
 
 @media (max-width: 600px) {
   .browse-frames-section {
-    padding: 20px 0;
+    padding: 15px 12px;
   }
   .browse-frames-section .container {
     padding: 0;
   }
-  .browse-frames-section .section-title {
-    font-size: 16px;
-    margin-bottom: 15px;
+  .home-section-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #3A2415;
   }
   .frames-grid {
     display: flex;
     flex-wrap: nowrap;
-    justify-content: space-between;
-    gap: 5px;
-    padding-bottom: 5px; 
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 10px 4px; 
     overflow-x: auto;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
   }
   .frames-grid::-webkit-scrollbar {
     display: none; 
   }
   .frame-card {
-    width: 75px;
-    height: 75px;
-    min-width: 75px;
-    padding: 8px 2px;
+    width: 92px;
+    height: 92px;
+    min-width: 92px;
+    padding: 10px 6px 8px 6px;
     box-sizing: border-box;
     flex-shrink: 0;
-    flex: 1; /* allow them to stretch to fill if needed, but flex-shrink 0 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
   }
   .frame-icon {
-    margin-bottom: 8px;
-    width: 60px;
-    height: 40px;
-    border-radius: 8px;
+    margin-bottom: 4px;
+    width: 58px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .frame-name {
-    font-size: 9px;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.1;
+    white-space: nowrap;
+    text-align: center;
+    color: #222;
   }
 }
 

@@ -14,13 +14,11 @@ import ForgotPassword from "./pages/ForgotPassword";
 import VerifyOTP from "./pages/VerifyOTP";
 import Profile from "./pages/Profile";
 import ChangePassword from "./pages/ChangePassword";
-import Stores from "./pages/Stores";
 
 import SelectLenses from "./pages/SelectLenses";
 import Analytics from "./pages/Analytics";
 import Admin from "./pages/Admin";
 import Wishlist from "./pages/Wishlist";
-import TryAtHome from "./pages/TryAtHome";
 import TrackOrder from "./pages/TrackOrder";
 
 function ScrollToTop() {
@@ -62,8 +60,6 @@ function App() {
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/try-at-home" element={<TryAtHome />} />
-          <Route path="/stores" element={<Stores />} />
         </Routes>
       </div>
     </>

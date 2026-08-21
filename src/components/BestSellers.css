@@ -1,9 +1,9 @@
 .bestsellers-section {
   background-color: #F7F7F7; /* Neutral light gray background that fits modern eCommerce aesthetics */
-  padding: 40px 0; /* 0 padding on sides for absolute full screen edge-to-edge layout */
+  padding: 40px 0;
   margin: 30px 0;
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
+  width: 100%;
+  max-width: 100%;
   position: relative;
 }
 
@@ -368,18 +368,84 @@
 
 @media (max-width: 768px) {
   .bestsellers-section {
-    padding: 30px 20px;
+    padding: 20px 0;
     max-width: 100%;
     border-radius: 0;
   }
+  .bestsellers-header {
+    padding: 0 16px;
+    align-items: center;
+    gap: 10px;
+  }
   .bestsellers-title {
-    font-size: 28px;
+    font-size: 22px;
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+  }
+  .bestsellers-tabs {
+    gap: 15px;
+  }
+  .bestsellers-tab {
+    font-size: 14px;
+  }
+  .bestsellers-shopall-btn {
+    padding: 6px 14px;
+    font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .bestsellers-carousel-wrapper {
+    padding: 0 16px;
+  }
+  .bestsellers-carousel {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 12px;
   }
   .bestseller-card {
-    min-width: calc((100% - 20px) / 1.5);
-    width: calc((100% - 20px) / 1.5);
+    min-width: 210px;
+    width: 210px;
+    scroll-snap-align: start;
+  }
+  .bestseller-image-wrapper {
+    height: 170px;
+    padding: 10px;
+  }
+  .bestseller-card-info {
+    padding: 12px 14px 16px 14px;
+  }
+  .bestseller-price {
+    font-size: 16px;
+  }
+  .bestseller-tryon-overlay-btn {
+    padding: 5px 12px;
+    font-size: 12px;
   }
   .bestsellers-nav-btn {
     display: none; /* Hide arrow buttons on mobile */
+  }
+}
+
+@media (max-width: 360px) {
+  .bestsellers-header {
+    padding: 0 10px;
+  }
+  .bestsellers-title {
+    font-size: 18px;
+  }
+  .bestsellers-shopall-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+  .bestsellers-carousel-wrapper {
+    padding: 0 10px;
+  }
+  .bestseller-card {
+    min-width: 185px;
+    width: 185px;
+  }
+  .bestseller-image-wrapper {
+    height: 155px;
   }
 }

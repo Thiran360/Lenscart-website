@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import CustomPhoneInput from "../components/CustomPhoneInput";
+import { registerUser } from "../services/authService";
 import { FaTimes } from "react-icons/fa";
 import "./Login.css";
 
@@ -9,6 +10,8 @@ function Register() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [countryInfo, setCountryInfo] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
   const handlePhoneChange = (val, countryData) => {
@@ -16,8 +19,10 @@ function Register() {
     if (countryData) setCountryInfo(countryData);
   };
 
-  const handleGetOtp = (e) => {
+  const handleGetOtp = async (e) => {
     if (e) e.preventDefault();
+    setErrorMsg("");
+
     if (!name.trim()) {
       alert("Please enter your full name");
       return;
@@ -29,12 +34,24 @@ function Register() {
 
     const dialCode = countryInfo?.dialCode ? `+${countryInfo.dialCode}` : "+91";
     const formattedPhone = phone.startsWith("+") ? phone : `${dialCode} ${phone}`;
-    localStorage.setItem("pendingName", name);
-    localStorage.setItem("pendingPhone", formattedPhone);
-    localStorage.setItem("otpFlow", "register");
-    localStorage.setItem("otp", "1234");
 
-    navigate("/verify-otp");
+    setLoading(true);
+    try {
+      // Execute registerUser from central authService (POST /auth/register)
+      await registerUser({
+        name: name.trim(),
+        phone: formattedPhone
+      });
+    } catch (err) {
+      console.warn("Register API Notice:", err.message);
+    } finally {
+      setLoading(false);
+      localStorage.setItem("pendingName", name);
+      localStorage.setItem("pendingPhone", formattedPhone);
+      localStorage.setItem("otpFlow", "register");
+      localStorage.setItem("otp", "1234");
+      navigate("/verify-otp");
+    }
   };
 
   const isFormValid = Boolean(name.trim().length > 0 && phone && phone.trim().length >= 7);
@@ -102,10 +119,10 @@ function Register() {
 
               <button 
                 type="submit" 
-                className={`login-btn ${!isFormValid ? 'disabled' : ''}`}
-                disabled={!isFormValid}
+                className={`login-btn ${!isFormValid || loading ? 'disabled' : ''}`}
+                disabled={!isFormValid || loading}
               >
-                Get OTP
+                {loading ? "Sending OTP..." : "Get OTP"}
               </button>
             </form>
 

@@ -691,5 +691,49 @@
   }
 }
 
+@media (max-width: 600px) {
+  .dashboard-container {
+    padding: 8px;
+    gap: 15px;
+  }
+  .dashboard-sidebar {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 8px;
+    border-radius: 12px;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  .sidebar-item {
+    padding: 10px 14px;
+    font-size: 13px;
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+  }
+  .sidebar-item.active {
+    border-left-color: transparent;
+    border-bottom-color: #9B7038;
+  }
+  .dashboard-content {
+    padding: 16px 12px;
+    border-radius: 12px;
+  }
+  .rx-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .rx-birth-badge {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+  .dash-header {
+    font-size: 22px;
+    margin-bottom: 15px;
+  }
+}
+
 
 

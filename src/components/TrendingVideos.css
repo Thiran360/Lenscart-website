@@ -187,3 +187,26 @@
     padding: 5px 10px;
   }
 }
+
+@media (max-width: 360px) {
+  .trending-card {
+    flex: 0 0 calc((100% - 10px) / 2);
+    min-width: calc((100% - 10px) / 2);
+    height: 230px;
+  }
+  .trending-card-image-box {
+    height: 150px;
+    padding: 10px;
+  }
+  .trending-card-content {
+    padding: 8px 10px;
+  }
+  .trending-card-name {
+    font-size: 11px;
+    max-width: 60px;
+  }
+  .trending-action-btn {
+    font-size: 9.5px;
+    padding: 4px 8px;
+  }
+}

@@ -256,3 +256,34 @@
   .hero-nav-btn.prev { left: 10px; }
   .hero-nav-btn.next { right: 10px; }
 }
+
+@media (max-width: 480px) {
+  .hero-banner {
+    height: 260px;
+  }
+  .campaign-title {
+    font-size: 24px;
+    letter-spacing: 2px;
+  }
+  .brand-logo-text {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+  .est-text {
+    font-size: 9.5px;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .shop-now-btn {
+    padding: 8px 16px;
+    font-size: 11px;
+    margin-top: 10px;
+  }
+  .hero-nav-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 11px;
+  }
+  .hero-nav-btn.prev { left: 5px; }
+  .hero-nav-btn.next { right: 5px; }
+}

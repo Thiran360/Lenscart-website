@@ -1,6 +1,6 @@
 .collections-section {
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
+  width: 100%;
+  max-width: 100%;
   padding: 30px 20px;
   background-color: #F6F1E8;
   font-family: 'Instrument Sans', sans-serif;

@@ -9,31 +9,31 @@ const sliderData = [
     image: "/hero-1.jpg",
     title: "ELEGANT EYEGLASSES",
     estText: "EST.",
-    brand: "JOHN 🌴 JACOBS",
-    year: "2024"
+    brand: "LENS 👓 MAKER",
+    year: "2026"
   },
   { 
     id: 2,
     image: "/hero-2.jpg",
     title: "SUNGLASSES CLUB",
     estText: "PREMIUM",
-    brand: "UV PROTECTED SUNGLASSES",
+    brand: "100% UV POLARIZED COLLECTION",
     year: "EDITION"
   },
   { 
     id: 3,
     image: "/hero-3.jpg",
-    title: "KIDS GLASSES",
-    estText: "FUN",
-    brand: "PLAYFUL & DURABLE FRAMES",
-    year: "TRENDS"
+    title: "AR VIRTUAL TRY-ON",
+    estText: "LIVE",
+    brand: "REAL-TIME 3D FITTING ROOM",
+    year: "EXPERIENCE"
   },
   { 
     id: 4,
     image: "/hero-4.jpg",
-    title: "POWER GLASSES",
+    title: "POWER LENSES",
     estText: "CUSTOM",
-    brand: "PRECISION PRESCRIPTION LENSES",
+    brand: "PRECISION PRESCRIPTION OPTICS",
     year: "SERIES"
   },
   { 
@@ -41,16 +41,16 @@ const sliderData = [
     image: "/hero-5.jpg",
     title: "COMPUTER GLASSES",
     estText: "TOP",
-    brand: "BLUE LIGHT BLOCKING",
+    brand: "ANTI BLUE-LIGHT PROTECTIVE SHIELD",
     year: "QUALITY"
   },
   { 
     id: 6,
     image: "/hero-6.jpg",
-    title: "LUXURY FRAMES",
+    title: "LUXURY TITANIUM",
     estText: "NEW",
-    brand: "GOLD & AVIATOR COLLECTION",
-    year: "2024"
+    brand: "ULTRA-LIGHTWEIGHT AVIATORS",
+    year: "2026"
   }
 ];
 

@@ -39,7 +39,8 @@ function Products() {
   useEffect(() => {
     setActiveTab("All");
     setFilters({ gender: [], brand: [], shape: [], size: [], color: [], price: [], material: [], bestSellers: [], sales: [], lensPower: [] });
-  }, [filterType]);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [filterType, location.search]);
 
   const isBogoShop = searchParams.get("bogo") === "true";
   const isKidsClub = searchQuery === "kids";

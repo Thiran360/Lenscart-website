@@ -249,5 +249,20 @@
   }
 }
 
+@media (max-width: 360px) {
+  .stores-header-banner h1 {
+    font-size: 22px;
+  }
+  .stores-header-banner p {
+    font-size: 13px;
+  }
+  .store-card {
+    padding: 15px;
+  }
+  .store-card-header h3 {
+    font-size: 17px;
+  }
+}
+
 
 
