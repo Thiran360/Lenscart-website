@@ -73,9 +73,9 @@ export function computeHeadPose(landmarks, transformMatrix, videoWidth, videoHei
   const faceWidth   = Math.hypot(screenRightTemple.x - screenLeftTemple.x, screenRightTemple.y - screenLeftTemple.y) || 1;
 
   // ── Glasses anchor position ───────────────────────────────────────────────
-  // Anchors right on upper nose bridge between eyes (landmark 168)
-  const bridgeX = noseBridge.x * 0.5 + eyeMidX * 0.5;
-  const bridgeY = eyeMidY * 0.68 + noseBridge.y * 0.32;
+  // Anchor directly at pupil eye level (eyeMidY) so lenses align perfectly on eyes
+  const bridgeX = eyeMidX;
+  const bridgeY = eyeMidY;
 
   const cx = videoWidth  / 2;
   const cy = videoHeight / 2;

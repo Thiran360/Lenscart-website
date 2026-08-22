@@ -67,6 +67,20 @@
   animation: floatStyle 3.5s ease-in-out infinite;
   width: 140px;
   height: 80px;
+  position: relative;
+}
+
+.style-icon::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 12px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 70%);
+  border-radius: 50%;
+  z-index: -1;
 }
 
 @keyframes floatStyle {
@@ -84,6 +98,7 @@
   object-fit: contain;
   display: block;
   transition: transform 0.4s ease;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
 }
 
 .style-card:hover .style-image {

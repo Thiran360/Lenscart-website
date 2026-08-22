@@ -171,7 +171,7 @@ function createGlassReflectionMesh(centerX, radius, isSunglasses, sunTint) {
   const lensMat = createLensMaterial(isSunglasses, sunTint);
   const lensMesh = new THREE.Mesh(lensGeo, lensMat);
   lensMesh.rotation.x = Math.PI / 2;
-  lensMesh.scale.z = 0.25;
+  lensMesh.scale.z = 0.01;
   group.add(lensMesh);
 
   // Anti-reflective Specular Glare Ring
@@ -336,13 +336,7 @@ export async function createHDTexturedGlasses(product, selectedColor) {
   // 1. Add Facial Drop Shadow Plane (casts dark shadow on nose & cheeks)
   group.add(createFacialDropShadowMesh());
 
-  // 2. Add 3D Curved Glass Lenses & Anti-Reflective Specular Glare (Left & Right Pupils)
-  const leftCenterX = -0.50;
-  const rightCenterX = 0.50;
-  const lensRadius = profile.lensRadius || 0.28;
-
-  group.add(createGlassReflectionMesh(leftCenterX, lensRadius, isSunglasses, sunTint));
-  group.add(createGlassReflectionMesh(rightCenterX, lensRadius, isSunglasses, sunTint));
+  // Glass Reflection Mesh removed from HD textured glasses to prevent black ovals
 
   // 3. Load High-Resolution Catalog Product Texture
   try {
@@ -354,15 +348,53 @@ export async function createHDTexturedGlasses(product, selectedColor) {
 
     const imgW = texture.image?.width || 600;
     const imgH = texture.image?.height || 200;
-    const aspect = imgW / imgH;
 
-    // Normalize so lens centers sit exactly at X = -0.50 and X = +0.50 (IPD = 1.0 unit)
-    const planeWidth = 2.05;
-    const planeHeight = planeWidth / aspect;
+    // Detect actual opaque bounds to compensate for transparent/white padding
+    const canvas = document.createElement('canvas');
+    canvas.width = imgW;
+    canvas.height = imgH;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(texture.image, 0, 0, imgW, imgH);
+    const data = ctx.getImageData(0, 0, imgW, imgH).data;
+
+    let minX = imgW, maxX = 0, minY = imgH, maxY = 0;
+    let found = false;
+    for (let y = 0; y < imgH; y++) {
+      for (let x = 0; x < imgW; x++) {
+        const i = (y * imgW + x) * 4;
+        const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
+        // Check for non-transparent AND non-white pixels
+        const isOpaque = a > 20 && !(r > 240 && g > 240 && b > 240);
+        if (isOpaque) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+          found = true;
+        }
+      }
+    }
+    
+    if (!found) {
+      minX = 0; maxX = imgW; minY = 0; maxY = imgH;
+    }
+
+    const contentWidth = maxX - minX;
+    const trueCenterX = (minX + maxX) / 2;
+    const trueCenterY = (minY + maxY) / 2;
+
+    // Lenses are typically at 25% and 75% of the TRUE glasses width. Distance = 50% of width.
+    const ipdPixels = contentWidth * 0.50;
+    // We want 1.0 units in 3D to match the distance between lenses
+    const unitsPerPixel = 1.0 / ipdPixels;
+
+    const planeWidth = imgW * unitsPerPixel;
+    const planeHeight = imgH * unitsPerPixel;
 
     const frontGeo = new THREE.PlaneGeometry(planeWidth, planeHeight);
     const frontMat = new THREE.MeshStandardMaterial({
       map: texture,
+      color: new THREE.Color(frameColor).lerp(new THREE.Color(0xffffff), 0.3), // Tint the image with the selected color
       transparent: true,
       alphaTest: 0.02,
       depthWrite: true,
@@ -372,7 +404,14 @@ export async function createHDTexturedGlasses(product, selectedColor) {
     });
 
     const frontMesh = new THREE.Mesh(frontGeo, frontMat);
-    frontMesh.position.set(0, 0, 0.012);
+    
+    // Offset the mesh so the TRUE glasses center is exactly at (0,0)
+    const imageCenterX = imgW / 2;
+    const imageCenterY = imgH / 2;
+    const offsetX = (imageCenterX - trueCenterX) * unitsPerPixel;
+    const offsetY = -(imageCenterY - trueCenterY) * unitsPerPixel; // ThreeJS Y is UP
+
+    frontMesh.position.set(offsetX, offsetY, 0.012);
     frontMesh.name = 'hd-front-frame';
     group.add(frontMesh);
 
@@ -380,27 +419,9 @@ export async function createHDTexturedGlasses(product, selectedColor) {
     console.warn('[TryOn] HD Product texture load failed, building procedural frame:', err);
   }
 
-  // 4. Add 3D Temple Arms (Side arms wrapping around ears with depth occlusion)
-  const frameMat = createFrameMaterial(frameColor);
-  const leftOuterX = leftCenterX - lensRadius * 1.15;
-  const rightOuterX = rightCenterX + lensRadius * 1.15;
-  const armLength = 0.95;
+  // Procedural arms removed from HD texture model to prevent extra lines
 
-  group.add(createTempleArm(-1, frameMat, leftOuterX, armLength));
-  group.add(createTempleArm(1, frameMat, rightOuterX, armLength));
-
-  // 5. Add Translucent Silicone Nose Pads
-  const padMat = new THREE.MeshStandardMaterial({
-    color: 0xfffffe,
-    transparent: true,
-    opacity: 0.65,
-    roughness: 0.2,
-  });
-  [-1, 1].forEach((side) => {
-    const pad = new THREE.Mesh(new THREE.SphereGeometry(0.018, 8, 8), padMat);
-    pad.position.set(side * 0.18, -lensRadius * 0.35, 0.022);
-    group.add(pad);
-  });
+  // Removed 3D components from HD image for a cleaner look
 
   group.userData = {
     type: 'hd-textured',
@@ -457,7 +478,7 @@ export function createProceduralGlasses(product, selectedColor) {
   const rightInnerX = rightCenterX - lensRadius * 0.85;
   const bridgeY = profile.lensShape === 'aviator' ? lensRadius * 0.45 : lensRadius * 0.35;
   
-  group.add(createNoseBridge(leftInnerX, rightInnerX, bridgeY, frameMat.clone()));
+  // Nose bridge removed as per user request for style
 
   const leftOuterX  = leftCenterX  - lensRadius * 1.15;
   const rightOuterX = rightCenterX + lensRadius * 1.15;
