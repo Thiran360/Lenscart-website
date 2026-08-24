@@ -348,48 +348,11 @@ export async function createHDTexturedGlasses(product, selectedColor) {
 
     const imgW = texture.image?.width || 600;
     const imgH = texture.image?.height || 200;
+    const aspect = imgW / imgH;
 
-    // Detect actual opaque bounds to compensate for transparent/white padding
-    const canvas = document.createElement('canvas');
-    canvas.width = imgW;
-    canvas.height = imgH;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(texture.image, 0, 0, imgW, imgH);
-    const data = ctx.getImageData(0, 0, imgW, imgH).data;
-
-    let minX = imgW, maxX = 0, minY = imgH, maxY = 0;
-    let found = false;
-    for (let y = 0; y < imgH; y++) {
-      for (let x = 0; x < imgW; x++) {
-        const i = (y * imgW + x) * 4;
-        const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
-        // Check for non-transparent AND non-white pixels
-        const isOpaque = a > 20 && !(r > 240 && g > 240 && b > 240);
-        if (isOpaque) {
-          if (x < minX) minX = x;
-          if (x > maxX) maxX = x;
-          if (y < minY) minY = y;
-          if (y > maxY) maxY = y;
-          found = true;
-        }
-      }
-    }
-    
-    if (!found) {
-      minX = 0; maxX = imgW; minY = 0; maxY = imgH;
-    }
-
-    const contentWidth = maxX - minX;
-    const trueCenterX = (minX + maxX) / 2;
-    const trueCenterY = (minY + maxY) / 2;
-
-    // Lenses are typically at 25% and 75% of the TRUE glasses width. Distance = 50% of width.
-    const ipdPixels = contentWidth * 0.50;
-    // We want 1.0 units in 3D to match the distance between lenses
-    const unitsPerPixel = 1.0 / ipdPixels;
-
-    const planeWidth = imgW * unitsPerPixel;
-    const planeHeight = imgH * unitsPerPixel;
+    // Normalize so lens centers sit exactly at X = -0.50 and X = +0.50 (IPD = 1.0 unit)
+    const planeWidth = 2.05;
+    const planeHeight = planeWidth / aspect;
 
     const frontGeo = new THREE.PlaneGeometry(planeWidth, planeHeight);
     const frontMat = new THREE.MeshStandardMaterial({
@@ -404,14 +367,7 @@ export async function createHDTexturedGlasses(product, selectedColor) {
     });
 
     const frontMesh = new THREE.Mesh(frontGeo, frontMat);
-    
-    // Offset the mesh so the TRUE glasses center is exactly at (0,0)
-    const imageCenterX = imgW / 2;
-    const imageCenterY = imgH / 2;
-    const offsetX = (imageCenterX - trueCenterX) * unitsPerPixel;
-    const offsetY = -(imageCenterY - trueCenterY) * unitsPerPixel; // ThreeJS Y is UP
-
-    frontMesh.position.set(offsetX, offsetY, 0.012);
+    frontMesh.position.set(0, 0, 0.012);
     frontMesh.name = 'hd-front-frame';
     group.add(frontMesh);
 
