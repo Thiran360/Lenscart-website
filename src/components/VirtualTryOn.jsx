@@ -306,7 +306,7 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct, selectedColor }) => {
     if (capturedImage) {
       const link = document.createElement('a');
       link.href = capturedImage;
-      link.download = 'lenskart-tryon.jpg';
+      link.download = 'Mr.LensMaker-tryon.jpg';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

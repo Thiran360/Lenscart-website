@@ -11,7 +11,7 @@ const SunglassCategories = () => {
       image: "/men-category.jpeg",
       items: [
         { name: "John Jacobs | Meller", price: "Starts at ₹3000", icon: "👓" },
-        { name: "Vincent Chase | Lenskart Studio", price: "Starts at ₹1000", icon: "👓" },
+        { name: "Vincent Chase | Mr.LensMaker Studio", price: "Starts at ₹1000", icon: "👓" },
         { name: "Hustlr", price: "Starts at ₹1000", icon: "👓" },
         { name: "Essentials", price: "Starts at ₹500", icon: "👓" },
       ]
@@ -23,7 +23,7 @@ const SunglassCategories = () => {
       image: "/women-category.jpeg",
       items: [
         { name: "John Jacobs | Meller", price: "Starts at ₹3000", icon: "👓" },
-        { name: "Vincent Chase | Lenskart Studio", price: "Starts at ₹1000", icon: "👓" },
+        { name: "Vincent Chase | Mr.LensMaker Studio", price: "Starts at ₹1000", icon: "👓" },
         { name: "Hustlr", price: "Starts at ₹1000", icon: "👓" },
         { name: "Essentials", price: "Starts at ₹500", icon: "👓" },
       ]

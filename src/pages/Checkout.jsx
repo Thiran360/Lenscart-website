@@ -57,7 +57,7 @@ function Checkout() {
       status: 'In Transit',
       total: `₹${Math.round(checkoutTotal)}`,
       items: checkoutItems.map(item => ({
-        name: item.name || item.title || "Lenskart Eyewear",
+        name: item.name || item.title || "Mr.LensMaker Eyewear",
         image: item.image || "/frame-image1.jpg",
         price: item.price || 2000,
         color: item.selectedColor || "Black"

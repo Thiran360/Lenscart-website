@@ -1,4 +1,4 @@
-// Centralized API Service for LensMaker Application
+// Centralized API Service for Mr.LensMaker Application
 // Base URL: https://concise-egomaniac-starved.ngrok-free.dev/api/v1/
 
 export const BASE_API_URL = "https://concise-egomaniac-starved.ngrok-free.dev/api/v1";

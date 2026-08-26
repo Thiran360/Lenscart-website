@@ -37,7 +37,7 @@ const PaymentGatewayModal = ({ isOpen, amount, method, onSuccess, onCancel }) =>
           <div className="pg-merchant">
             <span className="pg-merchant-logo">L</span>
             <div>
-              <h3>Lenskart</h3>
+              <h3>Mr.LensMaker</h3>
               <p>Transaction ID: LK{Math.floor(100000000 + Math.random() * 900000000)}</p>
             </div>
           </div>

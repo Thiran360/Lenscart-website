@@ -83,7 +83,7 @@ export function computeHeadPose(landmarks, transformMatrix, videoWidth, videoHei
   const position = {
     x:  bridgeX - cx,
     y: -(bridgeY - cy), // Three.js Y is UP (+Y)
-    z: -(noseBridge.z * 0.35) + 6,
+    z: -(noseBridge.z * 0.75) + 30, // Match the 0.75 multiplier of the face mesh + forward offset
   };
 
   // ── Scale ─────────────────────────────────────────────────────────────────

@@ -45,7 +45,7 @@ function Analytics() {
       <div className="analytics-container">
         <div className="analytics-header">
           <h1>Website Analytics & Performance</h1>
-          <p>Real-time insights for your Lenskart store.</p>
+          <p>Real-time insights for your Mr.LensMaker store.</p>
         </div>
 
         {/* KPI Cards */}

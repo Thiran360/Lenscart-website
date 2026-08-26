@@ -1,7 +1,7 @@
 export const productsData = [
   {
     "id": 39,
-    "brand": "Lenskart",
+    "brand": "Mr.LensMaker",
     "name": "Sunglass One",
     "category": "Classic",
     "type": "sunglasses",
@@ -34,7 +34,7 @@ export const productsData = [
   },
   {
     "id": 40,
-    "brand": "Lenskart",
+    "brand": "Mr.LensMaker",
     "name": "Sunglass Two",
     "category": "Premium",
     "type": "sunglasses",
@@ -69,7 +69,7 @@ export const productsData = [
   },
   {
     "id": 41,
-    "brand": "Lenskart",
+    "brand": "Mr.LensMaker",
     "name": "Sunglass Three",
     "category": "Classic",
     "type": "sunglasses",
@@ -103,7 +103,7 @@ export const productsData = [
   },
   {
     "id": 42,
-    "brand": "Lenskart",
+    "brand": "Mr.LensMaker",
     "name": "Sunglass Four",
     "category": "Premium",
     "type": "sunglasses",
@@ -139,7 +139,7 @@ export const productsData = [
   },
   {
     "id": 43,
-    "brand": "Lenskart",
+    "brand": "Mr.LensMaker",
     "name": "Sunglass Five",
     "category": "Classic",
     "type": "sunglasses",
@@ -170,7 +170,7 @@ export const productsData = [
   },
   {
     "id": 44,
-    "brand": "Lenskart",
+    "brand": "Mr.LensMaker",
     "name": "Sunglass Six",
     "category": "Premium",
     "type": "sunglasses",
@@ -204,7 +204,7 @@ export const productsData = [
   },
   {
     "id": 45,
-    "brand": "Lenskart",
+    "brand": "Mr.LensMaker",
     "name": "Sunglass Seven",
     "category": "Classic",
     "type": "sunglasses",
@@ -275,7 +275,7 @@ export const productsData = [
   },
   {
     "id": 2,
-    "brand": "Lenskart Air",
+    "brand": "Mr.LensMaker Air",
     "name": "Round Transparent",
     "category": "Premium",
     "type": "eyeglasses",
@@ -322,7 +322,7 @@ export const productsData = [
     "price": 4000,
     "oldPrice": 5000,
     "discount": 20,
-    "image": "/eyeglass3.png",
+    "image": "/eyeglass_21.png",
     "description": "Sleek and sophisticated rimless glasses. Provides a wide field of vision with minimal weight.",
     "colors": [
       "grey",
@@ -378,7 +378,7 @@ export const productsData = [
   },
   {
     "id": 5,
-    "brand": "Lenskart Air",
+    "brand": "Mr.LensMaker Air",
     "name": "Flexi Square",
     "category": "Premium",
     "type": "sunglasses",
@@ -555,7 +555,7 @@ export const productsData = [
   },
   {
     "id": 12,
-    "brand": "Lenskart Air",
+    "brand": "Mr.LensMaker Air",
     "name": "Feather Light Rectangle",
     "category": "Premium",
     "type": "eyeglasses",
@@ -699,7 +699,7 @@ export const productsData = [
   },
   {
     "id": 16,
-    "brand": "Lenskart Air",
+    "brand": "Mr.LensMaker Air",
     "name": "Clear Wayfarer",
     "category": "Classic",
     "type": "eyeglasses",
@@ -849,7 +849,7 @@ export const productsData = [
     "price": 3500,
     "oldPrice": 5000,
     "discount": 30,
-    "image": "/eyeglass4.png",
+    "image": "/eye_glass.png",
     "description": "Featured product added from local assets.",
     "colors": [
       "grey",
@@ -884,11 +884,10 @@ export const productsData = [
     "price": 1100,
     "oldPrice": 1500,
     "discount": 26,
-    "image": "/kids1.png",
+    "image": "/kids2.png",
     "description": "Durable and flexible rectangle glasses for kids. Perfect for school and play.",
     "colors": [
       "blue",
-      "black",
       "red"
     ],
     "lensPower": [
@@ -903,9 +902,9 @@ export const productsData = [
   },
   {
     "id": 902,
-    "name": "Lenskart Junior Round",
+    "name": "Mr.LensMaker Junior Round",
     "category": "Kids",
-    "brand": "Lenskart Junior",
+    "brand": "Mr.LensMaker Junior",
     "gender": "Unisex",
     "shape": "Round",
     "size": "S",
@@ -965,7 +964,7 @@ export const productsData = [
     "id": 904,
     "name": "Junior Sporty Aviator",
     "category": "Kids",
-    "brand": "Lenskart Junior",
+    "brand": "Mr.LensMaker Junior",
     "gender": "Boys",
     "shape": "Aviator",
     "size": "S",
@@ -1014,29 +1013,6 @@ export const productsData = [
       "0.00",
       "+1.00",
       "+2.00"
-    ]
-  },
-  {
-    "id": 906,
-    "name": "Hooper Tiny Oval",
-    "category": "Kids",
-    "brand": "Hooper Kids",
-    "gender": "Unisex",
-    "shape": "Oval",
-    "size": "XS",
-    "rating": 4.9,
-    "price": 1250,
-    "oldPrice": 1800,
-    "discount": 30,
-    "image": "/kids6.png",
-    "description": "Tiny oval frames for toddlers. Made from ultra-safe silicone.",
-    "colors": [
-      "blue",
-      "green",
-      "red"
-    ],
-    "lensPower": [
-      "0.00"
     ]
   }
 ];
