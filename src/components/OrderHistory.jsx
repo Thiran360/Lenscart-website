@@ -39,7 +39,7 @@ function OrderHistory({ initialAction }) {
         status: "In Transit",
         total: "₹4500",
         items: [{
-          name: "Lenskart Air - Aviator Gold",
+          name: "Mr.LensMaker Air - Aviator Gold",
           image: "https://images.unsplash.com/photo-1577803645773-f96470509666?w=200&q=80",
           price: 4500,
           color: "Gold"

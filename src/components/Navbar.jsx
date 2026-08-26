@@ -107,7 +107,7 @@ function Navbar() {
               </button>
 
               <Link to="/" className="nav-logo">
-                <img src="/lenskartlogo.png" alt="LensKart" className="logo-img" />
+                <img src="/lensmakerlogo.png" alt="Mr.LensMaker" className="logo-img" />
               </Link>
             </div>
 
@@ -304,7 +304,7 @@ function Navbar() {
           <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
             <div className="mobile-drawer-header">
               <div className="mobile-drawer-logo">
-                <img src="/lenskartlogo.png" alt="LensKart" style={{ height: '36px', objectFit: 'contain' }} />
+                <img src="/lensmakerlogo.png" alt="Mr.LensMaker" style={{ height: '36px', objectFit: 'contain' }} />
               </div>
               <button 
                 type="button" 

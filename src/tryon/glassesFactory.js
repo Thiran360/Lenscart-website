@@ -171,7 +171,7 @@ function createGlassReflectionMesh(centerX, radius, isSunglasses, sunTint) {
   const lensMat = createLensMaterial(isSunglasses, sunTint);
   const lensMesh = new THREE.Mesh(lensGeo, lensMat);
   lensMesh.rotation.x = Math.PI / 2;
-  lensMesh.scale.z = 0.25;
+  lensMesh.scale.z = 0.01;
   group.add(lensMesh);
 
   // Anti-reflective Specular Glare Ring
@@ -336,13 +336,7 @@ export async function createHDTexturedGlasses(product, selectedColor) {
   // 1. Add Facial Drop Shadow Plane (casts dark shadow on nose & cheeks)
   group.add(createFacialDropShadowMesh());
 
-  // 2. Add 3D Curved Glass Lenses & Anti-Reflective Specular Glare (Left & Right Pupils)
-  const leftCenterX = -0.50;
-  const rightCenterX = 0.50;
-  const lensRadius = profile.lensRadius || 0.28;
-
-  group.add(createGlassReflectionMesh(leftCenterX, lensRadius, isSunglasses, sunTint));
-  group.add(createGlassReflectionMesh(rightCenterX, lensRadius, isSunglasses, sunTint));
+  // Glass Reflection Mesh removed from HD textured glasses to prevent black ovals
 
   // 3. Load High-Resolution Catalog Product Texture
   try {
@@ -363,6 +357,7 @@ export async function createHDTexturedGlasses(product, selectedColor) {
     const frontGeo = new THREE.PlaneGeometry(planeWidth, planeHeight);
     const frontMat = new THREE.MeshStandardMaterial({
       map: texture,
+      color: new THREE.Color(frameColor).lerp(new THREE.Color(0xffffff), 0.3), // Tint the image with the selected color
       transparent: true,
       alphaTest: 0.02,
       depthWrite: true,
@@ -380,27 +375,9 @@ export async function createHDTexturedGlasses(product, selectedColor) {
     console.warn('[TryOn] HD Product texture load failed, building procedural frame:', err);
   }
 
-  // 4. Add 3D Temple Arms (Side arms wrapping around ears with depth occlusion)
-  const frameMat = createFrameMaterial(frameColor);
-  const leftOuterX = leftCenterX - lensRadius * 1.15;
-  const rightOuterX = rightCenterX + lensRadius * 1.15;
-  const armLength = 0.95;
+  // Procedural arms removed from HD texture model to prevent extra lines
 
-  group.add(createTempleArm(-1, frameMat, leftOuterX, armLength));
-  group.add(createTempleArm(1, frameMat, rightOuterX, armLength));
-
-  // 5. Add Translucent Silicone Nose Pads
-  const padMat = new THREE.MeshStandardMaterial({
-    color: 0xfffffe,
-    transparent: true,
-    opacity: 0.65,
-    roughness: 0.2,
-  });
-  [-1, 1].forEach((side) => {
-    const pad = new THREE.Mesh(new THREE.SphereGeometry(0.018, 8, 8), padMat);
-    pad.position.set(side * 0.18, -lensRadius * 0.35, 0.022);
-    group.add(pad);
-  });
+  // Removed 3D components from HD image for a cleaner look
 
   group.userData = {
     type: 'hd-textured',
@@ -457,7 +434,7 @@ export function createProceduralGlasses(product, selectedColor) {
   const rightInnerX = rightCenterX - lensRadius * 0.85;
   const bridgeY = profile.lensShape === 'aviator' ? lensRadius * 0.45 : lensRadius * 0.35;
   
-  group.add(createNoseBridge(leftInnerX, rightInnerX, bridgeY, frameMat.clone()));
+  // Nose bridge removed as per user request for style
 
   const leftOuterX  = leftCenterX  - lensRadius * 1.15;
   const rightOuterX = rightCenterX + lensRadius * 1.15;

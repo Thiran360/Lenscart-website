@@ -11,7 +11,7 @@ const EyeglassCategories = () => {
       image: "/men-eyeglass.jpeg",
       items: [
         { name: "John Jacobs | Owndays | Le Petit", price: "Starts at ₹3000", icon: "👓" },
-        { name: "Vincent Chase | Lenskart Air", price: "Starts at ₹1500", icon: "👓" },
+        { name: "Vincent Chase | Mr.LensMaker Air", price: "Starts at ₹1500", icon: "👓" },
         { name: "Hustlr", price: "Starts at ₹500", icon: "👓" },
         { name: "Essentials", price: "Starts at ₹500", icon: "👓" },
       ]
@@ -23,7 +23,7 @@ const EyeglassCategories = () => {
       image: "/women-eyeglass.jpeg",
       items: [
         { name: "John Jacobs | Owndays | Le Petit", price: "Starts at ₹3000", icon: "👓" },
-        { name: "Vincent Chase | Lenskart Air", price: "Starts at ₹1500", icon: "👓" },
+        { name: "Vincent Chase | Mr.LensMaker Air", price: "Starts at ₹1500", icon: "👓" },
         { name: "Hustlr", price: "Starts at ₹500", icon: "👓" },
         { name: "Essentials", price: "Starts at ₹500", icon: "👓" },
       ]

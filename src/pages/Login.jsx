@@ -50,7 +50,7 @@ function Login() {
             <span className="badge">DISCOVER PREMIUM EYEWEAR</span>
             <h4>Many stylish solutions</h4>
             <h1>
-              <span>Lenskart</span>
+              <span>Mr.LensMaker</span>
               Experience The Clarity Of Vision
             </h1>
             <p>Authentic premium frames with carefully sourced lenses for your daily vision and lifestyle.</p>
@@ -61,7 +61,7 @@ function Login() {
               <FaTimes />
             </button>
             
-            <h2>Welcome To Lenskart!</h2>
+            <h2>Welcome To Mr.LensMaker!</h2>
             <p style={{ textAlign: "center", color: "#666", marginTop: "-25px", marginBottom: "30px", fontSize: "14px" }}>
               Sign in with your mobile phone number
             </p>
@@ -88,7 +88,7 @@ function Login() {
             </form>
 
             <p className="login-footer-text">
-              New to LensKart?{" "}
+              New to Mr.LensMaker?{" "}
               <Link to="/register" style={{ color: "#0d6b6d", fontWeight: "bold" }}>
                 Create an Account
               </Link>

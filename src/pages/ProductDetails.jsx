@@ -95,6 +95,13 @@ function ProductDetails() {
   const [currentCouponIndex, setCurrentCouponIndex] = useState(0);
   const [pincode, setPincode] = useState('');
   const [deliveryDate, setDeliveryDate] = useState(null);
+  const [selectedAssurances, setSelectedAssurances] = useState([]);
+
+  const toggleAssurance = (assurance) => {
+    setSelectedAssurances(prev => 
+      prev.includes(assurance) ? prev.filter(a => a !== assurance) : [...prev, assurance]
+    );
+  };
 
   const coupons = [
     {
@@ -341,7 +348,10 @@ function ProductDetails() {
                     GET ASSURED YOU
                   </h4>
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#fcfbfa', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(224, 216, 200, 0.6)', flex: '1', minWidth: '130px' }}>
+                    <div 
+                      onClick={() => toggleAssurance('return')}
+                      style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', background: selectedAssurances.includes('return') ? '#e6f7f7' : '#fcfbfa', padding: '10px 14px', borderRadius: '10px', border: selectedAssurances.includes('return') ? '1px solid #0d6b6d' : '1px solid rgba(224, 216, 200, 0.6)', flex: '1', minWidth: '130px', transition: 'all 0.3s' }}
+                    >
                       <span style={{ fontSize: '20px' }}>📦</span>
                       <div>
                         <div style={{ fontSize: '12.5px', fontWeight: '700', color: '#3A2415' }}>
@@ -351,7 +361,10 @@ function ProductDetails() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#fcfbfa', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(224, 216, 200, 0.6)', flex: '1', minWidth: '130px' }}>
+                    <div 
+                      onClick={() => toggleAssurance('exchange')}
+                      style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', background: selectedAssurances.includes('exchange') ? '#e6f7f7' : '#fcfbfa', padding: '10px 14px', borderRadius: '10px', border: selectedAssurances.includes('exchange') ? '1px solid #0d6b6d' : '1px solid rgba(224, 216, 200, 0.6)', flex: '1', minWidth: '130px', transition: 'all 0.3s' }}
+                    >
                       <span style={{ fontSize: '20px' }}>🔄</span>
                       <div>
                         <div style={{ fontSize: '12.5px', fontWeight: '700', color: '#3A2415' }}>14 Days Exchange</div>
@@ -359,7 +372,10 @@ function ProductDetails() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#fcfbfa', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(224, 216, 200, 0.6)', flex: '1', minWidth: '130px' }}>
+                    <div 
+                      onClick={() => toggleAssurance('warranty')}
+                      style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', background: selectedAssurances.includes('warranty') ? '#e6f7f7' : '#fcfbfa', padding: '10px 14px', borderRadius: '10px', border: selectedAssurances.includes('warranty') ? '1px solid #0d6b6d' : '1px solid rgba(224, 216, 200, 0.6)', flex: '1', minWidth: '130px', transition: 'all 0.3s' }}
+                    >
                       <span style={{ fontSize: '20px' }}>🛡️</span>
                       <div>
                         <div style={{ fontSize: '12.5px', fontWeight: '700', color: '#3A2415' }}>1 Year Warranty</div>

@@ -1,4 +1,4 @@
-// Zenni Optical / Lenskart Standard Optical Prescription Options
+// Zenni Optical / Mr.LensMaker Standard Optical Prescription Options
 
 export const generateSphOptions = () => {
   const options = [];

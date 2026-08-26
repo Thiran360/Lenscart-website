@@ -119,10 +119,10 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct, selectedColor }) => {
       loadScripts();
     }
 
-    // Safety fallback timer: unlock loading spinner after 2.5s max no matter what
+    // Safety fallback timer: unlock loading spinner after 8s max no matter what
     const safetyTimer = setTimeout(() => {
       if (isMounted) setIsModelLoaded(true);
-    }, 2500);
+    }, 8000);
 
     document.body.style.overflow = 'hidden';
     return () => {
@@ -236,7 +236,10 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct, selectedColor }) => {
   };
 
   const onResults = (results) => {
-    if (!isModelLoaded) setIsModelLoaded(true);
+    const hasFace = results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0;
+    if (!isModelLoaded && hasFace) {
+      setIsModelLoaded(true);
+    }
 
     const video = webcamRef.current?.video;
     const renderer = tryOnRendererRef.current;
@@ -245,7 +248,7 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct, selectedColor }) => {
     renderer.setVideo(video);
     renderer.resize();
 
-    if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+    if (hasFace) {
       const landmarks = results.multiFaceLandmarks[0];
       const transformMatrix = results.facialTransformationMatrixes?.[0];
       const videoWidth = video.videoWidth || 1280;
@@ -303,7 +306,7 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct, selectedColor }) => {
     if (capturedImage) {
       const link = document.createElement('a');
       link.href = capturedImage;
-      link.download = 'lenskart-tryon.jpg';
+      link.download = 'Mr.LensMaker-tryon.jpg';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -375,8 +378,10 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct, selectedColor }) => {
 
           {!isModelLoaded && (
             <div className="tryon-loading">
-              <div className="spinner"></div>
-              <p>Initializing AI 3D Tracking...</p>
+              <div className="face-scanner">
+                <div className="scanner-corners"></div>
+              </div>
+              <p className="loading-text">DETECTING FACE...</p>
             </div>
           )}
 
@@ -398,7 +403,8 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct, selectedColor }) => {
               }}
               mirrored={isMirrored}
               onUserMedia={() => {
-                setTimeout(() => setIsModelLoaded(true), 300);
+                // Only hide loading screen when a face is actually detected in onResults
+                console.log("Webcam started, waiting for face detection...");
               }}
               onUserMediaError={(err) => {
                 console.error("Webcam access error:", err);
@@ -460,22 +466,30 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct, selectedColor }) => {
               </div>
             )}
           </div>
-          <div className="frames-carousel" ref={scrollRef}>
-            {productsData.map((item) => (
-              <div
-                key={item.id}
-                className={`frame-option ${selectedFrame?.id === item.id ? 'selected' : ''}`}
-                onClick={() => {
-                  setSelectedFrame(item);
-                  if (item.colors && item.colors.length > 0) {
-                    setActiveColor(item.colors[0]);
-                  }
-                }}
-              >
-                <img src={item.image} alt={item.name} />
-                <span className="frame-name">{item.name}</span>
-              </div>
-            ))}
+          <div className="carousel-container">
+            <button className="carousel-nav-btn left-btn" onClick={() => scrollRef.current?.scrollBy({ left: -250, behavior: 'smooth' })}>
+              &#10094;
+            </button>
+            <div className="frames-carousel" ref={scrollRef}>
+              {productsData.map((item) => (
+                <div
+                  key={item.id}
+                  className={`frame-option ${selectedFrame?.id === item.id ? 'selected' : ''}`}
+                  onClick={() => {
+                    setSelectedFrame(item);
+                    if (item.colors && item.colors.length > 0) {
+                      setActiveColor(item.colors[0]);
+                    }
+                  }}
+                >
+                  <img src={item.image} alt={item.name} />
+                  <span className="frame-name">{item.name}</span>
+                </div>
+              ))}
+            </div>
+            <button className="carousel-nav-btn right-btn" onClick={() => scrollRef.current?.scrollBy({ left: 250, behavior: 'smooth' })}>
+              &#10095;
+            </button>
           </div>
         </div>
 
