@@ -25,9 +25,9 @@
   width: 180px;
   height: 180px;
   border-radius: 50%;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  border: 1px solid transparent;
+  border: 2px solid #e0d5c1;
   color: #333;
   animation: fadeUpStyle 0.8s ease-out forwards;
   opacity: 0;
@@ -98,7 +98,7 @@
   object-fit: contain;
   display: block;
   transition: transform 0.4s ease;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+  mix-blend-mode: multiply;
 }
 
 .style-card:hover .style-image {

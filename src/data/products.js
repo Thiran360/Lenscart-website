@@ -138,37 +138,7 @@ export const productsData = [
     ]
   },
   {
-    "id": 43,
-    "brand": "Mr.LensMaker",
-    "name": "Sunglass Five",
-    "category": "Classic",
-    "type": "sunglasses",
-    "gender": "Men",
-    "shape": "Square",
-    "size": "L",
-    "rating": 4.5,
-    "price": 2100,
-    "oldPrice": 3100,
-    "discount": 32,
-    "image": "/sunglass5.png",
-    "description": "Classic sunglass five.",
-    "colors": [
-      "grey",
-      "red",
-      "silver",
-      "transparent"
-    ],
-    "lensPower": [
-      "-3.00",
-      "-2.00",
-      "-1.00",
-      "0.00",
-      "+1.00",
-      "+2.00",
-      "+3.00"
-    ]
-  },
-  {
+
     "id": 44,
     "brand": "Mr.LensMaker",
     "name": "Sunglass Six",
