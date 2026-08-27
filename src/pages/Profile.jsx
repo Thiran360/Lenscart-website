@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { FaUser, FaBoxOpen, FaGlasses, FaHome, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { logoutUser } from "../services/authService";
 import "./Profile.css";
 import PrescriptionManager from "../components/PrescriptionManager";
 import OrderHistory from "../components/OrderHistory";
@@ -30,9 +31,8 @@ function Profile() {
     setActiveTab(tab);
   }, [location.search]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("user");
+  const handleLogout = async () => {
+    await logoutUser();
     navigate("/login");
   };
 
