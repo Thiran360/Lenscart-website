@@ -2,40 +2,73 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import CustomPhoneInput from "../components/CustomPhoneInput";
+import { loginUser, clean10DigitPhone } from "../services/authService";
 import { FaTimes } from "react-icons/fa";
 import "./Login.css";
 
 function Login() {
   const [phone, setPhone] = useState("");
   const [countryInfo, setCountryInfo] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
   const handlePhoneChange = (val, countryData) => {
     setPhone(val);
     if (countryData) setCountryInfo(countryData);
+    if (errorMsg) setErrorMsg("");
   };
 
-  const handleGetOtp = (e) => {
+  const handleGetOtp = async (e) => {
     if (e) e.preventDefault();
-    if (!phone || phone.length < 7) {
-      alert("Please enter a valid mobile phone number");
+    setErrorMsg("");
+
+    const cleanPhone = clean10DigitPhone(phone);
+    if (!cleanPhone || cleanPhone.length !== 10) {
+      alert("Please enter a valid 10-digit mobile phone number");
       return;
     }
 
     const dialCode = countryInfo?.dialCode ? `+${countryInfo.dialCode}` : "+91";
-    const formattedPhone = phone.startsWith("+") ? phone : `${dialCode} ${phone}`;
-    
-    // Check if existing user profile exists in localStorage
-    const existingUser = JSON.parse(localStorage.getItem("user"));
-    if (existingUser && existingUser.name) {
-      localStorage.setItem("pendingName", existingUser.name);
+    const formattedDisplayPhone = `${dialCode} ${cleanPhone}`;
+
+    setLoading(true);
+    try {
+      // POST /login/ with payload { phone: "9876543210" } (pure 10-digit string)
+      const response = await loginUser({ phone: cleanPhone });
+      
+      // ONLY navigate on API SUCCESS
+      if (response) {
+        const token = response?.data?.user_token || response?.user_token;
+        if (token) {
+          localStorage.setItem("user_token", token);
+        }
+
+        const serverOtp = response?.data?.otp || response?.otp;
+        if (serverOtp) {
+          localStorage.setItem("otp", String(serverOtp));
+        }
+
+        // Save session items only when API call succeeds
+        const existingUser = JSON.parse(localStorage.getItem("user"));
+        if (existingUser && existingUser.name) {
+          localStorage.setItem("pendingName", existingUser.name);
+        }
+
+        localStorage.setItem("pendingPhone", formattedDisplayPhone);
+        localStorage.setItem("cleanPhone", cleanPhone);
+        localStorage.setItem("otpFlow", "login");
+
+        navigate("/verify-otp");
+      }
+    } catch (err) {
+      console.error("[Login API Error]:", err);
+      const msg = err?.data?.message || err?.data?.error || err?.message || "Failed to send OTP. Please check your mobile number.";
+      setErrorMsg(msg);
+      // DO NOT navigate on failure
+    } finally {
+      setLoading(false);
     }
-
-    localStorage.setItem("pendingPhone", formattedPhone);
-    localStorage.setItem("otpFlow", "login");
-    localStorage.setItem("otp", "1234");
-
-    navigate("/verify-otp");
   };
 
   const isPhoneValid = Boolean(phone && phone.trim().length >= 7);
@@ -66,6 +99,22 @@ function Login() {
               Sign in with your mobile phone number
             </p>
 
+            {errorMsg && (
+              <div style={{
+                background: "#ffebee",
+                color: "#c62828",
+                padding: "12px 16px",
+                borderRadius: "8px",
+                fontSize: "14px",
+                marginBottom: "20px",
+                textAlign: "center",
+                border: "1px solid #ffcdd2",
+                fontWeight: "500"
+              }}>
+                ⚠️ {errorMsg}
+              </div>
+            )}
+
             <form onSubmit={handleGetOtp}>
               <div style={{ marginBottom: "30px" }}>
                 <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#3A2415", marginBottom: "6px" }}>
@@ -80,10 +129,10 @@ function Login() {
 
               <button 
                 type="submit" 
-                className={`login-btn ${!isPhoneValid ? 'disabled' : ''}`}
-                disabled={!isPhoneValid}
+                className={`login-btn ${!isPhoneValid || loading ? 'disabled' : ''}`}
+                disabled={!isPhoneValid || loading}
               >
-                Get OTP
+                {loading ? "Sending OTP..." : "Get OTP"}
               </button>
             </form>
 
@@ -101,3 +150,4 @@ function Login() {
 }
 
 export default Login;
+

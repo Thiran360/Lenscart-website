@@ -1,7 +1,7 @@
 // Centralized API Service for Mr.LensMaker Application
-// Base URL: https://concise-egomaniac-starved.ngrok-free.dev/api/v1/
+// Base URL: https://reformist-egotism-backlash.ngrok-free.dev/api
 
-export const BASE_API_URL = "https://concise-egomaniac-starved.ngrok-free.dev/api/v1";
+export const BASE_API_URL = "https://reformist-egotism-backlash.ngrok-free.dev/api";
 
 /**
  * Generic API request helper using Fetch API
@@ -17,19 +17,26 @@ export const apiRequest = async (endpoint, method = "GET", body = null, customHe
     ...customHeaders,
   };
 
-  const token = localStorage.getItem("userToken") || localStorage.getItem("token");
+  const token = localStorage.getItem("user_token");
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
+    headers["user_token"] = token;
   }
 
+  const httpMethod = method ? method.toUpperCase() : "GET";
+
   const config = {
-    method,
+    method: httpMethod,
     headers,
+    mode: "cors",
+    referrerPolicy: "no-referrer-when-downgrade",
   };
 
   if (body) {
-    config.body = JSON.stringify(body);
+    config.body = typeof body === "string" ? body : JSON.stringify(body);
   }
+
+  console.log(`[API Request] ${httpMethod} ${url}`, body);
 
   try {
     const response = await fetch(url, config);
