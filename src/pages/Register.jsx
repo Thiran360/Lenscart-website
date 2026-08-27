@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import CustomPhoneInput from "../components/CustomPhoneInput";
-import { registerUser } from "../services/authService";
+import { registerUser, clean10DigitPhone } from "../services/authService";
 import { FaTimes } from "react-icons/fa";
 import "./Login.css";
 
@@ -17,6 +17,7 @@ function Register() {
   const handlePhoneChange = (val, countryData) => {
     setPhone(val);
     if (countryData) setCountryInfo(countryData);
+    if (errorMsg) setErrorMsg("");
   };
 
   const handleGetOtp = async (e) => {
@@ -27,30 +28,50 @@ function Register() {
       alert("Please enter your full name");
       return;
     }
-    if (!phone || phone.length < 7) {
-      alert("Please enter a valid mobile phone number");
+    
+    const cleanPhone = clean10DigitPhone(phone);
+    if (!cleanPhone || cleanPhone.length !== 10) {
+      alert("Please enter a valid 10-digit mobile phone number");
       return;
     }
 
     const dialCode = countryInfo?.dialCode ? `+${countryInfo.dialCode}` : "+91";
-    const formattedPhone = phone.startsWith("+") ? phone : `${dialCode} ${phone}`;
+    const formattedDisplayPhone = `${dialCode} ${cleanPhone}`;
 
     setLoading(true);
     try {
-      // Execute registerUser from central authService (POST /auth/register)
-      await registerUser({
+      // Execute registerUser from central authService (POST /register/) with payload { phone: "9876543210", name: "User Name" }
+      const response = await registerUser({
         name: name.trim(),
-        phone: formattedPhone
+        phone: cleanPhone
       });
+
+      // ONLY navigate on API SUCCESS
+      if (response) {
+        const token = response?.data?.user_token || response?.user_token;
+        if (token) {
+          localStorage.setItem("user_token", token);
+        }
+
+        const serverOtp = response?.data?.otp || response?.otp;
+        if (serverOtp) {
+          localStorage.setItem("otp", String(serverOtp));
+        }
+
+        localStorage.setItem("pendingName", name.trim());
+        localStorage.setItem("pendingPhone", formattedDisplayPhone);
+        localStorage.setItem("cleanPhone", cleanPhone);
+        localStorage.setItem("otpFlow", "register");
+
+        navigate("/verify-otp");
+      }
     } catch (err) {
-      console.warn("Register API Notice:", err.message);
+      console.error("[Register API Error]:", err);
+      const msg = err?.data?.message || err?.data?.error || err?.message || "Registration failed. Please check your details.";
+      setErrorMsg(msg);
+      // DO NOT navigate on failure
     } finally {
       setLoading(false);
-      localStorage.setItem("pendingName", name);
-      localStorage.setItem("pendingPhone", formattedPhone);
-      localStorage.setItem("otpFlow", "register");
-      localStorage.setItem("otp", "1234");
-      navigate("/verify-otp");
     }
   };
 
@@ -81,6 +102,22 @@ function Register() {
             <p style={{ textAlign: "center", color: "#666", marginTop: "-25px", marginBottom: "30px", fontSize: "14px" }}>
               Quick 1-step signup with Mobile OTP
             </p>
+
+            {errorMsg && (
+              <div style={{
+                background: "#ffebee",
+                color: "#c62828",
+                padding: "12px 16px",
+                borderRadius: "8px",
+                fontSize: "14px",
+                marginBottom: "20px",
+                textAlign: "center",
+                border: "1px solid #ffcdd2",
+                fontWeight: "500"
+              }}>
+                ⚠️ {errorMsg}
+              </div>
+            )}
 
             <form onSubmit={handleGetOtp}>
               <div style={{ marginBottom: "20px" }}>

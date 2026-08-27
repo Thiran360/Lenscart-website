@@ -16,6 +16,7 @@ import {
 } from "react-icons/fa";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
+import { logoutUser } from "../services/authService";
 import "./Navbar.css";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
@@ -41,7 +42,7 @@ function Navbar() {
     const logged = localStorage.getItem("isLoggedIn") === "true";
     setIsLoggedIn(logged);
     const user = JSON.parse(localStorage.getItem("user"));
-    if (user && user.name) setUserName(user.name);
+    if (user) setUserName(user.name || user.phone || "");
   }, [location.pathname]);
 
   // Close mobile menu on route change
@@ -64,9 +65,8 @@ function Navbar() {
     };
   }, [isMobileMenuOpen]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("user");
+  const handleLogout = async () => {
+    await logoutUser();
     setIsLoggedIn(false);
     setUserName("");
     setIsMobileMenuOpen(false);
