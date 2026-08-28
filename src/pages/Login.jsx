@@ -4,7 +4,6 @@ import Navbar from "../components/Navbar";
 import CustomPhoneInput from "../components/CustomPhoneInput";
 import { loginUser, clean10DigitPhone } from "../services/authService";
 import { FaTimes } from "react-icons/fa";
-import axios from "axios";
 import "./Login.css";
 
 function Login() {
@@ -12,6 +11,7 @@ function Login() {
   const [countryInfo, setCountryInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [loginData, setLoginData] = useState({ name: "", phone: "" });
   const navigate = useNavigate();
 
   const handlePhoneChange = (val, countryData) => {
@@ -20,41 +20,6 @@ function Login() {
     if (errorMsg) setErrorMsg("");
   };
 
-  const handleLogin = async () => {
-    try {
-      console.log("Sending Payload:", {
-        phone: phone,
-      });
-
-      const response = await axios.post(
-        "https://reformist-egotism-backlash.ngrok-free.dev/api/login/",
-        {
-          phone: phone,
-        }
-      );
-
-      console.log("API Response:", response.data);
-
-      const result = response.data;
-
-      if (result.ok) {
-        setLoginData({
-          phone: result.phone,
-          name: result.user,
-        });
-
-        console.log("Login Success:", result);
-      } else {
-        console.log("Login Failed:", result.message);
-      }
-
-    } catch (error) {
-      console.error(
-        "Error:",
-        error.response?.data || error.message
-      );
-    }
-  };
 
   const handleGetOtp = async (e) => {
     if (e) e.preventDefault();
