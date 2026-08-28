@@ -4,9 +4,9 @@ import "./BrowseStyles.css";
 const stylesList = [
   { name: "Half Rim", path: "?style=half_rim", image: "/half_rim.png" },
   { name: "Full Rim", path: "?style=full_rim", image: "/classic_rectangle.png" },
-  { name: "Rimless", path: "?style=rimless", image: "/rimless_elegance.png" },
-  { name: "Wrap Around", path: "?style=wrap_around", image: "/golden_aviator.png" },
-  { name: "Oval", path: "?style=oval", image: "/metal_oval.png" }
+  { name: "Rimless", path: "?style=rimless", image: "/eyeglass1.png" },
+  { name: "Wrap Around", path: "?style=wrap_around", image: "/sunglass4.png" },
+  { name: "Oval", path: "?style=oval", image: "/oval_new_dark.jpg" }
 ];
 
 function BrowseStyles() {

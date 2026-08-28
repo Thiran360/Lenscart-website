@@ -153,15 +153,18 @@ function ProductDetails() {
   }, [id]);
 
   useEffect(() => {
-    if (isOffersOpen) {
+    if (isOffersOpen || isTryOnOpen || isSizeGuideOpen) {
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
     }
     return () => {
       document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
     };
-  }, [isOffersOpen]);
+  }, [isOffersOpen, isTryOnOpen, isSizeGuideOpen]);
 
   if (!product) {
     return (

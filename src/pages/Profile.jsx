@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { updateProfileApi } from "../services/profileService";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { FaUser, FaBoxOpen, FaGlasses, FaHome, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
@@ -42,12 +43,23 @@ function Profile() {
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editEmail.trim())
   );
 
-  const handleUpdateProfile = () => {
+  const handleUpdateProfile = async () => {
     if (!isProfileValid) return;
-    const updatedUser = { ...savedUser, name: editName, email: editEmail };
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-    setSavedUser(updatedUser);
-    alert("Profile updated successfully!");
+    
+    try {
+      await updateProfileApi({
+        name: editName,
+        email: editEmail
+      });
+
+      const updatedUser = { ...savedUser, name: editName, email: editEmail };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setSavedUser(updatedUser);
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("Failed to update profile. Please check console for details.");
+    }
   };
 
   return (

@@ -1,10 +1,12 @@
 // Centralized API Service for Mr.LensMaker Application
 // Base URL: https://reformist-egotism-backlash.ngrok-free.dev/api
 
+import axios from "axios";
+
 export const BASE_API_URL = "https://reformist-egotism-backlash.ngrok-free.dev/api";
 
 /**
- * Generic API request helper using Fetch API
+ * Generic API request helper using Axios
  * Includes ngrok browser warning skip header and token handling.
  */
 export const apiRequest = async (endpoint, method = "GET", body = null, customHeaders = {}) => {
@@ -18,41 +20,30 @@ export const apiRequest = async (endpoint, method = "GET", body = null, customHe
   };
 
   const token = localStorage.getItem("user_token");
+
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
-    headers["user_token"] = token;
+    headers["user-token"] = token;
   }
-
-  const httpMethod = method ? method.toUpperCase() : "GET";
 
   const config = {
-    method: httpMethod,
+    method: method.toLowerCase(),
+    url,
     headers,
-    mode: "cors",
-    referrerPolicy: "no-referrer-when-downgrade",
+    data: body,
   };
 
-  if (body) {
-    config.body = typeof body === "string" ? body : JSON.stringify(body);
-  }
-
-  console.log(`[API Request] ${httpMethod} ${url}`, body);
+  console.log(`[API Request] ${method} ${url}`, body);
 
   try {
-    const response = await fetch(url, config);
-    const data = await response.json().catch(() => null);
-
-    if (!response.ok) {
-      const errorMsg = data?.message || data?.error || `Request failed with status ${response.status}`;
-      const error = new Error(errorMsg);
-      error.status = response.status;
-      error.data = data;
-      throw error;
-    }
-
-    return data;
+    const response = await axios(config);
+    return response.data;
   } catch (error) {
     console.error(`[API Call Error] ${method} ${url}:`, error.message);
-    throw error;
+    const errorMsg = error.response?.data?.message || error.response?.data?.error || `Request failed with status ${error.response?.status}`;
+    const customError = new Error(errorMsg);
+    customError.status = error.response?.status;
+    customError.data = error.response?.data;
+    throw customError;
   }
 };

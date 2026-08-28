@@ -11,6 +11,7 @@ function Login() {
   const [countryInfo, setCountryInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [loginData, setLoginData] = useState({ name: "", phone: "" });
   const navigate = useNavigate();
 
   const handlePhoneChange = (val, countryData) => {
@@ -18,6 +19,7 @@ function Login() {
     if (countryData) setCountryInfo(countryData);
     if (errorMsg) setErrorMsg("");
   };
+
 
   const handleGetOtp = async (e) => {
     if (e) e.preventDefault();
@@ -36,7 +38,7 @@ function Login() {
     try {
       // POST /login/ with payload { phone: "9876543210" } (pure 10-digit string)
       const response = await loginUser({ phone: cleanPhone });
-      
+
       // ONLY navigate on API SUCCESS
       if (response) {
         const token = response?.data?.user_token || response?.user_token;
@@ -78,8 +80,10 @@ function Login() {
       <Navbar />
       <div className="login-page-wrapper">
         <div className="login-split-container">
-          
+
           <div className="login-image-side">
+            <h1>{loginData.name}</h1>
+
             <span className="badge">DISCOVER PREMIUM EYEWEAR</span>
             <h4>Many stylish solutions</h4>
             <h1>
@@ -93,7 +97,7 @@ function Login() {
             <button className="login-close-btn" onClick={() => navigate("/")} aria-label="Close">
               <FaTimes />
             </button>
-            
+
             <h2>Welcome To Mr.LensMaker!</h2>
             <p style={{ textAlign: "center", color: "#666", marginTop: "-25px", marginBottom: "30px", fontSize: "14px" }}>
               Sign in with your mobile phone number
@@ -127,8 +131,8 @@ function Login() {
                 />
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className={`login-btn ${!isPhoneValid || loading ? 'disabled' : ''}`}
                 disabled={!isPhoneValid || loading}
               >

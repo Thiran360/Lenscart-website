@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaHome, FaPlus, FaTrash, FaCheckCircle } from 'react-icons/fa';
+import { saveAddressApi } from '../services/profileService';
 import './AddressManager.css';
 
 function AddressManager() {
@@ -35,20 +36,38 @@ function AddressManager() {
     newAddr.pincode.length === 6
   );
 
-  const handleAddAddress = (e) => {
+  const handleAddAddress = async (e) => {
     e.preventDefault();
     if (!isAddrValid) return;
 
-    const created = {
-      id: Date.now(),
-      ...newAddr,
-      isDefault: addresses.length === 0
-    };
+    try {
+      // Map the local state keys to the required API payload keys
+      const payload = {
+        full_name: newAddr.name,
+        phone: newAddr.phone,
+        street_address: newAddr.street,
+        city: newAddr.city,
+        state: newAddr.state,
+        pincode: newAddr.pincode
+      };
 
-    const updated = [created, ...addresses];
-    handleSaveAddresses(updated);
-    setShowAddModal(false);
-    setNewAddr({ name: '', phone: '', street: '', city: '', state: '', pincode: '' });
+      await saveAddressApi(payload);
+
+      const created = {
+        id: Date.now(),
+        ...newAddr,
+        isDefault: addresses.length === 0
+      };
+
+      const updated = [created, ...addresses];
+      handleSaveAddresses(updated);
+      setShowAddModal(false);
+      setNewAddr({ name: '', phone: '', street: '', city: '', state: '', pincode: '' });
+      alert("Address saved successfully!");
+    } catch (err) {
+      console.error("Failed to save address:", err);
+      alert("Failed to save address to the server. Please try again.");
+    }
   };
 
   const handleDelete = (id) => {
