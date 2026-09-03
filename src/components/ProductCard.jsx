@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaRegHeart, FaHeart, FaStar } from "react-icons/fa";
+import { FaRegHeart, FaHeart, FaStar, FaGlasses } from "react-icons/fa";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
 import "./ProductCard.css";
@@ -187,7 +187,7 @@ function ProductCard({ product, is3DMode, onTryOn }) {
                 onClick={handleTryOn}
                 title="Try on glasses in 3D AR Camera"
               >
-                👓 TRY ON
+                <FaGlasses style={{ marginRight: '6px' }} /> TRY ON
               </button>
             )}
             <button className="buy-now-btn" style={{ 

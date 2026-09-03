@@ -19,9 +19,10 @@ function CategoryCard() {
   ];
 
   const getLinkForCategory = (name) => {
+    if (name.includes("Kids")) return "/products?search=kids";
     if (name.includes("Sunglasses")) return "/products?type=sunglasses";
     if (name.includes("Contact")) return "/products?type=contacts";
-    return "/products?type=eyeglasses"; // Default for eyeglasses, computer glasses, kids glasses
+    return "/products?type=eyeglasses"; // Default for eyeglasses, computer glasses
   };
 
   return (

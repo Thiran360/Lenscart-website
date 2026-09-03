@@ -9,7 +9,7 @@ const PromoBanner = () => {
         <div className="promo-banner-content">
           <h2 className="promo-title">FREE LENS<br />REPLACEMENT</h2>
           <p className="promo-subtitle">Any Frame | Any Power | Any Reason</p>
-          <Link to="/stores" className="promo-btn" style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center' }}>
+          <Link to="/products?type=eyeglasses" className="promo-btn" style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center' }}>
             Start Explore
           </Link>
           <p className="promo-terms">

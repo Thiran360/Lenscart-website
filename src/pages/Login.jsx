@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import CustomPhoneInput from "../components/CustomPhoneInput";
 import { loginUser, clean10DigitPhone } from "../services/authService";
+import { useToast } from "../context/ToastContext";
 import { FaTimes } from "react-icons/fa";
 import "./Login.css";
 
@@ -13,6 +14,7 @@ function Login() {
   const [errorMsg, setErrorMsg] = useState("");
   const [loginData, setLoginData] = useState({ name: "", phone: "" });
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handlePhoneChange = (val, countryData) => {
     setPhone(val);
@@ -27,7 +29,7 @@ function Login() {
 
     const cleanPhone = clean10DigitPhone(phone);
     if (!cleanPhone || cleanPhone.length !== 10) {
-      alert("Please enter a valid 10-digit mobile phone number");
+      toast.warning("Please enter a valid 10-digit mobile phone number");
       return;
     }
 
@@ -48,7 +50,7 @@ function Login() {
 
         const serverOtp = response?.data?.otp || response?.otp;
         if (serverOtp) {
-          localStorage.setItem("otp", String(serverOtp));
+          sessionStorage.setItem("otp", String(serverOtp));
         }
 
         // Save session items only when API call succeeds
@@ -59,7 +61,7 @@ function Login() {
 
         localStorage.setItem("pendingPhone", formattedDisplayPhone);
         localStorage.setItem("cleanPhone", cleanPhone);
-        localStorage.setItem("otpFlow", "login");
+        sessionStorage.setItem("otpFlow", "login");
 
         navigate("/verify-otp");
       }

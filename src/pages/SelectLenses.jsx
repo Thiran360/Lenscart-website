@@ -223,7 +223,6 @@ function SelectLenses() {
                 <div className="rx-method-tabs">
                   <button className={`rx-tab ${rxMethod === 'upload' ? 'active' : ''}`} onClick={() => setRxMethod('upload')}>Upload File</button>
                   <button className={`rx-tab ${rxMethod === 'manual' ? 'active' : ''}`} onClick={() => setRxMethod('manual')}>Enter Manually</button>
-                  <button className={`rx-tab ${rxMethod === 'later' ? 'active' : ''}`} onClick={() => setRxMethod('later')}>Provide Later</button>
                 </div>
 
                 {rxMethod === 'upload' && (
@@ -360,11 +359,7 @@ function SelectLenses() {
                   </div>
                 )}
 
-                {rxMethod === 'later' && (
-                  <div style={{ padding: '30px', textAlign: 'center', backgroundColor: '#f9f9f9', border: '1px solid #eee', borderRadius: 8 }}>
-                    <p style={{ color: '#6E4B34', fontSize: 15, margin: 0 }}>You can proceed to checkout now and upload or enter your prescription in your Dashboard later.</p>
-                  </div>
-                )}
+
               </>
             )}
 

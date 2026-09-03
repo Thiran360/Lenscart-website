@@ -107,6 +107,22 @@
   box-shadow: 0 0 0 2px rgba(13, 107, 109, 0.1);
 }
 
+.form-group input.input-error, .form-group select.input-error {
+  border-color: #ef4444 !important;
+  background-color: #fff9f9 !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12) !important;
+}
+
+.field-error-msg {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 5px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .primary-checkout-btn {
   background: #0d6b6d;
   color: #fff;
@@ -331,6 +347,24 @@
   margin: 0;
   font-size: 12px;
   color: #666;
+}
+
+.summary-item-lens-info {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.lens-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  color: #0d6b6d;
+  background: #e6f7f7;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #b2e0e0;
 }
 
 .summary-item-price {

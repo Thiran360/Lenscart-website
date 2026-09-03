@@ -5,6 +5,10 @@ import { useCart } from "../context/CartContext";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import PaymentGatewayModal from "../components/PaymentGatewayModal";
+import { saveAddressApi } from "../services/profileService";
+import { placeOrderApi } from "../services/checkoutService";
+import { useToast } from "../context/ToastContext";
+import { FaCreditCard } from "react-icons/fa";
 import "./Checkout.css";
 
 function Checkout() {
@@ -20,10 +24,13 @@ function Checkout() {
   const tax = subTotal * 0.18; // 18% tax simulation
   const shipping = subTotal > 1000 ? 0 : 50;
   const checkoutTotal = subTotal + tax + shipping;
+  const { toast } = useToast();
 
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("gpay");
   const [showPaymentGateway, setShowPaymentGateway] = useState(false);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [orderError, setOrderError] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -41,16 +48,186 @@ function Checkout() {
     pincode: ""
   });
 
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
+  // Auto-fill from stored user profile if available
+  useEffect(() => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      if (storedUser) {
+        const nameParts = (storedUser.name || "").trim().split(" ");
+        const first = nameParts[0] ? nameParts[0].replace(/[0-9]/g, '') : "";
+        const last = nameParts.slice(1).join(" ").replace(/[0-9]/g, '') || "";
+        
+        setAddress(prev => ({
+          ...prev,
+          firstName: prev.firstName || first,
+          lastName: prev.lastName || last,
+          email: prev.email || storedUser.email || "",
+          phone: prev.phone || (storedUser.phone ? String(storedUser.phone).replace(/\D/g, '').slice(0, 10) : "")
+        }));
+      }
+    } catch {
+      // ignore JSON parse error
+    }
+  }, []);
+
+  const validateField = (name, value) => {
+    let error = "";
+    const val = (value || "").trim();
+
+    switch (name) {
+      case "firstName":
+        if (!val) {
+          error = "First name is required";
+        } else if (/\d/.test(val)) {
+          error = "First name cannot contain numbers";
+        } else if (!/^[a-zA-Z\s.'-]+$/.test(val)) {
+          error = "Only alphabetic letters are allowed";
+        } else if (val.length < 2) {
+          error = "First name must be at least 2 characters";
+        }
+        break;
+
+      case "lastName":
+        if (!val) {
+          error = "Last name is required";
+        } else if (/\d/.test(val)) {
+          error = "Last name cannot contain numbers";
+        } else if (!/^[a-zA-Z\s.'-]+$/.test(val)) {
+          error = "Only alphabetic letters are allowed";
+        } else if (val.length < 1) {
+          error = "Last name is required";
+        }
+        break;
+
+      case "email":
+        if (!val) {
+          error = "Email address is required";
+        } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val)) {
+          error = "Please enter a valid email address (e.g. user@domain.com)";
+        }
+        break;
+
+      case "phone":
+        if (!val) {
+          error = "Phone number is required";
+        } else if (!/^\d{10}$/.test(val)) {
+          error = "Phone number must be exactly 10 digits";
+        } else if (!/^[6-9]/.test(val)) {
+          error = "Mobile number should start with 6, 7, 8, or 9";
+        }
+        break;
+
+      case "street":
+        if (!val) {
+          error = "Street address is required";
+        } else if (val.length < 5) {
+          error = "Please enter a complete address (minimum 5 characters)";
+        } else if (/^\d+$/.test(val)) {
+          error = "Address cannot be just numbers";
+        }
+        break;
+
+      case "city":
+        if (!val) {
+          error = "City is required";
+        } else if (/\d/.test(val)) {
+          error = "City name cannot contain numbers";
+        } else if (!/^[a-zA-Z\s.-]+$/.test(val)) {
+          error = "City name should only contain letters";
+        } else if (val.length < 2) {
+          error = "City name must be at least 2 characters";
+        }
+        break;
+
+      case "state":
+        if (!val) {
+          error = "Please select a state";
+        }
+        break;
+
+      case "pincode":
+        if (!val) {
+          error = "Pincode is required";
+        } else if (!/^[1-9][0-9]{5}$/.test(val)) {
+          error = "Enter a valid 6-digit postal pincode";
+        }
+        break;
+
+      default:
+        break;
+    }
+    return error;
+  };
+
   const handleAddressChange = (e) => {
-    setAddress({ ...address, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let sanitizedValue = value;
+
+    // Sanitize input in real-time
+    if (name === "firstName" || name === "lastName" || name === "city") {
+      // Disallow numbers and symbols
+      sanitizedValue = value.replace(/[0-9]/g, '');
+    } else if (name === "phone") {
+      // Only digits, maximum 10 digits
+      sanitizedValue = value.replace(/\D/g, '').slice(0, 10);
+    } else if (name === "pincode") {
+      // Only digits, maximum 6 digits
+      sanitizedValue = value.replace(/\D/g, '').slice(0, 6);
+    }
+
+    setAddress(prev => ({ ...prev, [name]: sanitizedValue }));
+
+    // Re-validate if field was previously touched
+    if (touched[name]) {
+      const fieldError = validateField(name, sanitizedValue);
+      setErrors(prev => ({ ...prev, [name]: fieldError }));
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched(prev => ({ ...prev, [name]: true }));
+    const fieldError = validateField(name, value);
+    setErrors(prev => ({ ...prev, [name]: fieldError }));
   };
 
   const handleContinueToPayment = (e) => {
     e.preventDefault();
+    
+    // Validate all fields
+    const allErrors = {};
+    const allFields = ["firstName", "lastName", "email", "phone", "street", "city", "state", "pincode"];
+    
+    allFields.forEach(field => {
+      const err = validateField(field, address[field]);
+      if (err) allErrors[field] = err;
+    });
+
+    setErrors(allErrors);
+    setTouched({
+      firstName: true,
+      lastName: true,
+      email: true,
+      phone: true,
+      street: true,
+      city: true,
+      state: true,
+      pincode: true
+    });
+
+    if (Object.keys(allErrors).length > 0) {
+      const firstKey = Object.keys(allErrors)[0];
+      toast.warning(allErrors[firstKey] || "Please fill in all required shipping fields correctly.");
+      return;
+    }
+
     setStep(2);
   };
 
-  const saveOrderAndAddress = (orderId) => {
+  const saveOrderLocally = (orderId) => {
     const newOrder = {
       id: orderId,
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
@@ -60,7 +237,9 @@ function Checkout() {
         name: item.name || item.title || "Mr.LensMaker Eyewear",
         image: item.image || "/frame-image1.jpg",
         price: item.price || 2000,
-        color: item.selectedColor || "Black"
+        color: item.selectedColor || "Black",
+        lensType: item.lensDetails?.type?.title || null,
+        lensPackage: item.lensDetails?.package?.title || null,
       })),
       address: {
         name: `${address.firstName} ${address.lastName}`.trim() || "Valued Customer",
@@ -72,48 +251,73 @@ function Checkout() {
       }
     };
 
-    // Save to order history
     const existingOrders = JSON.parse(localStorage.getItem("placedOrders")) || [];
     localStorage.setItem("placedOrders", JSON.stringify([newOrder, ...existingOrders]));
+  };
 
-    // Save address
+  const saveAddressToApi = async () => {
     if (address.street && address.city) {
-      const existingAddresses = JSON.parse(localStorage.getItem("savedAddresses")) || [];
-      const newAddr = {
-        id: Date.now(),
-        name: `${address.firstName} ${address.lastName}`.trim() || "Delivery Address",
-        phone: address.phone || "",
-        street: address.street || "",
-        city: address.city || "",
-        state: address.state || "",
-        pincode: address.pincode || "",
-        isDefault: existingAddresses.length === 0
-      };
-      localStorage.setItem("savedAddresses", JSON.stringify([newAddr, ...existingAddresses]));
+      try {
+        await saveAddressApi({
+          full_name: `${address.firstName} ${address.lastName}`.trim() || "Delivery Address",
+          phone: address.phone || "",
+          street_address: address.street || "",
+          city: address.city || "",
+          state: address.state || "",
+          pincode: address.pincode || ""
+        });
+      } catch (err) {
+        console.error("Failed to save address:", err);
+      }
+    }
+  };
+
+  const placeOrderViaApi = async () => {
+    try {
+      setIsPlacingOrder(true);
+      setOrderError(null);
+
+      const response = await placeOrderApi({
+        items: checkoutItems,
+        address,
+        paymentMethod,
+        subTotal,
+        tax,
+        shipping,
+        totalAmount: checkoutTotal,
+      });
+
+      const orderId = response?.order_id || response?.data?.order_id || `LK${Math.floor(10000000 + Math.random() * 90000000)}`;
+      
+      // Also save locally for the order history page
+      saveOrderLocally(orderId);
+      await saveAddressToApi();
+
+      return orderId;
+    } catch (err) {
+      console.error("[Checkout] API Error:", err);
+      // Fallback: generate local order ID if API fails
+      const fallbackId = `LK${Math.floor(10000000 + Math.random() * 90000000)}`;
+      saveOrderLocally(fallbackId);
+      await saveAddressToApi();
+      return fallbackId;
+    } finally {
+      setIsPlacingOrder(false);
     }
   };
 
   const handlePayNow = (e) => {
     e.preventDefault();
     if (checkoutItems.length === 0) {
-      alert("Your order is empty!");
+      toast.warning("Your order is empty!");
       return;
     }
-    
-    if (paymentMethod === 'cod') {
-      const orderId = `LK${Math.floor(10000000 + Math.random() * 90000000)}`;
-      saveOrderAndAddress(orderId);
-      clearCart();
-      navigate("/order-confirmed", { state: { orderId, total: checkoutTotal } });
-    } else {
-      setShowPaymentGateway(true);
-    }
+    setShowPaymentGateway(true);
   };
 
-  const handlePaymentSuccess = () => {
-    const orderId = `LK${Math.floor(10000000 + Math.random() * 90000000)}`;
-    saveOrderAndAddress(orderId);
+  const handlePaymentSuccess = async () => {
     setShowPaymentGateway(false);
+    const orderId = await placeOrderViaApi();
     clearCart();
     navigate("/order-confirmed", { state: { orderId, total: checkoutTotal } });
   };
@@ -144,52 +348,156 @@ function Checkout() {
             </div>
 
             {step === 1 && (
-              <form className="checkout-form" onSubmit={handleContinueToPayment}>
+              <form className="checkout-form" onSubmit={handleContinueToPayment} noValidate>
                 <h2 className="section-heading">Contact Information</h2>
                 <div className="form-row">
                   <div className="form-group">
                     <label>First Name *</label>
-                    <input type="text" name="firstName" required value={address.firstName} onChange={handleAddressChange} />
+                    <input 
+                      type="text" 
+                      name="firstName" 
+                      placeholder="e.g. Rahul"
+                      className={touched.firstName && errors.firstName ? "input-error" : ""}
+                      value={address.firstName} 
+                      onChange={handleAddressChange}
+                      onBlur={handleBlur}
+                    />
+                    {touched.firstName && errors.firstName && (
+                      <span className="field-error-msg">⚠️ {errors.firstName}</span>
+                    )}
                   </div>
                   <div className="form-group">
                     <label>Last Name *</label>
-                    <input type="text" name="lastName" required value={address.lastName} onChange={handleAddressChange} />
+                    <input 
+                      type="text" 
+                      name="lastName" 
+                      placeholder="e.g. Sharma"
+                      className={touched.lastName && errors.lastName ? "input-error" : ""}
+                      value={address.lastName} 
+                      onChange={handleAddressChange}
+                      onBlur={handleBlur}
+                    />
+                    {touched.lastName && errors.lastName && (
+                      <span className="field-error-msg">⚠️ {errors.lastName}</span>
+                    )}
                   </div>
                 </div>
+
                 <div className="form-row">
                   <div className="form-group">
                     <label>Email Address *</label>
-                    <input type="email" name="email" required value={address.email} onChange={handleAddressChange} />
+                    <input 
+                      type="email" 
+                      name="email" 
+                      placeholder="e.g. name@domain.com"
+                      className={touched.email && errors.email ? "input-error" : ""}
+                      value={address.email} 
+                      onChange={handleAddressChange}
+                      onBlur={handleBlur}
+                    />
+                    {touched.email && errors.email && (
+                      <span className="field-error-msg">⚠️ {errors.email}</span>
+                    )}
                   </div>
                   <div className="form-group">
                     <label>Phone Number *</label>
-                    <input type="tel" name="phone" required pattern="[0-9]{10}" placeholder="10-digit mobile number" value={address.phone} onChange={handleAddressChange} />
+                    <input 
+                      type="tel" 
+                      name="phone" 
+                      maxLength="10"
+                      placeholder="10-digit mobile (e.g. 9876543210)" 
+                      className={touched.phone && errors.phone ? "input-error" : ""}
+                      value={address.phone} 
+                      onChange={handleAddressChange}
+                      onBlur={handleBlur}
+                    />
+                    {touched.phone && errors.phone && (
+                      <span className="field-error-msg">⚠️ {errors.phone}</span>
+                    )}
                   </div>
                 </div>
 
                 <h2 className="section-heading" style={{ marginTop: '30px' }}>Shipping Address</h2>
                 <div className="form-group">
                   <label>Street Address *</label>
-                  <input type="text" name="street" required value={address.street} onChange={handleAddressChange} />
+                  <input 
+                    type="text" 
+                    name="street" 
+                    placeholder="House / Flat No., Street, Landmark"
+                    className={touched.street && errors.street ? "input-error" : ""}
+                    value={address.street} 
+                    onChange={handleAddressChange}
+                    onBlur={handleBlur}
+                  />
+                  {touched.street && errors.street && (
+                    <span className="field-error-msg">⚠️ {errors.street}</span>
+                  )}
                 </div>
+
                 <div className="form-row">
                   <div className="form-group">
                     <label>City *</label>
-                    <input type="text" name="city" required value={address.city} onChange={handleAddressChange} />
+                    <input 
+                      type="text" 
+                      name="city" 
+                      placeholder="e.g. Chennai"
+                      className={touched.city && errors.city ? "input-error" : ""}
+                      value={address.city} 
+                      onChange={handleAddressChange}
+                      onBlur={handleBlur}
+                    />
+                    {touched.city && errors.city && (
+                      <span className="field-error-msg">⚠️ {errors.city}</span>
+                    )}
                   </div>
+
                   <div className="form-group">
                     <label>State *</label>
-                    <select name="state" required value={address.state} onChange={handleAddressChange}>
+                    <select 
+                      name="state" 
+                      className={touched.state && errors.state ? "input-error" : ""}
+                      value={address.state} 
+                      onChange={handleAddressChange}
+                      onBlur={handleBlur}
+                    >
                       <option value="">Select State</option>
                       <option value="Tamil Nadu">Tamil Nadu</option>
                       <option value="Karnataka">Karnataka</option>
                       <option value="Maharashtra">Maharashtra</option>
                       <option value="Delhi">Delhi</option>
+                      <option value="Kerala">Kerala</option>
+                      <option value="Andhra Pradesh">Andhra Pradesh</option>
+                      <option value="Telangana">Telangana</option>
+                      <option value="Gujarat">Gujarat</option>
+                      <option value="Rajasthan">Rajasthan</option>
+                      <option value="Uttar Pradesh">Uttar Pradesh</option>
+                      <option value="West Bengal">West Bengal</option>
+                      <option value="Punjab">Punjab</option>
+                      <option value="Haryana">Haryana</option>
+                      <option value="Madhya Pradesh">Madhya Pradesh</option>
+                      <option value="Bihar">Bihar</option>
+                      <option value="Odisha">Odisha</option>
                     </select>
+                    {touched.state && errors.state && (
+                      <span className="field-error-msg">⚠️ {errors.state}</span>
+                    )}
                   </div>
+
                   <div className="form-group">
                     <label>Pincode *</label>
-                    <input type="text" name="pincode" required pattern="[0-9]{6}" value={address.pincode} onChange={handleAddressChange} />
+                    <input 
+                      type="text" 
+                      name="pincode" 
+                      maxLength="6"
+                      placeholder="6-digit pincode"
+                      className={touched.pincode && errors.pincode ? "input-error" : ""}
+                      value={address.pincode} 
+                      onChange={handleAddressChange}
+                      onBlur={handleBlur}
+                    />
+                    {touched.pincode && errors.pincode && (
+                      <span className="field-error-msg">⚠️ {errors.pincode}</span>
+                    )}
                   </div>
                 </div>
 
@@ -240,7 +548,7 @@ function Checkout() {
                       <input type="radio" name="payment" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} />
                       <span className="method-title">Credit / Debit Card</span>
                       <div className="method-icons">
-                        <span className="card-icon">💳</span>
+                        <FaCreditCard style={{ fontSize: '18px', color: '#0d6b6d' }} />
                       </div>
                     </label>
                     {paymentMethod === 'card' && (
@@ -257,23 +565,20 @@ function Checkout() {
                       </div>
                     )}
                   </div>
-
-                  {/* COD */}
-                  <div className={`payment-method-item ${paymentMethod === 'cod' ? 'active' : ''}`}>
-                    <label className="payment-method-header">
-                      <input type="radio" name="payment" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} />
-                      <span className="method-title">Cash on Delivery (COD)</span>
-                    </label>
-                    {paymentMethod === 'cod' && (
-                      <div className="payment-method-content">
-                        <p>Pay with cash upon delivery. An additional fee of ₹50 may apply.</p>
-                      </div>
-                    )}
-                  </div>
                 </div>
 
-                <button onClick={handlePayNow} className="primary-checkout-btn submit-btn">
-                  {paymentMethod === 'cod' ? 'Complete Order' : `Pay ₹${checkoutTotal.toFixed(2)}`}
+                {orderError && (
+                  <div style={{ color: '#e74c3c', marginTop: '12px', fontSize: '14px', textAlign: 'center' }}>
+                    {orderError}
+                  </div>
+                )}
+
+                <button 
+                  onClick={handlePayNow} 
+                  className="primary-checkout-btn submit-btn"
+                  disabled={isPlacingOrder}
+                >
+                  {isPlacingOrder ? 'Processing...' : `Pay ₹${checkoutTotal.toFixed(2)}`}
                 </button>
               </div>
             )}
@@ -294,7 +599,13 @@ function Checkout() {
                     </div>
                     <div className="summary-item-details">
                       <h4>{item.name}</h4>
-                      <p>{item.selectedColor || 'Standard'} | {item.size || 'Medium'}</p>
+                      <p>{item.selectedColor || item.colors?.[0] || 'Standard'} | {item.size || 'Medium'}</p>
+                      {item.lensDetails && (
+                        <div className="summary-item-lens-info">
+                          <span className="lens-tag">{item.lensDetails.type?.title}</span>
+                          <span className="lens-tag">{item.lensDetails.package?.title}</span>
+                        </div>
+                      )}
                     </div>
                     <div className="summary-item-price">
                       ₹{((item.price + (item.additionalPrice || 0)) * (item.quantity || 1)).toFixed(2)}

@@ -1,8 +1,16 @@
 import { useCart } from "../context/CartContext";
 import { FaTrash } from "react-icons/fa";
 
-function CartItem({ item }) {
+function CartItem({ item, onRemove }) {
   const { removeFromCart, updateQuantity } = useCart();
+
+  const handleDelete = () => {
+    if (onRemove) {
+      onRemove(item);
+    } else {
+      removeFromCart(item.cartItemId);
+    }
+  };
 
   return (
     <div className="cart-item">
@@ -23,7 +31,7 @@ function CartItem({ item }) {
             )}
             {item.lensDetails.prescription && (
               <p className="cart-item-prescription">
-                Prescription: {item.lensDetails.prescription.method === 'later' ? 'Provide Later' : 'Provided'}
+                Prescription: {item.lensDetails.prescription.method === 'upload' ? 'Uploaded File' : 'Manual Entry'}
                 {item.lensDetails.prescription.data?.name && ` (${item.lensDetails.prescription.data.name}`}
                 {item.lensDetails.prescription.data?.birthYear && `${item.lensDetails.prescription.data?.name ? ', ' : ' ('}Birth Year: ${item.lensDetails.prescription.data.birthYear}`}
                 {(item.lensDetails.prescription.data?.name || item.lensDetails.prescription.data?.birthYear) && `)`}
@@ -43,7 +51,7 @@ function CartItem({ item }) {
         ₹{item.price * item.quantity}
       </div>
 
-      <button onClick={() => removeFromCart(item.cartItemId)} className="cart-item-delete">
+      <button onClick={handleDelete} className="cart-item-delete" title="Remove item from cart">
         <FaTrash />
       </button>
     </div>

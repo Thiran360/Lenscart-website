@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { verifyOtpApi } from "../services/authService";
+import { useToast } from "../context/ToastContext";
 import { FaTimes } from "react-icons/fa";
 import "./Login.css";
 
@@ -14,12 +15,13 @@ function VerifyOTP() {
   const [errorMsg, setErrorMsg] = useState("");
 
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const phone = localStorage.getItem("pendingPhone") || "+91 9876543210";
   const cleanPhone = localStorage.getItem("cleanPhone") || phone;
-  const flow = localStorage.getItem("otpFlow") || "login";
+  const flow = sessionStorage.getItem("otpFlow") || "login";
   const name = localStorage.getItem("pendingName") || "";
-  const serverOtp = localStorage.getItem("otp");
+  const serverOtp = sessionStorage.getItem("otp");
 
   useEffect(() => {
     let interval = null;
@@ -37,7 +39,7 @@ function VerifyOTP() {
     setTimer(30);
     setCanResend(false);
     setErrorMsg("");
-    alert("New OTP sent to your phone! (Use test OTP: 1234)");
+    toast.info("New OTP sent to your phone! (Use test OTP: 1234)");
   };
 
   const handleVerify = async (e) => {
@@ -54,9 +56,10 @@ function VerifyOTP() {
       // Send phone (clean 10-digit string) & OTP payload to /verify-otp/
       const res = await verifyOtpApi({ phone: cleanPhone, otp });
 
-      const token = res?.data?.user_token || res?.user_token;
+      const token = res?.data?.user_token || res?.user_token || res?.token;
       const apiName = res?.data?.name || res?.name;
       const apiPhone = res?.data?.phone || res?.phone;
+      const apiUserType = res?.data?.user_type || res?.user_type || res?.data?.role || res?.role || res?.data?.user?.user_type || "customer";
 
       const registeredName = apiName || name || (flow === "register" ? "User" : "Customer");
       const registeredPhone = apiPhone || cleanPhone || phone;
@@ -64,10 +67,12 @@ function VerifyOTP() {
       // ONLY allow inside if API returns success and token is obtained
       if (res && token) {
         localStorage.setItem("user_token", token);
+        localStorage.setItem("user_type", String(apiUserType).toLowerCase());
 
         const userObj = {
           name: registeredName,
           phone: registeredPhone,
+          user_type: String(apiUserType).toLowerCase(),
           isVerified: true
         };
 
@@ -75,7 +80,8 @@ function VerifyOTP() {
         localStorage.setItem("user", JSON.stringify(userObj));
         localStorage.removeItem("pendingPhone");
         localStorage.removeItem("pendingName");
-        localStorage.removeItem("otp");
+        sessionStorage.removeItem("otp");
+        sessionStorage.removeItem("otpFlow");
 
         if (flow === "register") {
           setShowWelcomeModal(true);

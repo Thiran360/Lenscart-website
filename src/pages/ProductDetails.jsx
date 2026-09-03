@@ -1,7 +1,24 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { FaTruck } from "react-icons/fa";
+import { 
+  FaTruck, 
+  FaBoxOpen, 
+  FaUndo, 
+  FaShieldAlt, 
+  FaCamera, 
+  FaSpinner, 
+  FaHeart, 
+  FaRegHeart, 
+  FaStar, 
+  FaChevronRight, 
+  FaChevronLeft, 
+  FaRuler, 
+  FaShoppingCart, 
+  FaArrowRight, 
+  FaCheck,
+  FaTag
+} from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import { productsData } from "../data/products";
 import { useWishlist } from "../context/WishlistContext";
@@ -10,73 +27,41 @@ import SizeGuideModal from "../components/SizeGuideModal";
 import VirtualTryOn from "../components/VirtualTryOn";
 import ProductInfoTabs from "../components/ProductInfoTabs";
 import RelatedProducts from "../components/RelatedProducts";
+import { useToast } from "../context/ToastContext";
+import { getStoreProducts, getGlassProducts, getProductDetailsApi } from "../services/productService";
 import "./ProductDetails.css";
 
-// Reusing the sepia colorizer from BestSellers for color accuracy on grayscale frames
+// Color swatches helper styling
 const getSwatchStyle = (colorName) => {
-  const name = colorName.toLowerCase();
+  const name = String(colorName || "").toLowerCase();
   switch (name) {
     case 'black': return { backgroundColor: '#1a1a1a' };
-    case 'blue': return { backgroundColor: '#2e5b82' };
-    case 'brown': return { backgroundColor: '#8a6240' };
-    case 'gold': return { background: 'linear-gradient(135deg, #ffd700 0%, #b8860b 100%)' };
-    case 'pink': return { backgroundColor: '#f3a3b3' };
-    case 'grey': case 'gray': return { backgroundColor: '#95a5a6' };
-    case 'red': return { backgroundColor: '#c0392b' };
-    case 'green': return { backgroundColor: '#27ae60' };
-    case 'silver': return { background: 'linear-gradient(135deg, #e0e0e0 0%, #bdc3c7 100%)' };
-    case 'transparent': case 'white': return { backgroundColor: '#e2f2f5', border: '1px solid #c8d8db' };
-    case 'tortoise': return { background: 'repeating-linear-gradient(45deg, #4e3629 0px, #4e3629 4px, #a05a2c 4px, #a05a2c 8px)' };
-    default: return { backgroundColor: '#ccc' };
-  }
-};
-const getOverlayColor = (colorName) => {
-  const name = colorName.toLowerCase();
-  switch (name) {
-    case 'black': return '#000000';
-    case 'blue': return '#1e90ff';
-    case 'brown': case 'tortoiseshell': case 'tortoise': return '#8b4513';
-    case 'gold': return '#daa520';
-    case 'pink': return '#ff69b4';
-    case 'grey': case 'gray': return '#808080';
-    case 'red': return '#dc143c';
-    case 'green': return '#228b22';
-    case 'silver': return '#c0c0c0';
-    case 'transparent': case 'white': return 'transparent'; // Use original image colors
-    default: return 'transparent';
-  }
-};
-
-const getLightenColor = (colorName) => {
-  const name = colorName.toLowerCase();
-  switch (name) {
-    case 'black': return 'transparent';
-    case 'blue': return '#001133';
-    case 'brown': case 'tortoiseshell': case 'tortoise': return '#221100';
-    case 'gold': return '#332200';
-    case 'pink': return '#330011';
-    case 'grey': case 'gray': return '#222222';
-    case 'red': return '#330000';
-    case 'green': return '#002200';
-    case 'silver': return '#333333';
-    case 'transparent': case 'white': return 'transparent'; // Do not lighten
-    default: return 'transparent';
+    case 'blue': return { backgroundColor: '#1e40af' };
+    case 'brown': return { backgroundColor: '#854d0e' };
+    case 'gold': return { background: 'linear-gradient(135deg, #fcd34d 0%, #b45309 100%)' };
+    case 'pink': return { backgroundColor: '#f472b6' };
+    case 'grey': case 'gray': return { backgroundColor: '#64748b' };
+    case 'red': return { backgroundColor: '#dc2626' };
+    case 'green': return { backgroundColor: '#16a34a' };
+    case 'silver': return { background: 'linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%)' };
+    case 'transparent': case 'white': return { backgroundColor: '#f8fafc', border: '1px solid #cbd5e1' };
+    case 'tortoise': return { background: 'repeating-linear-gradient(45deg, #451a03 0px, #451a03 4px, #9a3412 4px, #9a3412 8px)' };
+    default: return { backgroundColor: '#64748b' };
   }
 };
 
 const getImageStyle = (imageStr, colorName) => {
-  const name = colorName.toLowerCase();
-  
+  const name = String(colorName || "").toLowerCase();
   switch (name) {
     case 'red': return { filter: 'contrast(1.1) sepia(1) saturate(5) hue-rotate(325deg)' };
     case 'blue': return { filter: 'contrast(1.1) sepia(1) saturate(5) hue-rotate(185deg)' };
     case 'green': return { filter: 'contrast(1.1) sepia(1) saturate(5) hue-rotate(85deg)' };
     case 'pink': return { filter: 'contrast(1.1) sepia(1) saturate(4) hue-rotate(295deg)' };
     case 'gold': return { filter: 'contrast(1.1) sepia(1) saturate(5) hue-rotate(15deg) brightness(1.2)' };
-    case 'brown': case 'tortoise': case 'tortoiseshell': return { filter: 'contrast(1.1) sepia(0.8) saturate(3) hue-rotate(350deg)' };
+    case 'brown': case 'tortoise': return { filter: 'contrast(1.1) sepia(0.8) saturate(3) hue-rotate(350deg)' };
     case 'grey': case 'gray': return { filter: 'contrast(1.1) grayscale(1)' };
     case 'silver': return { filter: 'contrast(1.1) grayscale(1) brightness(1.3)' };
-    case 'transparent': case 'white': return { filter: 'contrast(0.9) grayscale(1) brightness(1.5) opacity(0.8)' };
+    case 'transparent': case 'white': return { filter: 'contrast(0.9) grayscale(1) brightness(1.5) opacity(0.85)' };
     case 'black': return { filter: 'contrast(1.2) grayscale(1) brightness(0.6)' };
     default: return {};
   }
@@ -85,68 +70,91 @@ const getImageStyle = (imageStr, colorName) => {
 function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const product = productsData.find(p => p.id === parseInt(id));
   const { addToCart } = useCart();
-  
+  const { toast } = useToast();
+  const { isInWishlist, toggleWishlist } = useWishlist();
+
+  const [product, setProduct] = useState(() => {
+    return productsData.find(p => String(p.id) === String(id)) || null;
+  });
+  const [loadingProduct, setLoadingProduct] = useState(!product);
   const [selectedColor, setSelectedColor] = useState(product?.colors?.[0] || 'black');
+  const [selectedSize, setSelectedSize] = useState(product?.size || 'M');
   const [isTryOnOpen, setIsTryOnOpen] = useState(false);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [isOffersOpen, setIsOffersOpen] = useState(false);
   const [currentCouponIndex, setCurrentCouponIndex] = useState(0);
   const [pincode, setPincode] = useState('');
   const [deliveryDate, setDeliveryDate] = useState(null);
-  const [selectedAssurances, setSelectedAssurances] = useState([]);
+  const [selectedAssurances, setSelectedAssurances] = useState(['return', 'warranty']);
 
-  const toggleAssurance = (assurance) => {
-    setSelectedAssurances(prev => 
-      prev.includes(assurance) ? prev.filter(a => a !== assurance) : [...prev, assurance]
-    );
-  };
-
-  const coupons = [
-    {
-      title: "Coupon Discount",
-      desc: "EXTRA 10% - OFF (Use: BFS10) on Min Bill value of select products Rs.2,999 &...",
-      code: "BFS10"
-    },
-    {
-      title: "Bank Offer",
-      desc: "5% Cashback on HDFC Bank Credit Cards, up to Rs.1000",
-      code: "HDFC5"
-    }
-  ];
-
-  const handleNextCoupon = () => {
-    setCurrentCouponIndex((prev) => (prev + 1) % coupons.length);
-  };
-
-  const handlePrevCoupon = () => {
-    setCurrentCouponIndex((prev) => (prev - 1 + coupons.length) % coupons.length);
-  };
-
-  const handleCheckPincode = () => {
-    if (pincode.trim().length === 6 && !isNaN(pincode)) {
-      // Calculate dynamic delivery days (2 to 6 days) based on pincode digits
-      const lastDigit = parseInt(pincode.charAt(5));
-      const deliveryDays = (lastDigit % 5) + 2;
-      
-      const d = new Date();
-      d.setDate(d.getDate() + deliveryDays);
-      setDeliveryDate(d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
-    } else {
-      alert("Please enter a valid 6-digit pincode.");
-      setDeliveryDate(null);
-    }
-  };
-
-  // Angle states - simulating 3D views for thumbnails
+  // Dynamic 3D Thumbnail Angle Definitions
   const angles = [
-    { id: 1, transform: 'rotateY(0deg) scale(1)' },         // Front view
-    { id: 2, transform: 'rotateY(45deg) scale(0.9)' },      // Angled Left
-    { id: 3, transform: 'rotateY(-45deg) scale(0.9)' },     // Angled Right
-    { id: 4, transform: 'rotate(15deg) scale(1.2)' }        // Close-up tilt
+    { id: 1, label: 'Front', transform: 'rotateY(0deg) scale(1)' },
+    { id: 2, label: 'Left 45°', transform: 'rotateY(40deg) scale(0.92)' },
+    { id: 3, label: 'Right 45°', transform: 'rotateY(-40deg) scale(0.92)' },
+    { id: 4, label: '3D Angle', transform: 'rotate(12deg) scale(1.15)' }
   ];
   const [selectedAngle, setSelectedAngle] = useState(angles[0]);
+
+  // Load product details from Live API
+  useEffect(() => {
+    let isMounted = true;
+    setLoadingProduct(true);
+
+    // Call GET /product-details/?product-id=id
+    getProductDetailsApi(id)
+      .then((apiProduct) => {
+        if (!isMounted) return;
+        if (apiProduct) {
+          setProduct(apiProduct);
+          setSelectedColor(apiProduct?.colors?.[0] || 'black');
+          setSelectedSize(apiProduct?.size || 'M');
+        } else {
+          fallbackLocalProduct();
+        }
+      })
+      .catch((err) => {
+        if (!isMounted) return;
+        console.warn("[ProductDetails] getProductDetailsApi error, attempting fallback:", err.message);
+        fallbackLocalProduct();
+      })
+      .finally(() => {
+        if (isMounted) setLoadingProduct(false);
+      });
+
+    const fallbackLocalProduct = () => {
+      const found = productsData.find(p => String(p.id) === String(id));
+      if (found) {
+        setProduct(found);
+        setSelectedColor(found?.colors?.[0] || 'black');
+        setSelectedSize(found?.size || 'M');
+        return;
+      }
+
+      Promise.allSettled([getStoreProducts("1200"), getGlassProducts({ filter: "all" })])
+        .then(([storeRes, glassRes]) => {
+          if (!isMounted) return;
+          let candidate = null;
+          if (storeRes.status === "fulfilled" && Array.isArray(storeRes.value)) {
+            candidate = storeRes.value.find(p => String(p.id) === String(id));
+          }
+          if (!candidate && glassRes.status === "fulfilled") {
+            const apiProds = glassRes.value.products || [];
+            candidate = apiProds.find(p => String(p.id) === String(id));
+          }
+          if (candidate) {
+            setProduct(candidate);
+            setSelectedColor(candidate?.colors?.[0] || 'black');
+            setSelectedSize(candidate?.size || 'M');
+          }
+        });
+    };
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -166,20 +174,10 @@ function ProductDetails() {
     };
   }, [isOffersOpen, isTryOnOpen, isSizeGuideOpen]);
 
-  if (!product) {
-    return (
-      <div className="page-wrapper">
-        <Navbar />
-        <div className="container" style={{ textAlign: 'center', padding: '100px 0' }}>
-          <h2>Product Not Found</h2>
-          <Link to="/products" style={{ color: '#0d6b6d' }}>Return to Shop</Link>
-        </div>
-      </div>
+  const toggleAssurance = (assurance) => {
+    setSelectedAssurances(prev => 
+      prev.includes(assurance) ? prev.filter(a => a !== assurance) : [...prev, assurance]
     );
-  }
-
-  const handleSelectLenses = () => {
-    navigate(`/select-lenses/${product.id}`, { state: { product, selectedColor } });
   };
 
   const handleNextAngle = () => {
@@ -194,362 +192,389 @@ function ProductDetails() {
     setSelectedAngle(angles[prevIndex]);
   };
 
+  const handleCheckPincode = () => {
+    if (pincode.trim().length === 6 && !isNaN(pincode)) {
+      const lastDigit = parseInt(pincode.charAt(5));
+      const deliveryDays = (lastDigit % 4) + 2;
+      
+      const d = new Date();
+      d.setDate(d.getDate() + deliveryDays);
+      const formattedDate = d.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' });
+      setDeliveryDate(formattedDate);
+      toast.success(`Express Delivery to ${pincode} available by ${formattedDate}!`);
+    } else {
+      toast.warning("Please enter a valid 6-digit postal pincode.");
+      setDeliveryDate(null);
+    }
+  };
+
+  const handleSelectLenses = () => {
+    if (!product) return;
+    navigate(`/select-lenses/${product.id}`, { 
+      state: { 
+        product: {
+          ...product,
+          selectedSize: selectedSize
+        }, 
+        selectedColor 
+      } 
+    });
+  };
+
+  const handleAddToCart = () => {
+    if (!product) return;
+    addToCart(product, 1, selectedColor);
+    toast.success(`Added "${product.name}" to cart!`);
+  };
+
+  const coupons = [
+    {
+      title: "Mega Eyewear Sale",
+      desc: "Get Flat 15% OFF on your first prescription order with code FIRST15.",
+      code: "FIRST15"
+    },
+    {
+      title: "HDFC Bank Discount",
+      desc: "Extra 10% Instant Cashback up to ₹1,000 on HDFC Cards.",
+      code: "HDFC10"
+    },
+    {
+      title: "UPI Instant Discount",
+      desc: "Save ₹150 instantly on all prepaid UPI payments.",
+      code: "UPI150"
+    }
+  ];
+
+  const isWish = product ? isInWishlist(product.id) : false;
+
+  // Loading State
+  if (loadingProduct && !product) {
+    return (
+      <div className="page-wrapper" style={{ background: '#ffffff', minHeight: '80vh' }}>
+        <Navbar />
+        <div style={{ textAlign: 'center', padding: '140px 20px', color: '#0d6b6d' }}>
+          <FaSpinner className="fa-spin" style={{ fontSize: '48px', marginBottom: '20px', animation: 'spin 1s linear infinite' }} />
+          <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', marginBottom: '8px' }}>Loading Eyewear Experience...</h2>
+          <p style={{ fontSize: '15px', color: '#64748b' }}>Fetching live product details, high-res frames and specifications.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Not Found State
+  if (!product) {
+    return (
+      <div className="page-wrapper" style={{ background: '#ffffff' }}>
+        <Navbar />
+        <div style={{ textAlign: 'center', padding: '120px 20px' }}>
+          <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a', marginBottom: '12px' }}>Product Not Found</h2>
+          <p style={{ color: '#64748b', marginBottom: '24px' }}>The requested frame could not be found or has been discontinued.</p>
+          <Link to="/products?type=eyeglasses" style={{ display: 'inline-block', background: '#0d6b6d', color: '#fff', padding: '12px 28px', borderRadius: '12px', fontWeight: 700, textDecoration: 'none' }}>
+            Explore Full Catalog
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const isBogoEligible = Boolean(product.isBogo || product.applicable_for_buy_one_get_one);
+  const displayPrice = Number(product.price || 1200);
+  const displayOldPrice = Number(product.oldPrice || Math.round(displayPrice * 1.4));
+  const discountPercent = Number(product.discount || (displayOldPrice > displayPrice ? Math.round(((displayOldPrice - displayPrice) / displayOldPrice) * 100) : 25));
+
   return (
-    <div className="page-wrapper" style={{ background: '#fff' }}>
+    <div className="page-wrapper" style={{ background: '#ffffff' }}>
       <Navbar />
 
-      <div className="details-container">
-        <div className="details-layout">
+      <div className="pd-page-container">
+        
+        {/* Breadcrumb Navigation */}
+        <nav className="pd-breadcrumbs">
+          <Link to="/">Home</Link>
+          <span className="separator">/</span>
+          <Link to={`/products?type=${product.type || 'eyeglasses'}`}>
+            {product.type === 'sunglasses' ? 'Sunglasses' : product.type === 'kids' ? 'Kids Glasses' : 'Eyeglasses'}
+          </Link>
+          <span className="separator">/</span>
+          <span className="current">{product.name}</span>
+        </nav>
+
+        {/* Main Product Showcase Grid */}
+        <div className="pd-grid-layout">
           
-          {/* Left Side: Product Image (Thumbnails + Main) */}
-          <div className="image-column">
+          {/* LEFT: 3D / AR Showcase Studio */}
+          <div className="pd-showcase-column">
             
-            {/* Thumbnails on the side */}
-            <div className="thumbnail-column">
-              <div className="thumbnail-icon-360">360°</div>
+            {/* Thumbnail Angle Selectors */}
+            <div className="pd-thumbnails-strip">
               {angles.map((angle) => (
-                <div key={angle.id} className={`thumbnail-item ${selectedAngle.id === angle.id ? 'active' : ''}`} onClick={() => setSelectedAngle(angle)}>
-                  <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <img 
-                      src={product.image} 
-                      alt="" 
-                      style={{ 
-                        width: '100%', height: '100%', objectFit: 'contain',
-                        transform: angle.transform,
-                        ...getImageStyle(product.image, selectedColor)
-                      }} 
-                    />
-                  </div>
-                </div>
+                <button
+                  key={angle.id}
+                  className={`pd-thumb-btn ${selectedAngle.id === angle.id ? 'active' : ''}`}
+                  onClick={() => setSelectedAngle(angle)}
+                  title={angle.label}
+                >
+                  <img 
+                    src={product.image} 
+                    alt={angle.label} 
+                    style={{ 
+                      ...getImageStyle(product.image, selectedColor),
+                      transform: angle.transform 
+                    }} 
+                  />
+                  <span className="pd-thumb-label">{angle.label}</span>
+                </button>
               ))}
             </div>
 
-            {/* Main Image */}
-            <div className="main-image-wrapper">
-               <button className="wishlist-icon">♡</button>
-               <button className="carousel-arrow left" onClick={handlePrevAngle}>&lt;</button>
-               <button className="carousel-arrow right" onClick={handleNextAngle}>&gt;</button>
-               
-               <div className="main-image-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                    <img 
-                      src={product.image} 
-                      alt={product.name} 
-                      className="details-image" 
-                      style={{ 
-                        ...getImageStyle(product.image, selectedColor),
-                        transform: selectedAngle.transform
-                      }}
-                    />
-               </div>
+            {/* Main Interactive Studio Card */}
+            <div className="pd-studio-card">
+              
+              {/* Studio 360 Badge */}
+              <div className="pd-studio-badge">
+                <span>✨ 360° Studio View</span>
+              </div>
 
-               <button className="try-on-btn" onClick={() => setIsTryOnOpen(true)}>
-                 Try On
-               </button>
+              {/* Floating Wishlist Button */}
+              <button 
+                className={`pd-wishlist-float-btn ${isWish ? 'active' : ''}`}
+                onClick={() => toggleWishlist(product)}
+                title={isWish ? "Remove from Wishlist" : "Save to Wishlist"}
+              >
+                {isWish ? <FaHeart /> : <FaRegHeart />}
+              </button>
+
+              {/* Carousel Arrows */}
+              <button className="pd-nav-arrow left" onClick={handlePrevAngle} title="Previous Angle">
+                <FaChevronLeft />
+              </button>
+              <button className="pd-nav-arrow right" onClick={handleNextAngle} title="Next Angle">
+                <FaChevronRight />
+              </button>
+
+              {/* Main Frame Visual */}
+              <img 
+                src={product.image} 
+                alt={product.name} 
+                className="pd-main-frame-img"
+                style={{ 
+                  ...getImageStyle(product.image, selectedColor),
+                  transform: selectedAngle.transform 
+                }} 
+              />
+
+              {/* Floating 3D Virtual Try-On Pill */}
+              <button className="pd-tryon-pill-btn" onClick={() => setIsTryOnOpen(true)}>
+                <FaCamera style={{ fontSize: '15px', color: '#38bdf8' }} /> 3D Virtual Try-On
+              </button>
             </div>
           </div>
 
-          {/* Right Side: Product Info */}
-          <div className="info-column">
-            <h1 className="zenni-details-title">{product.name} #{product.id}</h1>
+          {/* RIGHT: Product Specs, Pricing & Purchase Flow */}
+          <div className="pd-info-column">
             
-            <p style={{ fontSize: '14px', color: '#666', margin: '0 0 4px 0' }}>Starting at</p>
-            
-            <div className="zenni-price-rating-row">
-              <span className="zenni-main-price">${(product.price / 80).toFixed(2)}</span>
+            {/* Header Tags */}
+            <div className="pd-header-tags">
+              <span className="pd-brand-tag">{product.brand || "Mr.LensMaker"}</span>
+              <span className="pd-id-tag">Model #{product.id}</span>
+              {isBogoEligible && (
+                <span style={{ fontSize: '11.5px', fontWeight: 800, background: '#fee2e2', color: '#b91c1c', padding: '3px 8px', borderRadius: '6px' }}>
+                  BOGO OFFER
+                </span>
+              )}
+            </div>
+
+            {/* Product Title */}
+            <h1 className="pd-product-title">{product.name}</h1>
+
+            {/* Rating Row */}
+            <div className="pd-rating-row">
+              <div className="pd-rating-pill">
+                <FaStar className="star-icon" />
+                <span>{product.rating || '4.8'}</span>
+              </div>
+              <a href="#reviews" className="pd-reviews-link">
+                <strong>218 verified customer ratings</strong> • Top Choice
+              </a>
+            </div>
+
+            {/* Luxury Price Card */}
+            <div className="pd-price-card">
+              <div className="pd-price-main-row">
+                <span className="pd-price-current">₹{displayPrice.toLocaleString('en-IN')}</span>
+                {displayOldPrice > displayPrice && (
+                  <span className="pd-price-old">₹{displayOldPrice.toLocaleString('en-IN')}</span>
+                )}
+                {discountPercent > 0 && (
+                  <span className="pd-discount-badge">{discountPercent}% OFF</span>
+                )}
+              </div>
+              <p className="pd-tax-note">Inclusive of all taxes & free express shipping on prescription orders</p>
               
-              <div className="zenni-rating-chip">
-                <span style={{ color: '#facc15', fontSize: '20px' }}>★</span>
-                <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{product.rating}</span>
-                <a href="#" style={{ color: '#0d6b6d', textDecoration: 'underline', fontSize: '14px' }}>218 reviews</a>
+              {isBogoEligible && (
+                <div className="pd-bogo-banner-pill">
+                  <FaTag /> 🎁 BUY 1 GET 1 FREE Eligible • Mix & Match any frame
+                </div>
+              )}
+            </div>
+
+            {/* Frame Customization Block (Size & Color) */}
+            <div className="pd-selection-card">
+              
+              {/* Frame Size Selector */}
+              <div style={{ marginBottom: '18px' }}>
+                <div className="pd-section-header">
+                  <span>Frame Size: <strong>{selectedSize === 'S' ? 'Small' : selectedSize === 'L' ? 'Large' : 'Medium'}</strong></span>
+                  <div className="pd-guide-link" onClick={() => setIsSizeGuideOpen(true)}>
+                    <FaRuler style={{ fontSize: '12px' }} /> Size & Fit Guide
+                  </div>
+                </div>
+
+                <div className="pd-size-pills-row">
+                  {[
+                    { key: 'S', title: 'Small', desc: '48 □ 16 - 135' },
+                    { key: 'M', title: 'Medium', desc: '52 □ 18 - 140' },
+                    { key: 'L', title: 'Large', desc: '55 □ 20 - 145' }
+                  ].map((sizeItem) => (
+                    <div 
+                      key={sizeItem.key}
+                      className={`pd-size-chip ${selectedSize === sizeItem.key ? 'active' : ''}`}
+                      onClick={() => setSelectedSize(sizeItem.key)}
+                    >
+                      <div className="pd-size-title">{sizeItem.title}</div>
+                      <div className="pd-size-desc">{sizeItem.desc}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Frame Color Swatches */}
+              <div className="pd-color-section">
+                <div className="pd-section-header">
+                  <span>Frame Color: <strong>{selectedColor.charAt(0).toUpperCase() + selectedColor.slice(1)}</strong></span>
+                  <span style={{ fontSize: '12px', color: '#64748b' }}>{product.colors?.length || 1} available</span>
+                </div>
+
+                <div className="pd-swatches-grid">
+                  {(product.colors && product.colors.length > 0 ? product.colors : ['black', 'blue', 'brown', 'gold']).map((color) => (
+                    <div
+                      key={color}
+                      className={`pd-swatch-ring ${selectedColor === color ? 'active' : ''}`}
+                      onClick={() => setSelectedColor(color)}
+                      title={color.charAt(0).toUpperCase() + color.slice(1)}
+                    >
+                      <div 
+                        className="pd-swatch-circle" 
+                        style={getSwatchStyle(color)} 
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Key Frame Specs Pills */}
+              <div className="pd-features-row">
+                <span className="pd-feature-chip">Shape: {product.shape || 'Rectangle'}</span>
+                <span className="pd-feature-chip">Gender: {product.gender || 'Unisex'}</span>
+                <span className="pd-feature-chip">{product.hasNosePads ? 'Adjustable Nose Pads' : 'Comfort Fit Bridge'}</span>
               </div>
             </div>
 
-            {/* Grey Box for Size and Color */}
-            <div className="zenni-options-card">
-              
-              {/* Size Section */}
-              <div className="zenni-size-block">
-                <div className="zenni-size-header">
-                  <div>Size: <span>{product.size === 'S' ? '48 □ 16 - 135' : product.size === 'L' ? '55 □ 20 - 145' : '52 □ 18 - 140'}</span></div>
-                  <div className="zenni-size-link" style={{ cursor: 'pointer' }} onClick={(e) => { e.preventDefault(); setIsSizeGuideOpen(true); }}>Size and fit</div>
-                </div>
-                <button className="zenni-size-pill-btn">
-                  {product.size === 'M' ? 'Medium' : product.size === 'L' ? 'Large' : 'Small'}
+            {/* CTAs Action Block */}
+            <div className="pd-cta-block">
+              <button className="pd-btn-primary-select" onClick={handleSelectLenses}>
+                SELECT LENSES & BUY NOW <FaArrowRight />
+              </button>
+
+              <div className="pd-btn-secondary-row">
+                <button className="pd-btn-secondary" onClick={handleAddToCart}>
+                  <FaShoppingCart style={{ color: '#0d6b6d' }} /> Add to Cart
+                </button>
+                <button className="pd-btn-secondary" onClick={() => setIsTryOnOpen(true)}>
+                  <FaCamera style={{ color: '#0d6b6d' }} /> Live 3D Try-On
+                </button>
+              </div>
+            </div>
+
+            {/* Delivery Pincode Checker */}
+            <div className="pd-delivery-card">
+              <div className="pd-delivery-header">
+                <FaTruck style={{ color: '#0d6b6d', fontSize: '18px' }} /> Check Delivery & Serviceability
+              </div>
+              <div className="pd-pincode-input-row">
+                <input 
+                  type="text" 
+                  placeholder="Enter 6-digit Pincode (e.g. 600001)" 
+                  value={pincode}
+                  onChange={(e) => setPincode(e.target.value.replace(/\D/g, ""))}
+                  maxLength={6}
+                  className="pd-pincode-input"
+                />
+                <button 
+                  onClick={handleCheckPincode}
+                  disabled={!pincode || pincode.length !== 6}
+                  className="pd-pincode-btn"
+                >
+                  CHECK
                 </button>
               </div>
 
-              {/* Color Section */}
-              <div style={{ fontSize: '18px', marginBottom: '16px' }}>
-                <strong style={{ color: '#000' }}>Frame Color:</strong> <span style={{ color: '#000' }}>{selectedColor.charAt(0).toUpperCase() + selectedColor.slice(1)}</span>
-              </div>
-              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                {product.colors && product.colors.map(color => (
-                  <div 
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    title={color}
-                    style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '50%',
-                      cursor: 'pointer',
-                      border: color === 'transparent' || color === 'white' ? '2px solid #ccc' : 'none',
-                      outline: selectedColor === color ? '2px solid #000' : 'none',
-                      outlineOffset: '2px',
-                      ...getSwatchStyle(color)
-                    }}
-                  ></div>
-                ))}
-              </div>
+              {deliveryDate && (
+                <div className="pd-delivery-result">
+                  <FaCheck /> Guaranteed Express Delivery by <strong>{deliveryDate}</strong>
+                </div>
+              )}
             </div>
 
-            {/* Delivery Pincode */}
-            {(() => {
-              const isPincodeValid = Boolean(pincode && pincode.trim().length === 6 && !isNaN(pincode));
-              return (
-                <div style={{ marginBottom: '30px', width: '100%' }}>
-                  <div style={{ fontSize: '15px', fontWeight: '700', color: '#3A2415', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <FaTruck style={{ color: '#0d6b6d', fontSize: '17px' }} /> Check Delivery Date
-                  </div>
-                  <div className="pincode-input-group">
-                    <input 
-                      type="text" 
-                      placeholder="Enter Pincode" 
-                      value={pincode}
-                      onChange={(e) => setPincode(e.target.value.replace(/\D/g, ""))}
-                      maxLength={6}
-                      className="pincode-input-field"
-                    />
-                    <button 
-                      onClick={handleCheckPincode}
-                      disabled={!isPincodeValid}
-                      className={`pincode-submit-btn ${isPincodeValid ? 'active' : ''}`}
-                    >
-                      CHECK
-                    </button>
-                  </div>
-                  {deliveryDate && (
-                    <div style={{ color: '#007a68', fontWeight: 'bold', fontSize: '15px', marginTop: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontSize: '16px' }}>✓</span> Get it as early as {deliveryDate}
-                    </div>
-                  )}
+            {/* Trust & Assurance Grid */}
+            <div className="pd-trust-grid">
+              <div 
+                className={`pd-trust-item ${selectedAssurances.includes('return') ? 'active' : ''}`}
+                onClick={() => toggleAssurance('return')}
+              >
+                <FaBoxOpen className="pd-trust-icon" />
+                <div>
+                  <div className="pd-trust-text-title">14-Day Free Returns</div>
+                  <div className="pd-trust-text-sub">100% Money Back</div>
                 </div>
-              );
-            })()}
-
-            {/* GET ASSURED YOU Section */}
-            {(() => {
-              const isSunglass = Boolean(
-                product?.type?.toLowerCase().includes('sunglasses') || 
-                product?.name?.toLowerCase().includes('sunglass') || 
-                product?.category?.toLowerCase().includes('sunglasses')
-              );
-
-              return (
-                <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #eaeaea', marginBottom: '25px' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '800', color: '#3A2415', marginBottom: '14px', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                    GET ASSURED YOU
-                  </h4>
-                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                    <div 
-                      onClick={() => toggleAssurance('return')}
-                      style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', background: selectedAssurances.includes('return') ? '#e6f7f7' : '#fcfbfa', padding: '10px 14px', borderRadius: '10px', border: selectedAssurances.includes('return') ? '1px solid #0d6b6d' : '1px solid rgba(224, 216, 200, 0.6)', flex: '1', minWidth: '130px', transition: 'all 0.3s' }}
-                    >
-                      <span style={{ fontSize: '20px' }}>📦</span>
-                      <div>
-                        <div style={{ fontSize: '12.5px', fontWeight: '700', color: '#3A2415' }}>
-                          {isSunglass ? "14 Days Return" : "14 Days Return"}
-                        </div>
-                        <div style={{ fontSize: '11px', color: '#666' }}>Full Money Back</div>
-                      </div>
-                    </div>
-
-                    <div 
-                      onClick={() => toggleAssurance('exchange')}
-                      style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', background: selectedAssurances.includes('exchange') ? '#e6f7f7' : '#fcfbfa', padding: '10px 14px', borderRadius: '10px', border: selectedAssurances.includes('exchange') ? '1px solid #0d6b6d' : '1px solid rgba(224, 216, 200, 0.6)', flex: '1', minWidth: '130px', transition: 'all 0.3s' }}
-                    >
-                      <span style={{ fontSize: '20px' }}>🔄</span>
-                      <div>
-                        <div style={{ fontSize: '12.5px', fontWeight: '700', color: '#3A2415' }}>14 Days Exchange</div>
-                        <div style={{ fontSize: '11px', color: '#666' }}>Hassle-Free Replacement</div>
-                      </div>
-                    </div>
-
-                    <div 
-                      onClick={() => toggleAssurance('warranty')}
-                      style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', background: selectedAssurances.includes('warranty') ? '#e6f7f7' : '#fcfbfa', padding: '10px 14px', borderRadius: '10px', border: selectedAssurances.includes('warranty') ? '1px solid #0d6b6d' : '1px solid rgba(224, 216, 200, 0.6)', flex: '1', minWidth: '130px', transition: 'all 0.3s' }}
-                    >
-                      <span style={{ fontSize: '20px' }}>🛡️</span>
-                      <div>
-                        <div style={{ fontSize: '12.5px', fontWeight: '700', color: '#3A2415' }}>1 Year Warranty</div>
-                        <div style={{ fontSize: '11px', color: '#666' }}>Brand Protection</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* Offers & Discounts */}
-            <div className="offers-container" style={{ marginBottom: '20px', borderTop: '1px solid #eaeaea', paddingTop: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#d4af37', color: '#fff', borderRadius: '50%', width: '22px', height: '22px', fontSize: '12px', fontWeight: 'bold', border: '2px solid #b38b22' }}>%</div>
-                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#222' }}>Offers & Discounts</h3>
-                </div>
-                <button onClick={() => setIsOffersOpen(true)} style={{ background: 'none', border: 'none', color: '#6b4c9a', textDecoration: 'none', fontWeight: 'bold', fontSize: '14px', cursor: 'pointer' }}>View all</button>
               </div>
 
-              <div style={{ position: 'relative', border: '1px dashed #ccc', padding: '16px', borderRadius: '4px', background: '#fff' }}>
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 'bold', color: '#222' }}>{coupons[currentCouponIndex].title}</h4>
-                <p style={{ margin: 0, fontSize: '14px', color: '#555', lineHeight: '1.5', paddingRight: '20px', minHeight: '42px' }}>
-                  {coupons[currentCouponIndex].desc}
-                </p>
-                <button onClick={() => alert("Coupon applied!")} style={{ position: 'absolute', bottom: '-1px', right: '-1px', background: '#6b4c9a', color: '#fff', border: 'none', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', borderTopLeftRadius: '4px', fontSize: '18px' }}>
-                  +
-                </button>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: '16px', gap: '16px' }}>
-                <span style={{ fontSize: '16px', color: '#222' }}>{currentCouponIndex + 1}/{coupons.length}</span>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <button onClick={handlePrevCoupon} style={{ background: '#fff', border: '1px solid #ddd', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#333', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>&lt;</button>
-                  <button onClick={handleNextCoupon} style={{ background: '#fff', border: '1px solid #ddd', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#333', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>&gt;</button>
+              <div 
+                className={`pd-trust-item ${selectedAssurances.includes('warranty') ? 'active' : ''}`}
+                onClick={() => toggleAssurance('warranty')}
+              >
+                <FaShieldAlt className="pd-trust-icon" />
+                <div>
+                  <div className="pd-trust-text-title">1-Year Warranty</div>
+                  <div className="pd-trust-text-sub">Comprehensive Coverage</div>
                 </div>
               </div>
             </div>
-
-            {/* Select Lenses Button */}
-            <button 
-              onClick={handleSelectLenses} 
-              style={{ width: '100%', padding: '18px', background: '#0d6b6d', color: '#fff', border: 'none', borderRadius: '30px', fontSize: '20px', fontWeight: 'bold', cursor: 'pointer', display: 'block', textTransform: 'uppercase', letterSpacing: '1.5px', boxShadow: '0 6px 20px rgba(13, 107, 109, 0.3)', transition: 'all 0.3s ease' }}
-              onMouseOver={(e) => { e.target.style.background = '#094d4f'; e.target.style.transform = 'translateY(-2px)'; }}
-              onMouseOut={(e) => { e.target.style.background = '#0d6b6d'; e.target.style.transform = 'translateY(0)'; }}
-            >
-              SELECT LENSES
-            </button>
-
 
           </div>
         </div>
 
-        {/* Product Information Tabs */}
+        {/* Product Information Tabs Section */}
         <ProductInfoTabs product={product} onOpenSizeGuide={() => setIsSizeGuideOpen(true)} />
 
-        {/* You Might Also Like Section */}
+        {/* Related Similar Products Section */}
         <RelatedProducts currentProduct={product} />
+
       </div>
 
-      {/* Try On Modal */}
-      {isTryOnOpen && (
-        <div className="tryon-overlay" onClick={() => setIsTryOnOpen(false)}>
-          <div className="tryon-modal" onClick={e => e.stopPropagation()}>
-            <button className="close-btn" onClick={() => setIsTryOnOpen(false)}>×</button>
-            <h2>Virtual Try-On</h2>
-            <div className="webcam-placeholder">
-              <p>Camera access required</p>
-              <button className="enable-cam-btn">Enable Camera</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Size Guide Modal */}
-      <SizeGuideModal isOpen={isSizeGuideOpen} onClose={() => setIsSizeGuideOpen(false)} product={product} />
-
-      {/* Offers Modal */}
-      {isOffersOpen && createPortal(
-        <div 
-          onClick={() => setIsOffersOpen(false)} 
-          style={{ 
-            zIndex: 99999, 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            position: 'fixed', 
-            top: 0, 
-            left: 0, 
-            right: 0, 
-            bottom: 0, 
-            width: '100%', 
-            height: '100vh', 
-            background: 'rgba(0,0,0,0.6)', 
-            backdropFilter: 'blur(4px)',
-            WebkitBackdropFilter: 'blur(4px)',
-            padding: '16px',
-            boxSizing: 'border-box'
-          }}
-        >
-          <div 
-            onClick={e => e.stopPropagation()} 
-            style={{ 
-              background: '#fff', 
-              padding: '24px 20px', 
-              borderRadius: '16px', 
-              width: '100%', 
-              maxWidth: '480px', 
-              maxHeight: '85vh', 
-              overflowY: 'auto', 
-              position: 'relative',
-              boxShadow: '0 12px 40px rgba(0,0,0,0.3)',
-              WebkitOverflowScrolling: 'touch',
-              margin: 'auto'
-            }}
-          >
-            <button 
-              style={{ 
-                position: 'absolute', 
-                top: '16px', 
-                right: '16px', 
-                background: '#f5f5f5', 
-                border: 'none', 
-                width: '32px', 
-                height: '32px', 
-                borderRadius: '50%', 
-                fontSize: '18px', 
-                cursor: 'pointer', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                color: '#333' 
-              }} 
-              onClick={() => setIsOffersOpen(false)}
-            >
-              ×
-            </button>
-            <h2 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: '800', borderBottom: '1px solid #eee', paddingBottom: '12px', color: '#222' }}>
-              All Offers & Discounts
-            </h2>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {coupons.map((coupon, idx) => (
-                <div key={idx} style={{ position: 'relative', border: idx === 0 ? '1.5px dashed #6b4c9a' : '1px dashed #ccc', padding: '16px', borderRadius: '10px', background: idx === 0 ? '#fcfaff' : '#fff' }}>
-                  <h4 style={{ margin: '0 0 6px 0', fontSize: '15px', fontWeight: 'bold', color: '#222' }}>{coupon.title}</h4>
-                  <p style={{ margin: '0 0 14px 0', fontSize: '13px', color: '#555', lineHeight: '1.4' }}>
-                    {coupon.desc}
-                  </p>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                    <div style={{ color: '#6b4c9a', fontWeight: 'bold', fontSize: '13px', background: '#f0eaff', padding: '4px 10px', borderRadius: '6px' }}>Code: {coupon.code}</div>
-                    <button 
-                      onClick={() => { alert("Coupon applied!"); setIsOffersOpen(false); }} 
-                      style={{ background: '#6b4c9a', color: '#fff', border: 'none', padding: '8px 18px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold' }}
-                    >
-                      Apply
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
+      {/* 3D AR Virtual Try-On Modal */}
       <VirtualTryOn 
         isOpen={isTryOnOpen} 
         onClose={() => setIsTryOnOpen(false)} 
         initialProduct={product} 
         selectedColor={selectedColor}
+      />
+
+      {/* Size Guide Modal */}
+      <SizeGuideModal 
+        isOpen={isSizeGuideOpen} 
+        onClose={() => setIsSizeGuideOpen(false)} 
+        product={product} 
       />
 
     </div>

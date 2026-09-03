@@ -101,7 +101,7 @@ function Hero() {
           <span>{sliderData[currentSlide].year}</span>
         </div>
 
-        <Link to="/products" className="shop-now-btn">
+        <Link to="/products?type=eyeglasses" className="shop-now-btn">
           Shop Now
         </Link>
       </div>

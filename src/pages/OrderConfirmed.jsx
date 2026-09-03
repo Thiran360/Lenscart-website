@@ -47,7 +47,7 @@ function OrderConfirmed() {
         </p>
 
         <div className="action-buttons">
-          <Link to="/products" className="continue-shopping-btn">Continue Shopping</Link>
+          <Link to="/products?type=eyeglasses" className="continue-shopping-btn">Continue Shopping</Link>
           <Link to="/track-order" state={{ orderId }} className="track-order-btn">Track Order</Link>
         </div>
       </div>

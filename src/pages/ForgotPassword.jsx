@@ -1,36 +1,39 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useToast } from "../context/ToastContext";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleResetPassword = () => {
     const savedUser = JSON.parse(localStorage.getItem("user"));
 
     if (!savedUser || savedUser.email !== email) {
-      alert("No account found with that email");
+      toast.error("No account found with that email");
       return;
     }
 
     if (!newPassword || !confirmPassword) {
-      alert("Please enter a new password and confirm it");
+      toast.warning("Please enter a new password and confirm it");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      alert("Passwords do not match");
+      toast.warning("Passwords do not match");
       return;
     }
 
     savedUser.password = newPassword;
     localStorage.setItem("user", JSON.stringify(savedUser));
     
-    alert("Password reset successfully. You can now login.");
-    window.location.href = "/login";
+    toast.success("Password reset successfully. You can now login.");
+    navigate("/login");
   };
 
   return (
@@ -43,15 +46,15 @@ function ForgotPassword() {
         <input type="email" placeholder="Registered Mail ID" value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: "100%", padding: "10px", marginTop: "15px", boxSizing: "border-box", fontSize: "14px" }} />
         
         <input type="password" placeholder="Create Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} style={{ width: "100%", padding: "10px", marginTop: "15px", boxSizing: "border-box", fontSize: "14px" }} />
-        
+
         <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} style={{ width: "100%", padding: "10px", marginTop: "15px", boxSizing: "border-box", fontSize: "14px" }} />
 
-        <button onClick={handleResetPassword} style={{ width: "100%", padding: "10px", marginTop: "20px", background: "#3A2415", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "15px", fontWeight: "bold" }}>
+        <button onClick={handleResetPassword} style={{ width: "100%", padding: "10px", marginTop: "20px", background: "#0d6b6d", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer", fontWeight: "bold" }}>
           Reset Password
         </button>
 
-        <p style={{ textAlign: "center", marginTop: "15px", fontSize: "14px", lineHeight: "1.6" }}>
-          Remembered? <Link to="/login" style={{ color: "#3A2415", textDecoration: "none", fontWeight: "bold" }}>Login</Link>
+        <p style={{ marginTop: "15px", textAlign: "center" }}>
+          Remember your password? <Link to="/login" style={{ color: "#0d6b6d", fontWeight: "bold" }}>Login</Link>
         </p>
       </div>
 
@@ -61,4 +64,3 @@ function ForgotPassword() {
 }
 
 export default ForgotPassword;
-

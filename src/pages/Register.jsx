@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import CustomPhoneInput from "../components/CustomPhoneInput";
 import { registerUser, clean10DigitPhone } from "../services/authService";
+import { useToast } from "../context/ToastContext";
 import { FaTimes } from "react-icons/fa";
 import "./Login.css";
 
@@ -13,6 +14,7 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handlePhoneChange = (val, countryData) => {
     setPhone(val);
@@ -25,13 +27,13 @@ function Register() {
     setErrorMsg("");
 
     if (!name.trim()) {
-      alert("Please enter your full name");
+      toast.warning("Please enter your full name");
       return;
     }
     
     const cleanPhone = clean10DigitPhone(phone);
     if (!cleanPhone || cleanPhone.length !== 10) {
-      alert("Please enter a valid 10-digit mobile phone number");
+      toast.warning("Please enter a valid 10-digit mobile phone number");
       return;
     }
 
@@ -55,13 +57,13 @@ function Register() {
 
         const serverOtp = response?.data?.otp || response?.otp;
         if (serverOtp) {
-          localStorage.setItem("otp", String(serverOtp));
+          sessionStorage.setItem("otp", String(serverOtp));
         }
 
         localStorage.setItem("pendingName", name.trim());
         localStorage.setItem("pendingPhone", formattedDisplayPhone);
         localStorage.setItem("cleanPhone", cleanPhone);
-        localStorage.setItem("otpFlow", "register");
+        sessionStorage.setItem("otpFlow", "register");
 
         navigate("/verify-otp");
       }

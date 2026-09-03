@@ -66,13 +66,12 @@ export const logoutUser = async () => {
     localStorage.removeItem("user_token");
     localStorage.removeItem("userToken");
     localStorage.removeItem("token");
+    localStorage.removeItem("user_type");
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("user");
     localStorage.removeItem("pendingPhone");
     localStorage.removeItem("cleanPhone");
     localStorage.removeItem("pendingName");
-    localStorage.removeItem("otpFlow");
-    localStorage.removeItem("otp");
     sessionStorage.clear();
   }
 };
@@ -90,8 +89,13 @@ export const verifyOtpApi = async (otpData) => {
   };
   const response = await apiRequest("/verify-otp/", "POST", payload);
   const token = response?.data?.user_token || response?.user_token;
+  const userType = response?.data?.user_type || response?.user_type || response?.data?.role || response?.role || response?.data?.user?.user_type;
+
   if (token) {
     localStorage.setItem("user_token", token);
+  }
+  if (userType) {
+    localStorage.setItem("user_type", String(userType).toLowerCase());
   }
   return response;
 };

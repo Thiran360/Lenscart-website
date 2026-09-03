@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { useToast } from "./context/ToastContext";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
@@ -37,6 +38,40 @@ function ScrollToTop() {
 
 function App() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const handleAuthRequired = (event) => {
+      const message = event?.detail?.message || "user_token is required. Please login to continue.";
+
+      // 1. Display toast error notification
+      if (toast?.error) {
+        toast.error(message);
+      }
+
+      // 2. Redirect to Login if not already on auth-related pages
+      const currentPath = window.location.pathname || location.pathname;
+      const authPages = ["/login", "/register", "/forgot-password", "/verify-otp"];
+      const isAuthPage = authPages.some((path) => currentPath.startsWith(path));
+
+      if (!isAuthPage) {
+        navigate("/login", {
+          state: {
+            from: currentPath + (window.location.search || location.search || ""),
+            reason: message,
+          },
+          replace: true,
+        });
+      }
+    };
+
+    window.addEventListener("auth:required", handleAuthRequired);
+    return () => {
+      window.removeEventListener("auth:required", handleAuthRequired);
+    };
+  }, [location, navigate, toast]);
+
   return (
     <>
       <ScrollToTop />
