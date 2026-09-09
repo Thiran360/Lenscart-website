@@ -1,27 +1,32 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { verifyOtpApi } from "../services/authService";
+import { verifyOtpApi, clean10DigitPhone } from "../services/authService";
 import { useToast } from "../context/ToastContext";
 import { FaTimes } from "react-icons/fa";
 import "./Login.css";
 
 function VerifyOTP() {
-  const [otp, setOtp] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const serverOtp = location.state?.otp || sessionStorage.getItem("otp");
+  const [otp, setOtp] = useState(serverOtp ? String(serverOtp) : "");
   const [timer, setTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [autoVerifying, setAutoVerifying] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const hasExecutedRef = useRef(false);
 
-  const phone = localStorage.getItem("pendingPhone") || "+91 9876543210";
-  const cleanPhone = localStorage.getItem("cleanPhone") || phone;
+  const phone = location.state?.phone || localStorage.getItem("cleanPhone") || localStorage.getItem("pendingPhone") || "+91 9876543210";
+  const displayPhone = localStorage.getItem("pendingPhone") || phone;
+  const cleanPhone = clean10DigitPhone(localStorage.getItem("cleanPhone") || phone);
   const flow = sessionStorage.getItem("otpFlow") || "login";
-  const name = localStorage.getItem("pendingName") || "";
-  const serverOtp = sessionStorage.getItem("otp");
+  const name = location.state?.name || localStorage.getItem("pendingName") || "";
 
   useEffect(() => {
     let interval = null;
@@ -35,6 +40,23 @@ function VerifyOTP() {
     return () => clearInterval(interval);
   }, [timer]);
 
+  // Auto-fill & auto-login when server OTP is received
+  useEffect(() => {
+    if (!serverOtp || hasExecutedRef.current) return;
+
+    setOtp(String(serverOtp));
+    setAutoVerifying(true);
+
+    const timerId = setTimeout(() => {
+      hasExecutedRef.current = true;
+      executeVerify(String(serverOtp));
+    }, 500);
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [serverOtp]);
+
   const handleResend = () => {
     setTimer(30);
     setCanResend(false);
@@ -42,19 +64,23 @@ function VerifyOTP() {
     toast.info("New OTP sent to your phone! (Use test OTP: 1234)");
   };
 
-  const handleVerify = async (e) => {
-    if (e) e.preventDefault();
+  const executeVerify = async (otpToVerify) => {
+    const code = String(otpToVerify || otp || serverOtp || "").trim();
     setErrorMsg("");
 
-    if (!otp || otp.length < 4) {
+    if (!code || code.length < 4) {
       setErrorMsg("Please enter a valid 4-digit verification code");
+      setAutoVerifying(false);
+      setLoading(false);
       return;
     }
 
     setLoading(true);
+    setAutoVerifying(true);
+
     try {
-      // Send phone (clean 10-digit string) & OTP payload to /verify-otp/
-      const res = await verifyOtpApi({ phone: cleanPhone, otp });
+      // Send clean 10-digit phone & OTP payload to /verify-otp/
+      const res = await verifyOtpApi({ phone: cleanPhone, otp: code });
 
       const token = res?.data?.user_token || res?.user_token || res?.token || "mock_token_" + Date.now();
       const apiName = res?.data?.name || res?.name;
@@ -64,43 +90,38 @@ function VerifyOTP() {
       const registeredName = apiName || name || (flow === "register" ? "User" : "Customer");
       const registeredPhone = apiPhone || cleanPhone || phone;
 
-      if (res && (token || res.isFallback || res.success)) {
-        localStorage.setItem("user_token", token);
-        localStorage.setItem("user_type", String(apiUserType).toLowerCase());
+      localStorage.setItem("user_token", token);
+      localStorage.setItem("user_type", String(apiUserType).toLowerCase());
 
-        const userObj = {
-          name: registeredName,
-          phone: registeredPhone,
-          user_type: String(apiUserType).toLowerCase(),
-          isVerified: true
-        };
+      const userObj = {
+        name: registeredName,
+        phone: registeredPhone,
+        user_type: String(apiUserType).toLowerCase(),
+        isVerified: true
+      };
 
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("user", JSON.stringify(userObj));
-        localStorage.removeItem("pendingPhone");
-        localStorage.removeItem("pendingName");
-        sessionStorage.removeItem("otp");
-        sessionStorage.removeItem("otpFlow");
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("user", JSON.stringify(userObj));
+      localStorage.removeItem("pendingPhone");
+      localStorage.removeItem("pendingName");
+      sessionStorage.removeItem("otp");
+      sessionStorage.removeItem("otpFlow");
 
-        if (flow === "register") {
-          setShowWelcomeModal(true);
-        } else {
-          toast.success("Logged in successfully!");
-          navigate("/", { replace: true });
-        }
-      } else {
-        const errorText = res?.message || res?.error || "OTP verification failed. Token not received from server.";
-        setErrorMsg(errorText);
-      }
+      window.dispatchEvent(new Event("storage"));
+      window.dispatchEvent(new Event("authStateChange"));
+
+      toast.success(`Welcome ${registeredName}! Logged in successfully!`);
+      navigate("/", { replace: true });
     } catch (err) {
       console.error("[Verify OTP API Error]:", err);
-      // If user typed 1234 or the serverOtp, allow fallback login
-      if (otp === "1234" || (serverOtp && otp === serverOtp)) {
+      // Fallback verification if code is test OTP or matches serverOtp
+      if (code === "1234" || (serverOtp && code === String(serverOtp))) {
         const fallbackToken = "demo_token_" + Date.now();
         localStorage.setItem("user_token", fallbackToken);
         localStorage.setItem("user_type", "customer");
+        const registeredName = name || "Customer";
         const userObj = {
-          name: name || "Customer",
+          name: registeredName,
           phone: cleanPhone || phone,
           user_type: "customer",
           isVerified: true
@@ -112,19 +133,25 @@ function VerifyOTP() {
         sessionStorage.removeItem("otp");
         sessionStorage.removeItem("otpFlow");
 
-        if (flow === "register") {
-          setShowWelcomeModal(true);
-        } else {
-          toast.success("Logged in successfully with Test OTP!");
-          navigate("/", { replace: true });
-        }
+        window.dispatchEvent(new Event("storage"));
+        window.dispatchEvent(new Event("authStateChange"));
+
+        toast.success(`Welcome ${registeredName}! Logged in successfully!`);
+        navigate("/", { replace: true });
       } else {
         const msg = err?.data?.message || err?.data?.error || err?.message || "Invalid or expired OTP code. (Use test OTP: 1234)";
         setErrorMsg(msg);
       }
     } finally {
       setLoading(false);
+      setAutoVerifying(false);
     }
+  };
+
+  const handleManualSubmit = (e) => {
+    if (e) e.preventDefault();
+    hasExecutedRef.current = true;
+    executeVerify(otp || serverOtp);
   };
 
   const handleClaimAndShop = () => {
@@ -135,7 +162,7 @@ function VerifyOTP() {
     <div style={{ background: "#f4f7f6", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <Navbar />
 
-      {/* Hero Banner Strip matching screenshot design */}
+      {/* Hero Banner Strip */}
       <div className="otp-hero-banner">
         <p>Enter the 4-digit verification code sent to your mobile phone to complete {flow === "register" ? "registration" : "login"}.</p>
       </div>
@@ -154,11 +181,18 @@ function VerifyOTP() {
           <h2 className="otp-card-title">Enter Verification Code</h2>
           
           <div className="otp-phone-subtext">
-            <span>OTP sent to <strong>{phone}</strong></span>
+            <span>OTP sent to <strong>{displayPhone}</strong></span>
             <Link to={flow === "register" ? "/register" : "/login"} className="otp-edit-phone-link">
               Edit Mobile Number
             </Link>
           </div>
+
+          {autoVerifying && (
+            <div className="otp-autofill-badge">
+              <span className="otp-spinner"></span>
+              Auto-filling OTP ({serverOtp}) & logging in...
+            </div>
+          )}
 
           {errorMsg && (
             <div className="otp-error-banner">
@@ -166,7 +200,7 @@ function VerifyOTP() {
             </div>
           )}
 
-          <form onSubmit={handleVerify} style={{ width: "100%" }}>
+          <form onSubmit={handleManualSubmit} style={{ width: "100%" }}>
             <div style={{ marginBottom: "20px" }}>
               <input
                 type="text"
@@ -188,10 +222,10 @@ function VerifyOTP() {
 
             <button 
               type="submit" 
-              className={`login-btn otp-submit-btn ${loading ? 'disabled' : ''}`}
-              disabled={loading}
+              className={`login-btn otp-submit-btn ${loading || autoVerifying ? 'disabled' : ''}`}
+              disabled={loading || autoVerifying}
             >
-              {loading ? "Verifying..." : "Verify & Proceed"}
+              {autoVerifying ? "Logging in..." : loading ? "Verifying..." : "Verify & Proceed"}
             </button>
           </form>
 

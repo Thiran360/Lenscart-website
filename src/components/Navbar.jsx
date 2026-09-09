@@ -59,14 +59,29 @@ function Navbar() {
   const is1200Active = currentStore === '1200' || currentMaxPrice === '1200';
 
   useEffect(() => {
-    const logged = localStorage.getItem("isLoggedIn") === "true";
-    setIsLoggedIn(logged);
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user) setUserName(user.name || user.phone || "");
+    const syncAuth = () => {
+      const logged = localStorage.getItem("isLoggedIn") === "true";
+      setIsLoggedIn(logged);
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user) {
+        setUserName(user.name || user.phone || "");
+      } else {
+        setUserName("");
+      }
 
-    const storedUserType = localStorage.getItem("user_type") || user?.user_type || user?.role;
-    const adminCheck = logged && (String(storedUserType).toLowerCase() === "admin" || user?.is_staff || user?.is_superuser);
-    setIsAdmin(Boolean(adminCheck));
+      const storedUserType = localStorage.getItem("user_type") || user?.user_type || user?.role;
+      const adminCheck = logged && (String(storedUserType).toLowerCase() === "admin" || user?.is_staff || user?.is_superuser);
+      setIsAdmin(Boolean(adminCheck));
+    };
+
+    syncAuth();
+
+    window.addEventListener("authStateChange", syncAuth);
+    window.addEventListener("storage", syncAuth);
+    return () => {
+      window.removeEventListener("authStateChange", syncAuth);
+      window.removeEventListener("storage", syncAuth);
+    };
   }, [location.pathname]);
 
   // Sync search input with URL search param
@@ -382,7 +397,7 @@ function Navbar() {
                     <span className="user-name-text">{userName || 'Profile'}</span>
                   </Link>
                 ) : (
-                  <Link to="/login" className="nav-icon-link" title="Account">
+                  <Link to="/login" className="nav-icon-link" title="Account" onClick={() => navigate("/login")}>
                     <FaRegUser />
                   </Link>
                 )}
@@ -423,10 +438,10 @@ function Navbar() {
                         <div className="dropdown-user-sub">Login to access your profile & orders</div>
                       </div>
                       <div className="profile-dropdown-divider"></div>
-                      <Link to="/login" className="profile-dropdown-action-btn primary">
+                      <Link to="/login" className="profile-dropdown-action-btn primary" onClick={() => navigate("/login")}>
                         Login
                       </Link>
-                      <Link to="/register" className="profile-dropdown-action-btn secondary">
+                      <Link to="/register" className="profile-dropdown-action-btn secondary" onClick={() => navigate("/register")}>
                         Register / Sign Up
                       </Link>
                     </>

@@ -54,21 +54,34 @@ function Register() {
           localStorage.setItem("user_token", token);
         }
 
-        const serverOtp = response?.data?.otp || response?.otp || "1234";
-        sessionStorage.setItem("otp", String(serverOtp));
+        const serverOtp = response?.data?.otp || response?.otp;
+        const actualOtp = serverOtp ? String(serverOtp) : "1234";
+        sessionStorage.setItem("otp", actualOtp);
 
-        localStorage.setItem("pendingName", name.trim());
+        const actualName = response?.data?.name || name.trim();
+        const actualPhone = response?.data?.phone || cleanPhone;
+
+        localStorage.setItem("pendingName", actualName);
         localStorage.setItem("pendingPhone", formattedDisplayPhone);
-        localStorage.setItem("cleanPhone", cleanPhone);
+        localStorage.setItem("cleanPhone", actualPhone);
         sessionStorage.setItem("otpFlow", "register");
 
         if (response.isFallback) {
           toast.info("Backend offline / CORS error. Using test OTP: 1234");
+        } else if (serverOtp) {
+          toast.success(`OTP received: ${serverOtp}. Auto-filling...`);
         } else {
           toast.success("OTP sent to your mobile number!");
         }
 
-        navigate("/verify-otp");
+        navigate("/verify-otp", {
+          state: {
+            autoVerify: Boolean(serverOtp),
+            otp: actualOtp,
+            name: actualName,
+            phone: actualPhone
+          }
+        });
       }
     } catch (err) {
       console.error("[Register API Error]:", err);
@@ -80,7 +93,14 @@ function Register() {
       localStorage.setItem("cleanPhone", cleanPhone);
       sessionStorage.setItem("otpFlow", "register");
       toast.info("Backend unreachable. Navigating with test OTP: 1234");
-      navigate("/verify-otp");
+      navigate("/verify-otp", {
+        state: {
+          autoVerify: true,
+          otp: serverOtp,
+          name: name.trim(),
+          phone: cleanPhone
+        }
+      });
     } finally {
       setLoading(false);
     }

@@ -1,9 +1,8 @@
-// Centralized API Service for Mr.LensMaker Application
-// Base URL: https://reformist-egotism-backlash.ngrok-free.dev/api
+// Base URL: https://capsule-most-rundown.ngrok-free.dev/api
 
 import axios from "axios";
 
-export const BASE_API_URL = import.meta.env.VITE_API_URL || "/api";
+export const BASE_API_URL = "https://capsule-most-rundown.ngrok-free.dev/api";
 
 let lastAuthDispatch = 0;
 
@@ -58,22 +57,42 @@ export const checkIsAuthTokenError = (errorOrData, status) => {
   );
 };
 
+const isPublicEndpoint = (endpointUrl = "") => {
+  const u = String(endpointUrl).toLowerCase();
+  return (
+    u.includes("/product-details") ||
+    u.includes("/search") ||
+    u.includes("/glass-product") ||
+    u.includes("/product") ||
+    u.includes("/sunglasses") ||
+    u.includes("/eyeglasses") ||
+    u.includes("/kids-club") ||
+    u.includes("/buy-one-get-one") ||
+    u.includes("/login") ||
+    u.includes("/register") ||
+    u.includes("/verify-otp") ||
+    u.includes("/forgot-password")
+  );
+};
+
 // Global Axios Response Interceptor to capture any 401s or "user_token is required" messages across all requests
 axios.interceptors.response.use(
   (response) => {
     // Check if the backend responded with HTTP 200 but contained an auth error payload
-    if (response?.data && checkIsAuthTokenError(response.data, response.status)) {
+    const reqUrl = response?.config?.url || "";
+    if (!isPublicEndpoint(reqUrl) && response?.data && checkIsAuthTokenError(response.data, response.status)) {
       const msg = response.data?.message || response.data?.error || response.data?.detail || "user_token is required. Please login.";
       dispatchAuthRequired(msg);
     }
     return response;
   },
   (error) => {
+    const reqUrl = error?.config?.url || "";
     const status = error.response?.status;
     const data = error.response?.data;
     const msg = data?.message || data?.error || data?.detail || error.message;
 
-    if (checkIsAuthTokenError(data || error, status)) {
+    if (!isPublicEndpoint(reqUrl) && checkIsAuthTokenError(data || error, status)) {
       dispatchAuthRequired(msg);
     }
     return Promise.reject(error);
@@ -98,18 +117,24 @@ export const apiRequest = async (endpoint, method = "GET", body = null, customHe
     headers["Content-Type"] = "application/json";
   }
 
-  const token = localStorage.getItem("user_token") || localStorage.getItem("userToken") || localStorage.getItem("token");
+  const isAuthEndpoint = cleanEndpoint.includes("/login") || cleanEndpoint.includes("/register") || cleanEndpoint.includes("/verify-otp");
 
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-    headers["user-token"] = token;
-    headers["user_token"] = token;
+  if (!isAuthEndpoint) {
+    const guestToken = "c2e70cb8a4188199e9e567fd50ebb2176ffb760c9af2bb9aafe58768df2042e1";
+    const token = localStorage.getItem("user_token") || localStorage.getItem("userToken") || localStorage.getItem("token") || guestToken;
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+      headers["user-token"] = token;
+      headers["user_token"] = token;
+    }
   }
 
   const config = {
     method: method.toLowerCase(),
     url,
     headers,
+    timeout: 8000, // 8s timeout to prevent hanging if remote tunnel is slow
   };
 
   // Only attach data property if body is provided (avoid sending null payload in DELETE / GET)
@@ -122,19 +147,27 @@ export const apiRequest = async (endpoint, method = "GET", body = null, customHe
 
   try {
     const response = await axios(config);
-    if (response?.data && checkIsAuthTokenError(response.data, response.status)) {
+    if (!isPublicEndpoint(url) && response?.data && checkIsAuthTokenError(response.data, response.status)) {
       const msg = response.data?.message || response.data?.error || response.data?.detail || "user_token is required. Please login.";
       dispatchAuthRequired(msg);
     }
     return response.data;
   } catch (error) {
-    console.error(`[API Call Error] ${method} ${url}:`, error.message);
-    const errorMsg = error.response?.data?.message || error.response?.data?.error || error.response?.data?.detail || `Request failed with status ${error.response?.status}`;
-    if (checkIsAuthTokenError(error.response?.data || error, error.response?.status)) {
+    const status = error.response?.status;
+    const errorMsg = error.response?.data?.message || error.response?.data?.error || error.response?.data?.detail || `Request failed with status ${status || error.message}`;
+    
+    // For public endpoints (like product-details or search), 404 or 400 is expected when item is not in remote database
+    if (isPublicEndpoint(url) && (status === 404 || status === 400)) {
+      console.warn(`[API Notice] ${method} ${url}: ${errorMsg} (using local catalog fallback)`);
+    } else {
+      console.error(`[API Call Error] ${method} ${url}:`, error.message);
+    }
+
+    if (!isPublicEndpoint(url) && checkIsAuthTokenError(error.response?.data || error, status)) {
       dispatchAuthRequired(errorMsg);
     }
     const customError = new Error(errorMsg);
-    customError.status = error.response?.status;
+    customError.status = status;
     customError.data = error.response?.data;
     throw customError;
   }

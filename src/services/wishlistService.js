@@ -2,7 +2,7 @@ import { apiRequest } from "./api";
 
 /**
  * Fetch all items in user's wishlist via GET /wishlist/
- * Base URL: https://reformist-egotism-backlash.ngrok-free.dev/api
+ * Base URL: https://capsule-most-rundown.ngrok-free.dev/api
  */
 export const getWishlistApi = async () => {
   return await apiRequest("/wishlist/", "GET");

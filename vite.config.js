@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://reformist-egotism-backlash.ngrok-free.dev',
+        target: 'https://capsule-most-rundown.ngrok-free.dev',
         changeOrigin: true,
         secure: false,
         headers: {

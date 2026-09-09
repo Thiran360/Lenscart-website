@@ -47,26 +47,38 @@ function Login() {
           localStorage.setItem("user_token", token);
         }
 
-        const serverOtp = response?.data?.otp || response?.otp || "1234";
-        sessionStorage.setItem("otp", String(serverOtp));
+        const serverOtp = response?.data?.otp || response?.otp;
+        const actualOtp = serverOtp ? String(serverOtp) : "1234";
+        sessionStorage.setItem("otp", actualOtp);
 
         // Save session items
         const existingUser = JSON.parse(localStorage.getItem("user"));
-        if (existingUser && existingUser.name) {
-          localStorage.setItem("pendingName", existingUser.name);
+        const actualName = response?.data?.name || (existingUser && existingUser.name) || "";
+        if (actualName) {
+          localStorage.setItem("pendingName", actualName);
         }
 
+        const actualPhone = response?.data?.phone || cleanPhone;
         localStorage.setItem("pendingPhone", formattedDisplayPhone);
-        localStorage.setItem("cleanPhone", cleanPhone);
+        localStorage.setItem("cleanPhone", actualPhone);
         sessionStorage.setItem("otpFlow", "login");
 
         if (response.isFallback) {
           toast.info("Backend offline / CORS error. Using test OTP: 1234");
+        } else if (serverOtp) {
+          toast.success(`OTP received: ${serverOtp}. Auto-filling...`);
         } else {
           toast.success("OTP sent to your mobile number!");
         }
 
-        navigate("/verify-otp");
+        navigate("/verify-otp", {
+          state: {
+            autoVerify: Boolean(serverOtp),
+            otp: actualOtp,
+            name: actualName,
+            phone: actualPhone
+          }
+        });
       }
     } catch (err) {
       console.error("[Login API Error]:", err);
@@ -77,7 +89,14 @@ function Login() {
       localStorage.setItem("cleanPhone", cleanPhone);
       sessionStorage.setItem("otpFlow", "login");
       toast.info("Backend unreachable. Navigating with test OTP: 1234");
-      navigate("/verify-otp");
+      navigate("/verify-otp", {
+        state: {
+          autoVerify: true,
+          otp: serverOtp,
+          name: "",
+          phone: cleanPhone
+        }
+      });
     } finally {
       setLoading(false);
     }
@@ -143,10 +162,10 @@ function Login() {
 
               <button
                 type="submit"
-                className={`login-btn ${!isPhoneValid || loading ? 'disabled' : ''}`}
-                disabled={!isPhoneValid || loading}
+                className={`login-btn ${loading ? 'disabled' : ''}`}
+                disabled={loading}
               >
-                {loading ? "Sending OTP..." : "Get OTP"}
+                {loading ? "Sending OTP..." : "Login / Get OTP"}
               </button>
             </form>
 

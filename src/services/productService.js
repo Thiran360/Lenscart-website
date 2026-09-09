@@ -1,5 +1,6 @@
 import axios from "axios";
 import { apiRequest, BASE_API_URL } from "./api";
+import { productsData } from "../data/products";
 
 export const CAPSULE_API_BASE_URL = BASE_API_URL;
 export const STORE_API_BASE_URL = BASE_API_URL;
@@ -99,6 +100,19 @@ export const getStoreProducts = async (params = "1200") => {
     }
 
     const normalized = list.map((item, idx) => normalizeProduct(item, idx)).filter(Boolean);
+
+    // If backend database currently has 0 store 1200 products, seamlessly fallback to catalog 1200 products
+    if (normalized.length === 0) {
+      const fallback1200 = productsData.filter(p => p.price <= 1200 || p.store === "1200");
+      return {
+        products: fallback1200,
+        totalItems: fallback1200.length,
+        totalPages: Math.max(1, Math.ceil(fallback1200.length / (limit || 9))),
+        total_pages: Math.max(1, Math.ceil(fallback1200.length / (limit || 9))),
+        total_data: fallback1200.length
+      };
+    }
+
     const totalPages = Number(rawData?.total_pages || (rawData?.total_data ? Math.ceil(rawData.total_data / (limit || 10)) : 1));
     const totalItems = Number(rawData?.total_items || rawData?.total_data || rawData?.count || normalized.length);
 
@@ -111,7 +125,14 @@ export const getStoreProducts = async (params = "1200") => {
     };
   } catch (error) {
     console.error(`[getStoreProducts] GET /product/ failed:`, error.message);
-    throw error;
+    const fallback1200 = productsData.filter(p => p.price <= 1200 || p.store === "1200");
+    return {
+      products: fallback1200,
+      totalItems: fallback1200.length,
+      totalPages: Math.max(1, Math.ceil(fallback1200.length / (limit || 9))),
+      total_pages: Math.max(1, Math.ceil(fallback1200.length / (limit || 9))),
+      total_data: fallback1200.length
+    };
   }
 };
 
@@ -233,47 +254,82 @@ export const getSunglassesApi = async (params = {}) => {
   const offset = (page - 1) * limit;
   const queryString = `?page=${page}&limit=${limit}&page_size=${limit}&page_number=${page}&offset=${offset}`;
 
-  const response = await apiRequest(`/sunglasses/${queryString}`, "GET");
-  console.log("[Sunglasses API Response]", response);
+  const allSunglasses = productsData.filter(p => p.type === 'sunglasses' || p.category === 'sunglasses');
+  const fallbackTotalItems = allSunglasses.length;
+  const fallbackTotalPages = Math.max(1, Math.ceil(fallbackTotalItems / limit));
+  const fallbackSlice = allSunglasses.slice(offset, offset + limit);
 
-  let list = [];
-  if (Array.isArray(response)) {
-    list = response;
-  } else if (Array.isArray(response?.data)) {
-    list = response.data;
-  } else if (Array.isArray(response?.results)) {
-    list = response.results;
-  } else if (Array.isArray(response?.sunglasses)) {
-    list = response.sunglasses;
-  } else if (Array.isArray(response?.products)) {
-    list = response.products;
-  } else if (Array.isArray(response?.items)) {
-    list = response.items;
-  } else if (Array.isArray(response?.data?.results)) {
-    list = response.data.results;
-  } else if (Array.isArray(response?.data?.products)) {
-    list = response.data.products;
-  } else if (Array.isArray(response?.data?.sunglasses)) {
-    list = response.data.sunglasses;
-  } else if (Array.isArray(response?.data?.items)) {
-    list = response.data.items;
-  } else if (Array.isArray(response?.data?.data)) {
-    list = response.data.data;
+  try {
+    const response = await apiRequest(`/sunglasses/${queryString}`, "GET");
+    console.log("[Sunglasses API Response]", response);
+
+    let list = [];
+    if (Array.isArray(response)) {
+      list = response;
+    } else if (Array.isArray(response?.data)) {
+      list = response.data;
+    } else if (Array.isArray(response?.results)) {
+      list = response.results;
+    } else if (Array.isArray(response?.sunglasses)) {
+      list = response.sunglasses;
+    } else if (Array.isArray(response?.products)) {
+      list = response.products;
+    } else if (Array.isArray(response?.items)) {
+      list = response.items;
+    } else if (Array.isArray(response?.data?.results)) {
+      list = response.data.results;
+    } else if (Array.isArray(response?.data?.products)) {
+      list = response.data.products;
+    } else if (Array.isArray(response?.data?.sunglasses)) {
+      list = response.data.sunglasses;
+    } else if (Array.isArray(response?.data?.items)) {
+      list = response.data.items;
+    } else if (Array.isArray(response?.data?.data)) {
+      list = response.data.data;
+    }
+
+    const normalized = list.map((item, idx) => normalizeProduct({ ...item, type: 'sunglasses' }, idx)).filter(Boolean);
+
+    // If backend database has 0 sunglasses on this page or empty, seamlessly fallback to local catalog
+    if (normalized.length === 0) {
+      return {
+        products: fallbackSlice,
+        totalItems: fallbackTotalItems,
+        totalPages: fallbackTotalPages,
+        pagination: {
+          page: page,
+          total_items: fallbackTotalItems,
+          total_pages: fallbackTotalPages,
+        },
+        page: page
+      };
+    }
+
+    const pagination = response?.pagination || response?.data?.pagination || {};
+    const totalPages = Number(pagination.total_pages || response?.total_pages || response?.data?.total_pages || (pagination.total_items ? Math.ceil(pagination.total_items / limit) : null) || Math.max(1, Math.ceil(normalized.length / limit)));
+    const totalItems = Number(pagination.total_items || response?.total_items || response?.data?.total_items || pagination.count || (totalPages * limit) || normalized.length);
+
+    return {
+      products: normalized,
+      totalItems: totalItems,
+      totalPages: totalPages,
+      pagination: pagination,
+      page: Number(pagination.page || page)
+    };
+  } catch (error) {
+    console.warn(`[getSunglassesApi] Page ${page} failed (${error.message}). Falling back to local catalog.`);
+    return {
+      products: fallbackSlice,
+      totalItems: fallbackTotalItems,
+      totalPages: fallbackTotalPages,
+      pagination: {
+        page: page,
+        total_items: fallbackTotalItems,
+        total_pages: fallbackTotalPages,
+      },
+      page: page
+    };
   }
-
-  const normalized = list.map((item, idx) => normalizeProduct({ ...item, type: 'sunglasses' }, idx)).filter(Boolean);
-
-  const pagination = response?.pagination || response?.data?.pagination || {};
-  const totalPages = Number(pagination.total_pages || response?.total_pages || response?.data?.total_pages || (pagination.total_items ? Math.ceil(pagination.total_items / limit) : null) || Math.max(1, Math.ceil(normalized.length / limit)));
-  const totalItems = Number(pagination.total_items || response?.total_items || response?.data?.total_items || pagination.count || (totalPages * limit) || normalized.length);
-
-  return {
-    products: normalized,
-    totalItems: totalItems,
-    totalPages: totalPages,
-    pagination: pagination,
-    page: Number(pagination.page || page)
-  };
 };
 
 /**
@@ -286,52 +342,87 @@ export const getEyeglassesApi = async (params = {}) => {
   const offset = (page - 1) * limit;
   const queryString = `?page=${page}&limit=${limit}&page_size=${limit}&page_number=${page}&offset=${offset}`;
 
-  const response = await apiRequest(`/eyeglasses/${queryString}`, "GET");
-  console.log("[Eyeglasses API Response]", response);
+  const allEyeglasses = productsData.filter(p => p.type === 'eyeglasses' || p.category === 'eyeglasses');
+  const fallbackTotalItems = allEyeglasses.length;
+  const fallbackTotalPages = Math.max(1, Math.ceil(fallbackTotalItems / limit));
+  const fallbackSlice = allEyeglasses.slice(offset, offset + limit);
 
-  let list = [];
-  if (Array.isArray(response)) {
-    list = response;
-  } else if (Array.isArray(response?.data)) {
-    list = response.data;
-  } else if (Array.isArray(response?.results)) {
-    list = response.results;
-  } else if (Array.isArray(response?.eyeglasses)) {
-    list = response.eyeglasses;
-  } else if (Array.isArray(response?.products)) {
-    list = response.products;
-  } else if (Array.isArray(response?.items)) {
-    list = response.items;
-  } else if (Array.isArray(response?.data?.results)) {
-    list = response.data.results;
-  } else if (Array.isArray(response?.data?.products)) {
-    list = response.data.products;
-  } else if (Array.isArray(response?.data?.eyeglasses)) {
-    list = response.data.eyeglasses;
-  } else if (Array.isArray(response?.data?.items)) {
-    list = response.data.items;
-  } else if (Array.isArray(response?.data?.data)) {
-    list = response.data.data;
+  try {
+    const response = await apiRequest(`/eyeglasses/${queryString}`, "GET");
+    console.log("[Eyeglasses API Response]", response);
+
+    let list = [];
+    if (Array.isArray(response)) {
+      list = response;
+    } else if (Array.isArray(response?.data)) {
+      list = response.data;
+    } else if (Array.isArray(response?.results)) {
+      list = response.results;
+    } else if (Array.isArray(response?.eyeglasses)) {
+      list = response.eyeglasses;
+    } else if (Array.isArray(response?.products)) {
+      list = response.products;
+    } else if (Array.isArray(response?.items)) {
+      list = response.items;
+    } else if (Array.isArray(response?.data?.results)) {
+      list = response.data.results;
+    } else if (Array.isArray(response?.data?.products)) {
+      list = response.data.products;
+    } else if (Array.isArray(response?.data?.eyeglasses)) {
+      list = response.data.eyeglasses;
+    } else if (Array.isArray(response?.data?.items)) {
+      list = response.data.items;
+    } else if (Array.isArray(response?.data?.data)) {
+      list = response.data.data;
+    }
+
+    const normalized = list.map((item, idx) => normalizeProduct({ ...item, type: 'eyeglasses' }, idx)).filter(Boolean);
+
+    // If backend database has 0 eyeglasses on this page or empty, seamlessly fallback to local catalog
+    if (normalized.length === 0) {
+      return {
+        products: fallbackSlice,
+        totalItems: fallbackTotalItems,
+        totalPages: fallbackTotalPages,
+        pagination: {
+          page: page,
+          total_items: fallbackTotalItems,
+          total_pages: fallbackTotalPages,
+        },
+        page: page
+      };
+    }
+
+    const pagination = response?.pagination || response?.data?.pagination || {};
+    const totalPages = Number(pagination.total_pages || response?.total_pages || response?.data?.total_pages || (pagination.total_items ? Math.ceil(pagination.total_items / limit) : null) || Math.max(1, Math.ceil(normalized.length / limit)));
+    const totalItems = Number(pagination.total_items || response?.total_items || response?.data?.total_items || pagination.count || (totalPages * limit) || normalized.length);
+
+    return {
+      products: normalized,
+      totalItems: totalItems,
+      totalPages: totalPages,
+      pagination: pagination,
+      page: Number(pagination.page || page)
+    };
+  } catch (error) {
+    console.warn(`[getEyeglassesApi] Page ${page} failed (${error.message}). Falling back to local catalog.`);
+    return {
+      products: fallbackSlice,
+      totalItems: fallbackTotalItems,
+      totalPages: fallbackTotalPages,
+      pagination: {
+        page: page,
+        total_items: fallbackTotalItems,
+        total_pages: fallbackTotalPages,
+      },
+      page: page
+    };
   }
-
-  const normalized = list.map((item, idx) => normalizeProduct({ ...item, type: 'eyeglasses' }, idx)).filter(Boolean);
-
-  const pagination = response?.pagination || response?.data?.pagination || {};
-  const totalPages = Number(pagination.total_pages || response?.total_pages || response?.data?.total_pages || (pagination.total_items ? Math.ceil(pagination.total_items / limit) : null) || Math.max(1, Math.ceil(normalized.length / limit)));
-  const totalItems = Number(pagination.total_items || response?.total_items || response?.data?.total_items || pagination.count || (totalPages * limit) || normalized.length);
-
-  return {
-    products: normalized,
-    totalItems: totalItems,
-    totalPages: totalPages,
-    pagination: pagination,
-    page: Number(pagination.page || page)
-  };
 };
 
 /**
  * Fetch Kids Club products (with optional product_name search)
- * GET https://reformist-egotism-backlash.ngrok-free.dev/api/kids-club/
+ * GET https://capsule-most-rundown.ngrok-free.dev/api/kids-club/
  * Headers: Authorization: Bearer <user_token>, user-token: <user_token>, user_token: <user_token>
  * Method: GET
  */
@@ -340,6 +431,16 @@ export const getKidsClubApi = async (params = {}) => {
   const limit = typeof params === "object" ? (params?.limit || 9) : 9;
   const offset = (page - 1) * limit;
   const productName = typeof params === "object" ? (params?.product_name || params?.search || "") : (typeof params === "string" ? params : "");
+
+  const allKids = productsData.filter(p => 
+    (p.name || '').toLowerCase().includes('kid') || 
+    (p.category || '').toLowerCase().includes('kid') || 
+    (p.gender || '').toLowerCase().includes('kid') ||
+    (p.type || '').toLowerCase().includes('kid')
+  );
+  const fallbackTotalItems = allKids.length;
+  const fallbackTotalPages = Math.max(1, Math.ceil(fallbackTotalItems / limit));
+  const fallbackSlice = allKids.slice(offset, offset + limit);
 
   let queryParts = [
     `page=${page}`,
@@ -354,59 +455,90 @@ export const getKidsClubApi = async (params = {}) => {
   }
 
   const queryString = `?${queryParts.join("&")}`;
-  const response = await apiRequest(`/kids-club/${queryString}`, "GET");
-  console.log("[Kids Club API Response]", response);
 
-  let list = [];
-  if (Array.isArray(response)) {
-    list = response;
-  } else if (Array.isArray(response?.data)) {
-    list = response.data;
-  } else if (Array.isArray(response?.results)) {
-    list = response.results;
-  } else if (Array.isArray(response?.kids_club)) {
-    list = response.kids_club;
-  } else if (Array.isArray(response?.kids)) {
-    list = response.kids;
-  } else if (Array.isArray(response?.products)) {
-    list = response.products;
-  } else if (Array.isArray(response?.items)) {
-    list = response.items;
-  } else if (Array.isArray(response?.data?.results)) {
-    list = response.data.results;
-  } else if (Array.isArray(response?.data?.products)) {
-    list = response.data.products;
-  } else if (Array.isArray(response?.data?.kids_club)) {
-    list = response.data.kids_club;
-  } else if (Array.isArray(response?.data?.kids)) {
-    list = response.data.kids;
-  } else if (Array.isArray(response?.data?.data)) {
-    list = response.data.data;
+  try {
+    const response = await apiRequest(`/kids-club/${queryString}`, "GET");
+    console.log("[Kids Club API Response]", response);
+
+    let list = [];
+    if (Array.isArray(response)) {
+      list = response;
+    } else if (Array.isArray(response?.data)) {
+      list = response.data;
+    } else if (Array.isArray(response?.results)) {
+      list = response.results;
+    } else if (Array.isArray(response?.kids_club)) {
+      list = response.kids_club;
+    } else if (Array.isArray(response?.kids)) {
+      list = response.kids;
+    } else if (Array.isArray(response?.products)) {
+      list = response.products;
+    } else if (Array.isArray(response?.items)) {
+      list = response.items;
+    } else if (Array.isArray(response?.data?.results)) {
+      list = response.data.results;
+    } else if (Array.isArray(response?.data?.products)) {
+      list = response.data.products;
+    } else if (Array.isArray(response?.data?.kids_club)) {
+      list = response.data.kids_club;
+    } else if (Array.isArray(response?.data?.kids)) {
+      list = response.data.kids;
+    } else if (Array.isArray(response?.data?.data)) {
+      list = response.data.data;
+    }
+
+    const normalized = list.map((item, idx) => normalizeProduct({
+      ...item,
+      category: item.collection_tier || 'Kids',
+      type: item.category_type || 'kids',
+      target_audience: 'kids'
+    }, idx)).filter(Boolean);
+
+    // Fallback if empty
+    if (normalized.length === 0) {
+      return {
+        products: fallbackSlice,
+        totalItems: fallbackTotalItems,
+        totalPages: fallbackTotalPages,
+        pagination: {
+          page: page,
+          total_items: fallbackTotalItems,
+          total_pages: fallbackTotalPages,
+        },
+        page: page
+      };
+    }
+
+    const pagination = response?.pagination || response?.data?.pagination || {};
+    const totalPages = Number(pagination.total_pages || response?.total_pages || response?.data?.total_pages || (pagination.total_items ? Math.ceil(pagination.total_items / limit) : null) || Math.max(1, Math.ceil(normalized.length / limit)));
+    const totalItems = Number(pagination.total_items || response?.total_items || response?.data?.total_items || pagination.count || (totalPages * limit) || normalized.length);
+
+    return {
+      products: normalized,
+      totalItems: totalItems,
+      totalPages: totalPages,
+      pagination: pagination,
+      page: Number(pagination.page || page)
+    };
+  } catch (error) {
+    console.warn(`[getKidsClubApi] Page ${page} failed (${error.message}). Falling back to local catalog.`);
+    return {
+      products: fallbackSlice,
+      totalItems: fallbackTotalItems,
+      totalPages: fallbackTotalPages,
+      pagination: {
+        page: page,
+        total_items: fallbackTotalItems,
+        total_pages: fallbackTotalPages,
+      },
+      page: page
+    };
   }
-
-  const normalized = list.map((item, idx) => normalizeProduct({
-    ...item,
-    category: item.collection_tier || 'Kids',
-    type: item.category_type || 'kids',
-    target_audience: 'kids'
-  }, idx)).filter(Boolean);
-
-  const pagination = response?.pagination || response?.data?.pagination || {};
-  const totalPages = Number(pagination.total_pages || response?.total_pages || response?.data?.total_pages || (pagination.total_items ? Math.ceil(pagination.total_items / limit) : null) || Math.max(1, Math.ceil(normalized.length / limit)));
-  const totalItems = Number(pagination.total_items || response?.total_items || response?.data?.total_items || pagination.count || (totalPages * limit) || normalized.length);
-
-  return {
-    products: normalized,
-    totalItems: totalItems,
-    totalPages: totalPages,
-    pagination: pagination,
-    page: Number(pagination.page || page)
-  };
 };
 
 /**
  * Fetch Buy One Get One (BOGO) products
- * GET https://reformist-egotism-backlash.ngrok-free.dev/api/buy-one-get-one/
+ * GET https://capsule-most-rundown.ngrok-free.dev/api/buy-one-get-one/
  */
 export const getBuyOneGetOneApi = async (params = {}) => {
   const page = typeof params === "object" ? (params?.page || 1) : 1;
@@ -414,88 +546,132 @@ export const getBuyOneGetOneApi = async (params = {}) => {
   const offset = (page - 1) * limit;
   const queryString = `?page=${page}&limit=${limit}&page_size=${limit}&page_number=${page}&offset=${offset}`;
 
-  const response = await apiRequest(`/buy-one-get-one/${queryString}`, "GET");
-  console.log("[Buy One Get One API Response]", response);
+  const allBogo = productsData.filter(p => p.isBogo || p.applicable_for_buy_one_get_one || (p.price && p.price <= 1500));
+  const fallbackTotalItems = allBogo.length;
+  const fallbackTotalPages = Math.max(1, Math.ceil(fallbackTotalItems / limit));
+  const fallbackSlice = allBogo.slice(offset, offset + limit);
 
-  let list = [];
-  if (Array.isArray(response)) {
-    list = response;
-  } else if (Array.isArray(response?.data)) {
-    list = response.data;
-  } else if (Array.isArray(response?.results)) {
-    list = response.results;
-  } else if (Array.isArray(response?.buy_one_get_one)) {
-    list = response.buy_one_get_one;
-  } else if (Array.isArray(response?.bogo)) {
-    list = response.bogo;
-  } else if (Array.isArray(response?.products)) {
-    list = response.products;
-  } else if (Array.isArray(response?.items)) {
-    list = response.items;
-  } else if (Array.isArray(response?.data?.results)) {
-    list = response.data.results;
-  } else if (Array.isArray(response?.data?.products)) {
-    list = response.data.products;
-  } else if (Array.isArray(response?.data?.buy_one_get_one)) {
-    list = response.data.buy_one_get_one;
-  } else if (Array.isArray(response?.data?.bogo)) {
-    list = response.data.bogo;
-  } else if (Array.isArray(response?.data?.items)) {
-    list = response.data.items;
-  } else if (Array.isArray(response?.data?.data)) {
-    list = response.data.data;
+  try {
+    const response = await apiRequest(`/buy-one-get-one/${queryString}`, "GET");
+    console.log("[Buy One Get One API Response]", response);
+
+    let list = [];
+    if (Array.isArray(response)) {
+      list = response;
+    } else if (Array.isArray(response?.data)) {
+      list = response.data;
+    } else if (Array.isArray(response?.results)) {
+      list = response.results;
+    } else if (Array.isArray(response?.buy_one_get_one)) {
+      list = response.buy_one_get_one;
+    } else if (Array.isArray(response?.bogo)) {
+      list = response.bogo;
+    } else if (Array.isArray(response?.products)) {
+      list = response.products;
+    } else if (Array.isArray(response?.items)) {
+      list = response.items;
+    } else if (Array.isArray(response?.data?.results)) {
+      list = response.data.results;
+    } else if (Array.isArray(response?.data?.products)) {
+      list = response.data.products;
+    } else if (Array.isArray(response?.data?.buy_one_get_one)) {
+      list = response.data.buy_one_get_one;
+    } else if (Array.isArray(response?.data?.bogo)) {
+      list = response.data.bogo;
+    } else if (Array.isArray(response?.data?.items)) {
+      list = response.data.items;
+    } else if (Array.isArray(response?.data?.data)) {
+      list = response.data.data;
+    }
+
+    const normalized = list.map((item, idx) => normalizeProduct({
+      ...item,
+      applicable_for_buy_one_get_one: true,
+      isBogo: true,
+    }, idx)).filter(Boolean);
+
+    // Fallback if empty
+    if (normalized.length === 0) {
+      return {
+        products: fallbackSlice,
+        totalItems: fallbackTotalItems,
+        totalPages: fallbackTotalPages,
+        pagination: {
+          page: page,
+          total_items: fallbackTotalItems,
+          total_pages: fallbackTotalPages,
+        },
+        page: page
+      };
+    }
+
+    const pagination = response?.pagination || response?.data?.pagination || {};
+    const totalPages = Number(pagination.total_pages || response?.total_pages || response?.data?.total_pages || (pagination.total_items ? Math.ceil(pagination.total_items / limit) : null) || Math.max(1, Math.ceil(normalized.length / limit)));
+    const totalItems = Number(pagination.total_items || response?.total_items || response?.data?.total_items || pagination.count || (totalPages * limit) || normalized.length);
+
+    return {
+      products: normalized,
+      totalItems: totalItems,
+      totalPages: totalPages,
+      pagination: pagination,
+      page: Number(pagination.page || page)
+    };
+  } catch (error) {
+    console.warn(`[getBuyOneGetOneApi] Page ${page} failed (${error.message}). Falling back to local catalog.`);
+    return {
+      products: fallbackSlice,
+      totalItems: fallbackTotalItems,
+      totalPages: fallbackTotalPages,
+      pagination: {
+        page: page,
+        total_items: fallbackTotalItems,
+        total_pages: fallbackTotalPages,
+      },
+      page: page
+    };
   }
-
-  const normalized = list.map((item, idx) => normalizeProduct({
-    ...item,
-    applicable_for_buy_one_get_one: true,
-    isBogo: true,
-  }, idx)).filter(Boolean);
-
-  const pagination = response?.pagination || response?.data?.pagination || {};
-  const totalPages = Number(pagination.total_pages || response?.total_pages || response?.data?.total_pages || (pagination.total_items ? Math.ceil(pagination.total_items / limit) : null) || Math.max(1, Math.ceil(normalized.length / limit)));
-  const totalItems = Number(pagination.total_items || response?.total_items || response?.data?.total_items || pagination.count || (totalPages * limit) || normalized.length);
-
-  return {
-    products: normalized,
-    totalItems: totalItems,
-    totalPages: totalPages,
-    pagination: pagination,
-    page: Number(pagination.page || page)
-  };
 };
 
 /**
  * Fetch single product details by product ID
- * GET https://reformist-egotism-backlash.ngrok-free.dev/api/product-details/?product-id=46
+ * GET https://capsule-most-rundown.ngrok-free.dev/api/product-details/?product-id=46
  * @param {string|number} productId
  */
 export const getProductDetailsApi = async (productId) => {
   if (!productId) return null;
 
   const cleanId = String(productId).trim();
-  const url = `/product-details/?product-id=${encodeURIComponent(cleanId)}`;
+  if (!cleanId) return null;
 
-  console.log(`[getProductDetailsApi] GET ${url} (product-id: "${cleanId}")`);
+  const url = `/product-details/?product_id=${encodeURIComponent(cleanId)}&product-id=${encodeURIComponent(cleanId)}`;
 
-  const response = await apiRequest(url, "GET");
-  console.log("[getProductDetailsApi Response]:", response);
+  console.log(`[getProductDetailsApi] GET ${url} (product_id: "${cleanId}")`);
 
-  let rawData = response?.data?.product || 
-                response?.data?.product_details || 
-                response?.product_details || 
-                response?.product || 
-                response?.data || 
-                response;
+  try {
+    const response = await apiRequest(url, "GET");
+    console.log("[getProductDetailsApi Response]:", response);
 
-  if (Array.isArray(rawData)) {
-    rawData = rawData[0];
+    let rawData = response?.data?.product || 
+                  response?.data?.product_details || 
+                  response?.product_details || 
+                  response?.product || 
+                  response?.data || 
+                  response;
+
+    if (Array.isArray(rawData)) {
+      rawData = rawData[0];
+    }
+
+    if (rawData && typeof rawData === "object" && (rawData.id || rawData.product_name || rawData.name)) {
+      return normalizeProduct(rawData, 0);
+    }
+  } catch (error) {
+    console.warn(`[getProductDetailsApi] Backend returned error for product #${cleanId} (${error.message}). Falling back to local catalog product.`);
   }
 
-  if (rawData && typeof rawData === "object") {
-    return normalizeProduct(rawData, 0);
-  }
-  return null;
+  // Fallback to local catalog product data if backend doesn't have it or returned 404
+  const localProduct = productsData.find(p => String(p.id) === String(cleanId));
+  return localProduct || null;
 };
 
 export { searchProductsApi } from "./searchService";
