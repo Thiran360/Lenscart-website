@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { FaCloudUploadAlt, FaFileAlt, FaCheckCircle, FaTrashAlt, FaPlus } from "react-icons/fa";
+import { FaCloudUploadAlt, FaFileAlt, FaCheckCircle, FaTrashAlt, FaPlus, FaGlasses } from "react-icons/fa";
 import { SPH_OPTIONS, CYL_OPTIONS, AXIS_OPTIONS } from "../utils/rxOptions";
 import { getPrescriptionsApi, savePrescriptionApi, deletePrescriptionApi } from "../services/profileService";
 import ConfirmModal from "./ConfirmModal";
