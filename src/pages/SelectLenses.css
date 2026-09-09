@@ -1,0 +1,420 @@
+.lens-page-wrapper {
+  background: #F6F1E8;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.lens-selection-container {
+  display: flex;
+  max-width: 1200px;
+  margin: 40px auto;
+  gap: 40px;
+  padding: 0 20px;
+  width: 100%;
+}
+
+.lens-steps-area {
+  flex: 2;
+  background: #F6F1E8;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  padding: 40px;
+  animation: slideUpFade 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.lens-summary-area {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  padding: 30px;
+  height: fit-content;
+  position: sticky;
+  top: 40px;
+  animation: slideUpFade 0.6s ease-out 0.2s forwards;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+@keyframes slideUpFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-indicator {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.step-pill {
+  padding: 8px 16px;
+  background: #F6F1E8;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6E4B34;
+}
+
+.step-pill.active {
+  background: #3A2415;
+  color: #fff;
+}
+
+.step-content h2 {
+  color: #3A2415;
+  font-size: 26px;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.step-content p.subtitle {
+  color: #6E4B34;
+  margin-bottom: 30px;
+}
+
+.options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.option-card {
+  border: 2px solid #eaeaea;
+  border-radius: 10px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: #ffffff;
+  animation: fadeUpOption 0.5s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes fadeUpOption {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.option-card:nth-child(1) { animation-delay: 0.1s; }
+.option-card:nth-child(2) { animation-delay: 0.2s; }
+.option-card:nth-child(3) { animation-delay: 0.3s; }
+
+.option-card:hover {
+  border-color: #C9A66B;
+  background: #ffffff;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 183, 198, 0.15);
+}
+
+.option-card.selected {
+  border-color: #C9A66B;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 183, 198, 0.15);
+  transform: scale(1.02);
+}
+
+.option-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.option-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.option-price {
+  font-weight: bold;
+  color: #C9A66B;
+  font-size: 16px;
+}
+
+.option-card p {
+  margin: 0;
+  color: #6E4B34;
+  font-size: 14px;
+}
+
+/* Rx Step specific */
+.rx-method-tabs {
+  display: flex;
+  gap: 15px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+}
+
+.rx-tab {
+  flex: 1;
+  padding: 15px;
+  background: #F6F1E8;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #6E4B34;
+  transition: all 0.2s;
+  font-size: 15px;
+}
+
+.rx-tab:hover {
+  background: #F6F1E8;
+}
+
+.rx-tab.active {
+  background: #3A2415;
+  color: #fff;
+  border-color: #3A2415;
+}
+
+.rx-upload-area {
+  border: 2px dashed #C9A66B;
+  border-radius: 8px;
+  padding: 60px 40px;
+  text-align: center;
+  cursor: pointer;
+  background: #F6F1E8;
+  transition: all 0.2s;
+}
+
+.rx-upload-area:hover {
+  background: #F6F1E8;
+}
+
+.rx-manual-form {
+  background: #F6F1E8;
+  padding: 25px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.rx-eye-section {
+  margin-bottom: 25px;
+}
+
+.rx-eye-section h4 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 16px;
+}
+
+.rx-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.rx-grid input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 15px;
+}
+
+/* Navigation Buttons */
+.step-navigation {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.back-btn {
+  padding: 14px 30px;
+  border: 1px solid #ccc;
+  background: #F6F1E8;
+  color: #333;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.back-btn:hover {
+  background: #F6F1E8;
+}
+
+.continue-btn {
+  padding: 14px 40px;
+  border: none;
+  background: #3A2415;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.continue-btn:hover:not(:disabled) {
+  background: #00264d;
+}
+
+.continue-btn:disabled {
+  background: #F6F1E8;
+  cursor: not-allowed;
+}
+
+/* Summary Area */
+.summary-product {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.summary-product img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.summary-details h3 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.summary-details p {
+  margin: 0;
+  color: #6E4B34;
+  font-size: 14px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 15px;
+  color: #6E4B34;
+}
+
+.summary-row.total {
+  font-weight: bold;
+  font-size: 18px;
+  color: #333;
+  border-top: 2px solid #eee;
+  padding-top: 15px;
+  margin-top: 10px;
+}
+
+.summary-row span:last-child {
+  white-space: nowrap;
+  text-align: right;
+  margin-left: 10px;
+}
+
+@media (max-width: 900px) {
+  .lens-selection-container {
+    flex-direction: column;
+    margin: 20px auto;
+  }
+  .lens-summary-area {
+    position: static;
+  }
+}
+
+@media (max-width: 600px) {
+  .lens-summary-area {
+    padding: 20px 15px;
+  }
+  .summary-details h3 {
+    font-size: 14px;
+  }
+  .summary-details p {
+    font-size: 12px;
+  }
+  .summary-row {
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+  .summary-row.total {
+    font-size: 15px;
+    align-items: center;
+  }
+  .summary-product img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .lens-steps-area {
+    padding: 20px 15px;
+  }
+  .step-indicator {
+    flex-wrap: nowrap;
+    gap: 5px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+  .step-pill {
+    padding: 6px 10px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .step-content h2 {
+    font-size: 16px;
+  }
+  .step-content p.subtitle {
+    font-size: 11px;
+    margin-bottom: 20px;
+  }
+  .option-card {
+    padding: 15px;
+  }
+  .option-header h3 {
+    font-size: 15px;
+  }
+  .option-price {
+    font-size: 14px;
+  }
+  .option-card p {
+    font-size: 12px;
+  }
+  .rx-tab {
+    padding: 10px 5px;
+    font-size: 12px;
+  }
+  .continue-btn, .back-btn {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+  
+  .rx-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .rx-grid input {
+    font-size: 13px;
+    padding: 10px;
+  }
+  
+  .rx-eye-section h4 {
+    text-align: center;
+    font-size: 15px;
+  }
+  
+  .rx-manual-form {
+    padding: 15px;
+  }
+}
+
+
+

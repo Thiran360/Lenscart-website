@@ -1,0 +1,264 @@
+/* Append to SelectLensesModal.css */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  font-family: 'Instrument Sans', sans-serif;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 12px;
+  padding: 30px;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #6E4B34;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 5px;
+  color: #3A2415;
+  font-size: 24px;
+}
+
+.modal-subtitle {
+  color: #6E4B34;
+  margin-bottom: 25px;
+  font-size: 15px;
+}
+
+.options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+  min-height: 250px;
+}
+
+.option-card {
+  border: 2px solid #eaeaea;
+  border-radius: 8px;
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #ffffff;
+}
+
+.option-card:hover {
+  border-color: #C9A66B;
+  background: #ffffff;
+}
+
+.option-card.selected {
+  border-color: #C9A66B;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 183, 198, 0.15);
+}
+
+.option-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.option-header h3 {
+  margin: 0;
+  font-size: 17px;
+  color: #333;
+}
+
+.option-price {
+  font-weight: bold;
+  color: #C9A66B;
+  font-size: 15px;
+}
+
+.option-card p {
+  margin: 0;
+  color: #6E4B34;
+  font-size: 13px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+}
+
+.back-btn {
+  padding: 12px 25px;
+  border: 1px solid #ccc;
+  background: #F6F1E8;
+  color: #333;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.back-btn:hover {
+  background: #F6F1E8;
+}
+
+.continue-btn {
+  padding: 12px 35px;
+  border: none;
+  background: #C9A66B;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.continue-btn:hover:not(:disabled) {
+  background: #0099a8;
+}
+
+.continue-btn:disabled {
+  background: #F6F1E8;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Step 3: Prescription Details */
+.rx-step-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rx-method-tabs {
+  display: flex;
+  gap: 10px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.rx-tab {
+  flex: 1;
+  padding: 12px;
+  background: #F6F1E8;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #6E4B34;
+  transition: all 0.2s;
+}
+
+.rx-tab:hover {
+  background: #F6F1E8;
+}
+
+.rx-tab.active {
+  background: #3A2415;
+  color: #fff;
+  border-color: #3A2415;
+}
+
+.rx-upload-area {
+  border: 2px dashed #C9A66B;
+  border-radius: 8px;
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  background: #F6F1E8;
+  transition: all 0.2s;
+}
+
+.rx-upload-area:hover {
+  background: #F6F1E8;
+}
+
+.rx-manual-form {
+  background: #F6F1E8;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.rx-eye-section {
+  margin-bottom: 20px;
+}
+
+.rx-eye-section h4 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.rx-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.rx-grid input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .rx-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .rx-grid input {
+    font-size: 13px;
+    padding: 8px;
+  }
+  
+  .rx-eye-section h4 {
+    text-align: center;
+    font-size: 15px;
+  }
+  
+  .modal-content {
+    padding: 20px 15px;
+  }
+}
+
+
+

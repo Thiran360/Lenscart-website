@@ -1,0 +1,32 @@
+.hero{
+    height:500px;
+    background:url("https://images.unsplash.com/photo-1517841905240-472988babdf9?w=1600");
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    align-items:center;
+    padding-left:100px;
+}
+
+.hero-content{
+    max-width:500px;
+}
+
+.hero-content h1{
+    font-size:55px;
+    color:#222;
+}
+
+.hero-content p{
+    margin:20px 0;
+    font-size:22px;
+}
+
+.hero-content button{
+    padding:15px 30px;
+    background:#00b5cc;
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}

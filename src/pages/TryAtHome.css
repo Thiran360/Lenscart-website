@@ -1,0 +1,59 @@
+.try-at-home-features {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 40px;
+  flex-wrap: nowrap;
+}
+
+.try-at-home-feature-item {
+  flex: 1;
+  min-width: 100px;
+}
+
+.try-at-home-title {
+  font-size: 32px;
+}
+
+@media (max-width: 600px) {
+  .try-at-home-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    width: 100%;
+  }
+  .try-at-home-feature-item {
+    min-width: 0;
+  }
+  .try-at-home-feature-item p {
+    font-size: 10px !important;
+    word-break: break-word;
+    hyphens: auto;
+  }
+  .try-at-home-feature-item svg {
+    width: 25px !important;
+    height: 25px !important;
+  }
+  .try-at-home-feature-item > div {
+    font-size: 25px !important;
+    margin-bottom: 5px !important;
+  }
+  .try-at-home-content {
+    padding: 30px 10px !important;
+  }
+  .try-at-home-title {
+    font-size: 18px;
+    white-space: nowrap;
+  }
+  .try-at-home-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    padding: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 20px !important;
+  }
+  .try-at-home-inner {
+    border-radius: 0 !important;
+  }
+}

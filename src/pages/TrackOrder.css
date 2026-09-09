@@ -1,0 +1,256 @@
+.track-order-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f7f9fa;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.track-order-container {
+  flex: 1;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.page-title {
+  font-size: 28px;
+  color: #1a1a1a;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.track-search-bar {
+  display: flex;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.track-search-bar input {
+  flex: 1;
+  padding: 16px 20px;
+  border: none;
+  font-size: 16px;
+  outline: none;
+  background: #fff;
+}
+
+.track-search-bar button {
+  background: #0d6b6d;
+  color: #fff;
+  border: none;
+  padding: 0 30px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.track-search-bar button:hover:not(:disabled) {
+  background: #094d4f;
+}
+
+.track-search-bar button:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+.tracking-results-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+  overflow: hidden;
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tracking-header {
+  padding: 24px 30px;
+  background: #fafafa;
+  border-bottom: 1px solid #eaeaea;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-info h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  color: #1a1a1a;
+}
+
+.header-info p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.header-status {
+  text-align: right;
+}
+
+.estimated-label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.estimated-date {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  color: #0d6b6d;
+}
+
+.tracking-stepper-container {
+  padding: 40px 30px;
+}
+
+.track-step {
+  display: flex;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.track-step:last-child {
+  margin-bottom: 0;
+}
+
+.step-icon-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 20px;
+  width: 40px;
+}
+
+.step-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f0f0f0;
+  font-size: 18px;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.step-line {
+  width: 2px;
+  flex: 1;
+  background: #eaeaea;
+  margin-top: 5px;
+  margin-bottom: -25px; /* Pull the line down into the next step */
+  min-height: 40px;
+}
+
+.step-content {
+  flex: 1;
+  padding-bottom: 10px;
+}
+
+.step-content h4 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.step-content p {
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: #666;
+}
+
+.step-time {
+  font-size: 12px;
+  color: #999;
+}
+
+/* Status Styles */
+.track-step.completed .step-icon {
+  background: #2ecc71;
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.2);
+}
+
+.track-step.completed .step-line {
+  background: #2ecc71;
+}
+
+.track-step.active .step-icon {
+  background: #0d6b6d;
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(13, 107, 109, 0.2);
+}
+
+.track-step.active h4 {
+  color: #0d6b6d;
+}
+
+.track-step.pending .step-icon {
+  background: #f0f0f0;
+  color: #999;
+  filter: grayscale(100%);
+}
+
+.track-step.pending h4, .track-step.pending p {
+  color: #999;
+}
+
+/* Animations */
+.pulse-icon {
+  animation: pulseShadow 2s infinite;
+}
+
+@keyframes pulseShadow {
+  0% { box-shadow: 0 0 0 0 rgba(13, 107, 109, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(13, 107, 109, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(13, 107, 109, 0); }
+}
+
+.tracking-footer {
+  padding: 20px 30px;
+  background: #fafafa;
+  border-top: 1px solid #eaeaea;
+  text-align: center;
+}
+
+.support-text {
+  font-size: 14px;
+  color: #666;
+}
+
+.support-text a {
+  color: #0d6b6d;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .tracking-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  .header-status {
+    text-align: left;
+  }
+  .track-search-bar {
+    flex-direction: column;
+  }
+  .track-search-bar button {
+    padding: 16px;
+  }
+}
