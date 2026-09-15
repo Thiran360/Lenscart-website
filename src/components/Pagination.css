@@ -1,0 +1,126 @@
+/* ===== Reusable Pagination Component ===== */
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 28px;
+  padding: 14px 0;
+  user-select: none;
+}
+
+.pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Base button styles */
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #E2D7C5;
+  background: #FAF6F0;
+  color: #6E4B34;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+/* Page number buttons */
+.pagination-page {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+}
+
+.pagination-page:hover:not(.active) {
+  background: #F0E8DA;
+  border-color: #C5A059;
+  color: #3A2415;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(197, 160, 89, 0.15);
+}
+
+.pagination-page.active {
+  background: linear-gradient(135deg, #C5A059, #B38E50);
+  color: #ffffff;
+  border-color: #C5A059;
+  box-shadow: 0 3px 12px rgba(197, 160, 89, 0.35);
+  transform: translateY(-1px);
+}
+
+/* Nav buttons (Prev / Next) */
+.pagination-nav {
+  padding: 8px 14px;
+  border-radius: 10px;
+  gap: 6px;
+  font-size: 13.5px;
+}
+
+.pagination-nav:hover:not(:disabled) {
+  background: #F0E8DA;
+  border-color: #C5A059;
+  color: #3A2415;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(197, 160, 89, 0.15);
+}
+
+.pagination-nav:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Ellipsis */
+.pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: #A89278;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+/* Page info text */
+.pagination-info {
+  text-align: center;
+  font-size: 13px;
+  color: #8B7355;
+  margin-top: 8px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 550px) {
+  .pagination-container {
+    gap: 4px;
+    margin-top: 20px;
+    padding: 10px 0;
+  }
+
+  .pagination-nav-text {
+    display: none;
+  }
+
+  .pagination-nav {
+    padding: 8px 10px;
+  }
+
+  .pagination-page {
+    width: 34px;
+    height: 34px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  .pagination-ellipsis {
+    width: 28px;
+    height: 34px;
+  }
+}

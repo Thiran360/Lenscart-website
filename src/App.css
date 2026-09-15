@@ -1,0 +1,105 @@
+/* Google Font */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Poppins",sans-serif;
+}
+
+body{
+    background: #F6F1E8;
+}
+
+a{
+    text-decoration:none;
+    color:inherit;
+}
+
+li{
+    list-style:none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.category-section{
+    width:90%;
+    margin:50px auto;
+}
+
+.category-section h2{
+    font-size:30px;
+    margin-bottom:25px;
+    color:#222;
+}
+
+.product-section{
+    width:90%;
+    margin:50px auto;
+}
+
+.product-section h2{
+    font-size:30px;
+    margin-bottom:25px;
+    color:#222;
+}
+
+button{
+    cursor:pointer;
+    border:none;
+}
+
+.container{
+    width:90%;
+    margin:auto;
+}
+
+@media(max-width:768px){
+
+.category-section h2{
+    font-size:24px;
+}
+
+.product-section h2{
+    font-size:24px;
+}
+
+}
+
+@media(max-width:480px){
+
+.category-section{
+    width:95%;
+}
+
+.product-section{
+    width:95%;
+}
+
+.category-section h2,
+.product-section h2{
+    font-size:20px;
+}
+
+}
+
+/* Page Transition Animation */
+.page-transition-wrapper {
+  animation: pageFadeIn 0.4s ease-out forwards;
+}
+
+@keyframes pageFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}

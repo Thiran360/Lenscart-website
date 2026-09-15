@@ -1,0 +1,15 @@
+.footer{
+    margin-top:60px;
+    background:#1f1f1f;
+    color:white;
+    text-align:center;
+    padding:40px;
+}
+
+.footer h2{
+    margin-bottom:10px;
+}
+
+.footer p{
+    color:#ddd;
+}

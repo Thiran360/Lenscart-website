@@ -1,0 +1,31 @@
+.filter{
+    width:250px;
+    background: #F6F1E8;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+.filter h2{
+    margin-bottom:20px;
+}
+
+.filter-group{
+    margin-bottom:20px;
+}
+
+.filter select,
+.filter input[type="range"]{
+    width:100%;
+    margin-top:10px;
+}
+
+.apply-btn{
+    width:100%;
+    padding:12px;
+    background:#C9A66B;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}

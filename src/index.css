@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+:root {
+  --primary: #3A2415; /* Espresso Brown */
+  --teal: #C9A66B; /* Antique Gold */
+  --bg-color: #F6F1E8; /* Warm cream */
+  --border-color: #e2e8f0;
+  --text-main: #3A2415; /* Espresso Brown */
+  --text-muted: #6E4B34; /* Walnut Brown */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  font-family: 'Instrument Sans', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  display: none;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Marquee Animation (KFC Style) */
+.marquee-wrapper {
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  background-color: transparent;
+  color: var(--primary);
+  padding: 10px 0;
+  margin-bottom: 15px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.marquee-content {
+  display: flex;
+  animation: marqueeScroll 15s linear infinite;
+  will-change: transform;
+}
+
+.marquee-content span {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+@keyframes marqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+h1, h2, h3, h4, h5, h6 { font-family: 'Cormorant Garamond', serif; }
+
+
