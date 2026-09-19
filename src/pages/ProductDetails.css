@@ -220,8 +220,13 @@
   transform: translateY(-50%) scale(1.08);
 }
 
-.pd-nav-arrow.left { left: 16px; }
-.pd-nav-arrow.right { right: 16px; }
+.pd-nav-arrow.left {
+  left: 16px;
+}
+
+.pd-nav-arrow.right {
+  right: 16px;
+}
 
 /* Main Frame Image */
 .pd-main-frame-img {
@@ -517,7 +522,8 @@
 }
 
 .pd-swatch-ring.active {
-  border-color: #d97706; /* Luxury Amber Outline */
+  border-color: #d97706;
+  /* Luxury Amber Outline */
   box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.25);
 }
 
@@ -669,12 +675,14 @@
   .pd-cta-row-three {
     gap: 6px;
   }
+
   .pd-btn-cta {
     font-size: 11px;
     padding: 0 4px;
     height: 44px;
     gap: 4px;
   }
+
   .pd-free-returns-badge {
     font-size: 12.5px;
     padding: 6px 10px;
@@ -830,7 +838,8 @@
   min-width: 0;
 }
 
-.pd-trust-item:hover, .pd-trust-item.active {
+.pd-trust-item:hover,
+.pd-trust-item.active {
   background: var(--pd-primary-light);
   border-color: var(--pd-primary);
 }

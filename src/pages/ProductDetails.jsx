@@ -1,21 +1,21 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { 
-  FaTruck, 
-  FaBoxOpen, 
-  FaUndo, 
-  FaShieldAlt, 
-  FaCamera, 
-  FaSpinner, 
-  FaHeart, 
-  FaRegHeart, 
-  FaStar, 
-  FaChevronRight, 
-  FaChevronLeft, 
-  FaRuler, 
-  FaShoppingCart, 
-  FaArrowRight, 
+import {
+  FaTruck,
+  FaBoxOpen,
+  FaUndo,
+  FaShieldAlt,
+  FaCamera,
+  FaSpinner,
+  FaHeart,
+  FaRegHeart,
+  FaStar,
+  FaChevronRight,
+  FaChevronLeft,
+  FaRuler,
+  FaShoppingCart,
+  FaArrowRight,
   FaCheck,
   FaTag,
   FaExchangeAlt
@@ -94,15 +94,15 @@ function ProductDetails() {
   // Determine if frame has nose pads (e.g. Aviators, metallic frames, or explicitly flagged)
   const hasNosePads = Boolean(
     product && (
-      product.hasNosePads !== undefined 
-        ? product.hasNosePads 
-        : (product.includes_adjustable_nose_pad ?? 
-           product.adjustable_nose_pad ?? 
-           (product.shape?.toLowerCase() === 'aviator' ||
+      product.hasNosePads !== undefined
+        ? product.hasNosePads
+        : (product.includes_adjustable_nose_pad ??
+          product.adjustable_nose_pad ??
+          (product.shape?.toLowerCase() === 'aviator' ||
             product.description?.toLowerCase().includes('nose pad') ||
             product.description?.toLowerCase().includes('metallic') ||
             product.name?.toLowerCase().includes('aviator'))
-          )
+        )
     )
   );
 
@@ -193,7 +193,7 @@ function ProductDetails() {
   }, [isOffersOpen, isTryOnOpen, isSizeGuideOpen]);
 
   const toggleAssurance = (assurance) => {
-    setSelectedAssurances(prev => 
+    setSelectedAssurances(prev =>
       prev.includes(assurance) ? prev.filter(a => a !== assurance) : [...prev, assurance]
     );
   };
@@ -214,7 +214,7 @@ function ProductDetails() {
     if (pincode.trim().length === 6 && !isNaN(pincode)) {
       const lastDigit = parseInt(pincode.charAt(5));
       const deliveryDays = (lastDigit % 4) + 2;
-      
+
       const d = new Date();
       d.setDate(d.getDate() + deliveryDays);
       const formattedDate = d.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' });
@@ -228,14 +228,14 @@ function ProductDetails() {
 
   const handleSelectLenses = () => {
     if (!product) return;
-    navigate(`/select-lenses/${product.id}`, { 
-      state: { 
+    navigate(`/select-lenses/${product.id}`, {
+      state: {
         product: {
           ...product,
           selectedSize: selectedSize
-        }, 
-        selectedColor 
-      } 
+        },
+        selectedColor
+      }
     });
   };
 
@@ -317,7 +317,7 @@ function ProductDetails() {
       <Navbar />
 
       <div className="pd-page-container">
-        
+
         {/* Breadcrumb Navigation */}
         <nav className="pd-breadcrumbs">
           <Link to="/">Home</Link>
@@ -331,10 +331,10 @@ function ProductDetails() {
 
         {/* Main Product Showcase Grid */}
         <div className="pd-grid-layout">
-          
+
           {/* LEFT: 3D / AR Showcase Studio */}
           <div className="pd-showcase-column">
-            
+
             {/* Thumbnail Angle Selectors */}
             <div className="pd-thumbnails-strip">
               {angles.map((angle) => (
@@ -344,13 +344,13 @@ function ProductDetails() {
                   onClick={() => setSelectedAngle(angle)}
                   title={angle.label}
                 >
-                  <img 
-                    src={product.image} 
-                    alt={angle.label} 
-                    style={{ 
+                  <img
+                    src={product.image}
+                    alt={angle.label}
+                    style={{
                       ...getImageStyle(product.image, selectedColor),
-                      transform: angle.transform 
-                    }} 
+                      transform: angle.transform
+                    }}
                   />
                   <span className="pd-thumb-label">{angle.label}</span>
                 </button>
@@ -359,14 +359,14 @@ function ProductDetails() {
 
             {/* Main Interactive Studio Card */}
             <div className="pd-studio-card">
-              
+
               {/* Studio 360 Badge */}
               <div className="pd-studio-badge">
                 <span>✨ 360° Studio View</span>
               </div>
 
               {/* Floating Wishlist Button */}
-              <button 
+              <button
                 className={`pd-wishlist-float-btn ${isWish ? 'active' : ''}`}
                 onClick={() => toggleWishlist(product)}
                 title={isWish ? "Remove from Wishlist" : "Save to Wishlist"}
@@ -383,14 +383,14 @@ function ProductDetails() {
               </button>
 
               {/* Main Frame Visual */}
-              <img 
-                src={product.image} 
-                alt={product.name} 
+              <img
+                src={product.image}
+                alt={product.name}
                 className="pd-main-frame-img"
-                style={{ 
+                style={{
                   ...getImageStyle(product.image, selectedColor),
-                  transform: selectedAngle.transform 
-                }} 
+                  transform: selectedAngle.transform
+                }}
               />
 
               {/* Floating 3D Virtual Try-On Pill */}
@@ -402,7 +402,7 @@ function ProductDetails() {
 
           {/* RIGHT: Product Specs, Pricing & Purchase Flow */}
           <div className="pd-info-column">
-            
+
             {/* Header Tags */}
             <div className="pd-header-tags">
               <span className="pd-brand-tag">{product.brand || "Mr.LensMaker"}</span>
@@ -444,7 +444,7 @@ function ProductDetails() {
                 )}
               </div>
               <p className="pd-tax-note">Inclusive of all taxes & free express shipping on prescription orders</p>
-              
+
               {isBogoEligible && (
                 <div className="pd-bogo-banner-pill">
                   <FaTag /> 🎁 BUY 1 GET 1 FREE Eligible • Mix & Match any frame
@@ -454,7 +454,7 @@ function ProductDetails() {
 
             {/* Frame Customization Block (Size & Color) */}
             <div className="pd-selection-card">
-              
+
               {/* Frame Size Selector */}
               <div style={{ marginBottom: '18px' }}>
                 <div className="pd-section-header">
@@ -470,7 +470,7 @@ function ProductDetails() {
                     { key: 'M', title: 'Medium', desc: '52 □ 18 - 140' },
                     { key: 'L', title: 'Large', desc: '55 □ 20 - 145' }
                   ].map((sizeItem) => (
-                    <div 
+                    <div
                       key={sizeItem.key}
                       className={`pd-size-chip ${selectedSize === sizeItem.key ? 'active' : ''}`}
                       onClick={() => setSelectedSize(sizeItem.key)}
@@ -497,9 +497,9 @@ function ProductDetails() {
                       onClick={() => setSelectedColor(color)}
                       title={color.charAt(0).toUpperCase() + color.slice(1)}
                     >
-                      <div 
-                        className="pd-swatch-circle" 
-                        style={getSwatchStyle(color)} 
+                      <div
+                        className="pd-swatch-circle"
+                        style={getSwatchStyle(color)}
                       />
                     </div>
                   ))}
@@ -544,15 +544,15 @@ function ProductDetails() {
                 <FaTruck style={{ color: '#0d6b6d', fontSize: '18px' }} /> Check Delivery & Serviceability
               </div>
               <div className="pd-pincode-input-row">
-                <input 
-                  type="text" 
-                  placeholder="Enter 6-digit Pincode (e.g. 600001)" 
+                <input
+                  type="text"
+                  placeholder="Enter 6-digit Pincode (e.g. 600001)"
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value.replace(/\D/g, ""))}
                   maxLength={6}
                   className="pd-pincode-input"
                 />
-                <button 
+                <button
                   onClick={handleCheckPincode}
                   disabled={!pincode || pincode.length !== 6}
                   className="pd-pincode-btn"
@@ -570,29 +570,30 @@ function ProductDetails() {
 
             {/* Trust & Assurance Grid */}
             <div className="pd-trust-grid">
-              <div 
+              <div
                 className={`pd-trust-item ${selectedAssurances.includes('return') ? 'active' : ''}`}
                 onClick={() => toggleAssurance('return')}
               >
                 <FaBoxOpen className="pd-trust-icon" />
                 <div>
-                  <div className="pd-trust-text-title">14 Days Free Returns</div>
+                  <div className="pd-trust-text-title">4 Days Free Returns</div>
                   <div className="pd-trust-text-sub">100% Money Back</div>
                 </div>
               </div>
 
-              <div 
+              <div
                 className={`pd-trust-item ${selectedAssurances.includes('exchange') ? 'active' : ''}`}
                 onClick={() => toggleAssurance('exchange')}
               >
                 <FaExchangeAlt className="pd-trust-icon" />
                 <div>
                   <div className="pd-trust-text-title">14 Days Free Exchange</div>
+                  <div className="pd-trust-text-title">14 Days Free Exchange</div>
                   <div className="pd-trust-text-sub">Hassle-Free Swap</div>
                 </div>
               </div>
 
-              <div 
+              <div
                 className={`pd-trust-item ${selectedAssurances.includes('warranty') ? 'active' : ''}`}
                 onClick={() => toggleAssurance('warranty')}
               >
@@ -608,9 +609,9 @@ function ProductDetails() {
             {hasNosePads && (
               <div className="pd-care-kit-card">
                 <label className="pd-care-kit-label">
-                  <input 
-                    type="checkbox" 
-                    checked={includeCareKit} 
+                  <input
+                    type="checkbox"
+                    checked={includeCareKit}
                     onChange={(e) => setIncludeCareKit(e.target.checked)}
                     className="pd-care-kit-checkbox"
                   />
@@ -641,18 +642,18 @@ function ProductDetails() {
       </div>
 
       {/* 3D AR Virtual Try-On Modal */}
-      <VirtualTryOn 
-        isOpen={isTryOnOpen} 
-        onClose={() => setIsTryOnOpen(false)} 
-        initialProduct={product} 
+      <VirtualTryOn
+        isOpen={isTryOnOpen}
+        onClose={() => setIsTryOnOpen(false)}
+        initialProduct={product}
         selectedColor={selectedColor}
       />
 
       {/* Size Guide Modal */}
-      <SizeGuideModal 
-        isOpen={isSizeGuideOpen} 
-        onClose={() => setIsSizeGuideOpen(false)} 
-        product={product} 
+      <SizeGuideModal
+        isOpen={isSizeGuideOpen}
+        onClose={() => setIsSizeGuideOpen(false)}
+        product={product}
       />
 
       <Footer />

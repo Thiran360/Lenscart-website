@@ -101,27 +101,27 @@ const getImageStyle = (imageStr, colorName) => {
   }
   const name = colorName.toLowerCase();
   switch (name) {
-    case 'red': 
+    case 'red':
       return { filter: 'sepia(1) saturate(6) hue-rotate(325deg) brightness(0.85) contrast(1.2)' };
-    case 'blue': 
+    case 'blue':
       return { filter: 'sepia(1) saturate(6) hue-rotate(185deg) brightness(0.85) contrast(1.2)' };
-    case 'green': 
+    case 'green':
       return { filter: 'sepia(1) saturate(5) hue-rotate(85deg) brightness(0.85) contrast(1.2)' };
-    case 'pink': 
+    case 'pink':
       return { filter: 'sepia(1) saturate(5) hue-rotate(295deg) brightness(1.0) contrast(1.1)' };
-    case 'gold': 
+    case 'gold':
       return { filter: 'sepia(1) saturate(6) hue-rotate(15deg) brightness(1.1) contrast(1.1)' };
     case 'brown': case 'tortoise':
       return { filter: 'sepia(0.8) saturate(3) hue-rotate(350deg) brightness(0.7) contrast(1.15)' };
-    case 'grey': case 'gray': 
+    case 'grey': case 'gray':
       return { filter: 'grayscale(1) brightness(0.85) contrast(1.1)' };
-    case 'silver': 
+    case 'silver':
       return { filter: 'grayscale(1) brightness(1.2) contrast(1.05)' };
-    case 'transparent': case 'white': 
+    case 'transparent': case 'white':
       return { filter: 'opacity(0.75) brightness(1.4) contrast(0.9)' };
-    case 'black': 
+    case 'black':
       return { filter: 'grayscale(1) brightness(0.15) contrast(1.4)' };
-    default: 
+    default:
       return {};
   }
 };
@@ -129,7 +129,7 @@ const getImageStyle = (imageStr, colorName) => {
 const BestSellerCard = ({ product, onTryOn }) => {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const isSaved = isInWishlist(product.id);
-  
+
   // Default to the first color in colors list, or 'black' if undefined
   const defaultColor = product.colors && product.colors.length > 0 ? product.colors[0] : 'black';
   const [selectedColor, setSelectedColor] = useState(defaultColor);
@@ -164,28 +164,28 @@ const BestSellerCard = ({ product, onTryOn }) => {
       <Link to={`/product/${product.id}`} className="bestseller-card-link">
         <div className="bestseller-image-wrapper">
           <span className="bestseller-top-badge">Top rated</span>
-          <button 
+          <button
             type="button"
-            className="bestseller-wishlist-btn" 
-            onClick={handleHeartClick} 
+            className="bestseller-wishlist-btn"
+            onClick={handleHeartClick}
             aria-label="Toggle wishlist"
             style={{ zIndex: 20 }}
           >
             {isSaved ? <FaHeart color="#ff4d4f" /> : <FaRegHeart />}
           </button>
-          
-          <img 
-            src={displayImage} 
-            alt={product.name} 
-            className="bestseller-product-image" 
+
+          <img
+            src={displayImage}
+            alt={product.name}
+            className="bestseller-product-image"
             style={imageStyle}
           />
-          
-          <button 
+
+          <button
             type="button"
-            className="bestseller-tryon-overlay-btn" 
-            onClick={(e) => { 
-              e.preventDefault(); 
+            className="bestseller-tryon-overlay-btn"
+            onClick={(e) => {
+              e.preventDefault();
               onTryOn({ ...product, image: displayImage }); // Pass active colored image version to VirtualTryOn
             }}
           >
@@ -202,7 +202,7 @@ const BestSellerCard = ({ product, onTryOn }) => {
               <span className="bestseller-reviews-count">({getReviewCount(product.id)})</span>
             </div>
           </div>
-          
+
           <div className="bestseller-shape-row">
             <span className="bestseller-shape">{product.shape}</span>
           </div>
@@ -213,8 +213,8 @@ const BestSellerCard = ({ product, onTryOn }) => {
 
           <div className="bestseller-swatches">
             {product.colors && product.colors.slice(0, 4).map((color, idx) => (
-              <button 
-                key={idx} 
+              <button
+                key={idx}
                 type="button"
                 className={`bestseller-swatch ${selectedColor === color ? 'active-swatch' : ''}`}
                 style={getSwatchStyle(color)}
@@ -249,13 +249,13 @@ const BestSellers = () => {
 
   const filteredProducts = activeTab === 'eyeglasses'
     ? [
-        ...priorityEyeglasses.map(id => productsData.find(p => p.id === id)).filter(Boolean),
-        ...productsData.filter(p => p.type === 'eyeglasses' && !priorityEyeglasses.includes(p.id))
-      ]
+      ...priorityEyeglasses.map(id => productsData.find(p => p.id === id)).filter(Boolean),
+      ...productsData.filter(p => p.type === 'eyeglasses' && !priorityEyeglasses.includes(p.id))
+    ]
     : [
-        ...prioritySunglasses.map(id => productsData.find(p => p.id === id)).filter(Boolean),
-        ...productsData.filter(p => p.type === 'sunglasses' && !prioritySunglasses.includes(p.id))
-      ];
+      ...prioritySunglasses.map(id => productsData.find(p => p.id === id)).filter(Boolean),
+      ...productsData.filter(p => p.type === 'sunglasses' && !prioritySunglasses.includes(p.id))
+    ];
 
   const handleScroll = (direction) => {
     if (scrollRef.current) {
@@ -285,14 +285,14 @@ const BestSellers = () => {
         <div>
           <h2 className="bestsellers-title">BEST SELLERS</h2>
           <div className="bestsellers-tabs">
-            <button 
+            <button
               type="button"
               className={`bestsellers-tab ${activeTab === 'eyeglasses' ? 'active' : ''}`}
               onClick={() => setActiveTab('eyeglasses')}
             >
               Eyeglasses
             </button>
-            <button 
+            <button
               type="button"
               className={`bestsellers-tab ${activeTab === 'sunglasses' ? 'active' : ''}`}
               onClick={() => setActiveTab('sunglasses')}
@@ -307,28 +307,28 @@ const BestSellers = () => {
       </div>
 
       <div className="bestsellers-carousel-wrapper">
-        <button 
+        <button
           type="button"
-          className="bestsellers-nav-btn prev" 
+          className="bestsellers-nav-btn prev"
           onClick={() => handleScroll('left')}
           aria-label="Previous products"
         >
           ❮
         </button>
-        
+
         <div className="bestsellers-carousel" ref={scrollRef}>
           {filteredProducts.map(product => (
-            <BestSellerCard 
-              key={product.id} 
-              product={product} 
-              onTryOn={handleOpenTryOn} 
+            <BestSellerCard
+              key={product.id}
+              product={product}
+              onTryOn={handleOpenTryOn}
             />
           ))}
         </div>
 
-        <button 
+        <button
           type="button"
-          className="bestsellers-nav-btn next" 
+          className="bestsellers-nav-btn next"
           onClick={() => handleScroll('right')}
           aria-label="Next products"
         >
@@ -337,9 +337,9 @@ const BestSellers = () => {
       </div>
 
       {isTryOnOpen && (
-        <VirtualTryOn 
-          isOpen={isTryOnOpen} 
-          onClose={() => setIsTryOnOpen(false)} 
+        <VirtualTryOn
+          isOpen={isTryOnOpen}
+          onClose={() => setIsTryOnOpen(false)}
           initialProduct={tryOnProduct}
         />
       )}
