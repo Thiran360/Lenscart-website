@@ -81,14 +81,15 @@ function OrderHistory({ initialAction }) {
                 color: "Standard"
               }];
 
-          const address = ord.shipping_address || ord.address || (ord.full_name ? {
-            name: ord.full_name,
-            phone: ord.phone,
-            street: ord.street_address || ord.street,
-            city: ord.city,
-            state: ord.state,
-            pincode: ord.pincode
-          } : null);
+          const rawAddr = ord.shipping_address || ord.address || (ord.full_name ? ord : null);
+          const address = rawAddr ? {
+            name: rawAddr.full_name || rawAddr.name || "Customer",
+            phone: rawAddr.phone || "",
+            street: rawAddr.street_address || rawAddr.street || "",
+            city: rawAddr.city || "",
+            state: rawAddr.state || "",
+            pincode: rawAddr.pincode || ""
+          } : null;
 
           return {
             id,
@@ -240,7 +241,7 @@ function OrderHistory({ initialAction }) {
                 <div className="order-address-bar">
                   <FaMapMarkerAlt color="#0D6B6D" size={14} style={{ flexShrink: 0 }} />
                   <span>
-                    <strong>Delivery Address:</strong> {order.address.name} {order.address.phone ? `(${order.address.phone})` : ""} - {order.address.street || ""}, {order.address.city || ""} {order.address.pincode || ""}
+                    <strong>Delivery Address:</strong> {order.address.name} {order.address.phone ? `(${order.address.phone})` : ""} - {order.address.street || ""}, {order.address.city || ""}{order.address.state ? `, ${order.address.state}` : ""} - {order.address.pincode || ""}
                   </span>
                 </div>
               )}

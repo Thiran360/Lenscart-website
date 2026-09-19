@@ -52,6 +52,7 @@ function GlassManager() {
 
   const fileInputRef = useRef(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
 
   // Form State
@@ -114,10 +115,16 @@ function GlassManager() {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value
-    }));
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value
+      };
+      if (name === "category" && value === "₹1200 Store") {
+        updated.price = "1200";
+      }
+      return updated;
+    });
   };
 
   const handleColorToggle = (color) => {
@@ -135,6 +142,7 @@ function GlassManager() {
       toast.warning("Please upload a valid image file (PNG, JPG, WEBP).");
       return;
     }
+    setSelectedFile(file);
     const reader = new FileReader();
     reader.onload = (uploadEvent) => {
       setImagePreview(uploadEvent.target.result);
@@ -173,7 +181,8 @@ function GlassManager() {
       return;
     }
 
-    const priceNum = Number(formData.price);
+    const is1200Store = formData.category === "₹1200 Store" || Number(formData.price) === 1200;
+    const priceNum = is1200Store ? 1200 : Number(formData.price);
     setIsSubmitting(true);
 
     const apiPayload = {
@@ -184,7 +193,9 @@ function GlassManager() {
       price: priceNum,
       structure_style: formData.shape.toLowerCase(),
       target_audience: formData.gender.toLowerCase(),
-      collection_tier: (formData.category === "₹1200 Store" ? "essential" : formData.category.toLowerCase()),
+      collection_tier: (is1200Store ? "essential" : formData.category.toLowerCase()),
+      category: is1200Store ? "₹1200 Store" : formData.category,
+      store: is1200Store ? "1200" : undefined,
       available_colors: formData.colors.length ? formData.colors : ["black", "blue", "brown"],
       adjustable_nose_pad: Boolean(formData.hasNosePads),
       applicable_for_buy_one_get_one: Boolean(formData.applicable_for_buy_one_get_one)
@@ -192,7 +203,7 @@ function GlassManager() {
 
     try {
       // Call POST https://capsule-most-rundown.ngrok-free.dev/api/glass-product/create/
-      await createGlassProduct(apiPayload);
+      await createGlassProduct(apiPayload, selectedFile);
 
       // Reset Form
       setFormData({
@@ -212,6 +223,10 @@ function GlassManager() {
         rating: 4.8
       });
       setImagePreview(null);
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
       toast.success(`Success! "${apiPayload.model_name}" created and published to inventory.`);
       
       // Switch to inventory tab and re-fetch live stock
@@ -319,7 +334,13 @@ function GlassManager() {
                 <button
                   type="button"
                   className="remove-img-btn"
-                  onClick={() => setImagePreview(null)}
+                  onClick={() => {
+                    setImagePreview(null);
+                    setSelectedFile(null);
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = "";
+                    }
+                  }}
                 >
                   Remove Image
                 </button>
@@ -363,13 +384,22 @@ function GlassManager() {
             </div>
 
             <div className="glass-field">
-              <label><FaTag /> Price (₹) *</label>
+              <label>
+                <FaTag /> Price (₹) *
+                {formData.category === "₹1200 Store" && (
+                  <span style={{ color: "#0d6b6d", fontSize: "12px", marginLeft: "8px", fontWeight: "700" }}>
+                    (Locked to ₹1200 for ₹1200 Store)
+                  </span>
+                )}
+              </label>
               <input
                 type="number"
                 name="price"
                 placeholder="e.g. 1200"
-                value={formData.price}
+                value={formData.category === "₹1200 Store" ? "1200" : formData.price}
                 onChange={handleInputChange}
+                readOnly={formData.category === "₹1200 Store"}
+                style={formData.category === "₹1200 Store" ? { backgroundColor: "#f8fafc", cursor: "not-allowed", fontWeight: 700, color: "#0d6b6d" } : {}}
                 required
               />
             </div>
@@ -402,7 +432,7 @@ function GlassManager() {
                 <option value="Executive">Executive Series</option>
                 <option value="Premium">Premium Collection</option>
                 <option value="Kids">Junior Eyewear</option>
-                <option value="₹1200 Store">Essential Store</option>
+                <option value="₹1200 Store">₹1200 Store (Flat ₹1200)</option>
               </select>
             </div>
           </div>

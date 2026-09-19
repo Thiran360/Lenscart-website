@@ -297,9 +297,19 @@
   font-size: 30px;
   font-weight: 800;
   color: var(--pd-dark);
-  margin: 0 0 12px 0;
+  margin: 0 0 6px 0;
   line-height: 1.25;
   letter-spacing: -0.5px;
+}
+
+.pd-model-number-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 14px;
+  letter-spacing: 0.3px;
 }
 
 /* Rating Bar */
@@ -545,6 +555,132 @@
   margin-bottom: 28px;
 }
 
+/* 14 Days Free Returns Badge */
+.pd-free-returns-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: #f0fdf9;
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid #0d6b6d;
+  border-radius: 8px;
+  color: #0f766e;
+  font-size: 13.5px;
+  font-weight: 700;
+  width: fit-content;
+  letter-spacing: 0.2px;
+}
+
+.pd-free-returns-badge .pd-returns-icon {
+  color: #0d6b6d;
+  font-size: 14px;
+}
+
+/* CTA Button Layout: Select Lenses on top, Add Yours & Live 3D Try-On below */
+.pd-btn-select-lenses-full {
+  width: 100%;
+  height: 52px;
+  background: linear-gradient(135deg, #0d6b6d 0%, #084f50 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(13, 107, 109, 0.3);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pd-btn-select-lenses-full:hover {
+  background: linear-gradient(135deg, #0f766e 0%, #0d6b6d 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(13, 107, 109, 0.4);
+}
+
+.pd-cta-row-secondary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+/* Legacy fallback */
+.pd-cta-row-three {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+.pd-btn-cta {
+  height: 48px;
+  padding: 0 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  box-sizing: border-box;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+}
+
+.pd-btn-get-yours {
+  background: #ffffff;
+  color: #0d6b6d;
+  border: 1.5px solid #0d6b6d;
+}
+
+.pd-btn-get-yours:hover {
+  background: #0d6b6d;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(13, 107, 109, 0.25);
+}
+
+.pd-btn-get-yours:hover svg {
+  color: #ffffff !important;
+}
+
+.pd-btn-live-tryon {
+  background: #ffffff;
+  color: var(--pd-dark);
+  border: 1.5px solid var(--pd-border);
+}
+
+.pd-btn-live-tryon:hover {
+  background: #f8fafc;
+  border-color: #0d6b6d;
+  color: #0d6b6d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 500px) {
+  .pd-cta-row-three {
+    gap: 6px;
+  }
+  .pd-btn-cta {
+    font-size: 11px;
+    padding: 0 4px;
+    height: 44px;
+    gap: 4px;
+  }
+  .pd-free-returns-badge {
+    font-size: 12.5px;
+    padding: 6px 10px;
+  }
+}
+
 .pd-btn-primary-select {
   width: 100%;
   padding: 18px 24px;
@@ -669,24 +805,29 @@
   gap: 6px;
 }
 
-/* Trust / Assurance Cards Grid */
+/* Trust / Assurance Cards Grid - Strictly 3 on the same line */
 .pd-trust-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+  width: 100%;
 }
 
 .pd-trust-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+  padding: 12px 6px;
   border-radius: 12px;
   border: 1px solid var(--pd-border);
   background: #f8fafc;
   cursor: pointer;
   transition: all 0.2s ease;
+  min-width: 0;
 }
 
 .pd-trust-item:hover, .pd-trust-item.active {
@@ -697,17 +838,107 @@
 .pd-trust-icon {
   font-size: 20px;
   color: var(--pd-primary);
+  flex-shrink: 0;
 }
 
 .pd-trust-text-title {
-  font-size: 12.5px;
+  font-size: 11.5px;
   font-weight: 700;
   color: var(--pd-dark);
+  line-height: 1.25;
 }
 
 .pd-trust-text-sub {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--pd-muted);
+  line-height: 1.2;
+}
+
+/* Free Frame Care Kit Card */
+.pd-care-kit-card {
+  background: #f0fdf9;
+  border: 1.5px solid #a7f3d0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  transition: all 0.2s ease;
+}
+
+.pd-care-kit-card:hover {
+  border-color: #0d6b6d;
+  background: #e6f7f5;
+}
+
+.pd-care-kit-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.pd-care-kit-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #0d6b6d;
+  cursor: pointer;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.pd-care-kit-content {
+  flex: 1;
+}
+
+.pd-care-kit-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.pd-care-kit-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.pd-care-kit-tag {
+  background: #0d6b6d;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* Buy Now Button */
+.pd-btn-buy-now {
+  width: 100%;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #0d6b6d 0%, #084f50 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(13, 107, 109, 0.35);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 24px;
+}
+
+.pd-btn-buy-now:hover {
+  background: linear-gradient(135deg, #0f766e 0%, #0d6b6d 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(13, 107, 109, 0.45);
 }
 
 /* Responsive */

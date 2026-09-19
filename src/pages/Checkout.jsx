@@ -8,23 +8,75 @@ import PaymentGatewayModal from "../components/PaymentGatewayModal";
 import { saveAddressApi } from "../services/profileService";
 import { placeOrderApi } from "../services/checkoutService";
 import { useToast } from "../context/ToastContext";
-import { FaCreditCard } from "react-icons/fa";
+import { FaCreditCard, FaTag, FaCheckCircle } from "react-icons/fa";
 import "./Checkout.css";
+
+const AVAILABLE_COUPONS = [
+  { code: "FIRST15", discount: 15, type: "percent", label: "Flat 15% OFF", desc: "15% off first order" },
+  { code: "HDFC10", discount: 10, type: "percent", label: "Extra 10% OFF", desc: "10% instant discount" },
+  { code: "UPI150", discount: 150, type: "flat", label: "₹150 Flat OFF", desc: "₹150 instant off" },
+  { code: "LENS10", discount: 10, type: "percent", label: "10% OFF", desc: "10% store promo" },
+];
 
 function Checkout() {
   const { cartItems, totalPrice, clearCart } = useCart();
   const location = useRouterLocation();
   const navigate = useRouterNavigate();
   const buyNowProduct = location.state?.buyNowProduct;
-  
   const checkoutItems = buyNowProduct ? [buyNowProduct] : cartItems;
+  
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponInput, setCouponInput] = useState("");
+  const [couponError, setCouponError] = useState("");
+
   const subTotal = buyNowProduct 
     ? (buyNowProduct.price + (buyNowProduct.additionalPrice || 0)) * (buyNowProduct.quantity || 1) 
     : totalPrice;
-  const tax = subTotal * 0.18; // 18% tax simulation
-  const shipping = subTotal > 1000 ? 0 : 50;
-  const checkoutTotal = subTotal + tax + shipping;
+
+  const discountAmount = appliedCoupon 
+    ? (appliedCoupon.type === "percent" 
+        ? Math.round((subTotal * appliedCoupon.discount) / 100) 
+        : Math.min(subTotal, appliedCoupon.discount))
+    : 0;
+
+  const discountedSubTotal = Math.max(0, subTotal - discountAmount);
+  const tax = discountedSubTotal * 0.18; // 18% tax simulation
+  const shipping = discountedSubTotal > 1000 ? 0 : 50;
+  const checkoutTotal = discountedSubTotal + tax + shipping;
   const { toast } = useToast();
+
+  const handleApplyCoupon = (e) => {
+    if (e) e.preventDefault();
+    setCouponError("");
+    const cleanCode = couponInput.trim().toUpperCase();
+    if (!cleanCode) return;
+
+    const matched = AVAILABLE_COUPONS.find(c => c.code === cleanCode);
+    if (matched) {
+      setAppliedCoupon(matched);
+      setCouponInput("");
+      const saved = matched.type === "percent" ? Math.round((subTotal * matched.discount) / 100) : matched.discount;
+      toast.success(`Coupon "${matched.code}" applied! Saved ₹${saved}`);
+    } else {
+      setCouponError(`Invalid coupon "${cleanCode}". Try FIRST15, HDFC10, or UPI150.`);
+      toast.error(`Invalid coupon "${cleanCode}". Try FIRST15, HDFC10, or UPI150.`);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    if (appliedCoupon) {
+      toast.info(`Coupon "${appliedCoupon.code}" removed.`);
+      setAppliedCoupon(null);
+      setCouponError("");
+    }
+  };
+
+  const handleSelectCoupon = (c) => {
+    setAppliedCoupon(c);
+    setCouponError("");
+    const saved = c.type === "percent" ? Math.round((subTotal * c.discount) / 100) : c.discount;
+    toast.success(`Coupon "${c.code}" applied! Saved ₹${saved}`);
+  };
 
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("gpay");
@@ -43,6 +95,7 @@ function Checkout() {
     email: "",
     phone: "",
     street: "",
+    street2: "",
     city: "",
     state: "",
     pincode: ""
@@ -244,7 +297,7 @@ function Checkout() {
       address: {
         name: `${address.firstName} ${address.lastName}`.trim() || "Valued Customer",
         phone: address.phone || "",
-        street: address.street || "",
+        street: address.street2?.trim() ? `${address.street.trim()}, ${address.street2.trim()}` : (address.street || ""),
         city: address.city || "",
         state: address.state || "",
         pincode: address.pincode || ""
@@ -282,6 +335,8 @@ function Checkout() {
         address,
         paymentMethod,
         subTotal,
+        discount: discountAmount,
+        coupon: appliedCoupon?.code || null,
         tax,
         shipping,
         totalAmount: checkoutTotal,
@@ -291,15 +346,13 @@ function Checkout() {
       
       // Also save locally for the order history page
       saveOrderLocally(orderId);
-      await saveAddressToApi();
 
       return orderId;
     } catch (err) {
-      console.error("[Checkout] API Error:", err);
+      console.warn("[Checkout] Notice:", err.message);
       // Fallback: generate local order ID if API fails
       const fallbackId = `LK${Math.floor(10000000 + Math.random() * 90000000)}`;
       saveOrderLocally(fallbackId);
-      await saveAddressToApi();
       return fallbackId;
     } finally {
       setIsPlacingOrder(false);
@@ -419,11 +472,11 @@ function Checkout() {
 
                 <h2 className="section-heading" style={{ marginTop: '30px' }}>Shipping Address</h2>
                 <div className="form-group">
-                  <label>Street Address *</label>
+                  <label>Street Address Line 1 *</label>
                   <input 
                     type="text" 
                     name="street" 
-                    placeholder="House / Flat No., Street, Landmark"
+                    placeholder="House / Flat No., Building, Apartment"
                     className={touched.street && errors.street ? "input-error" : ""}
                     value={address.street} 
                     onChange={handleAddressChange}
@@ -432,6 +485,17 @@ function Checkout() {
                   {touched.street && errors.street && (
                     <span className="field-error-msg">⚠️ {errors.street}</span>
                   )}
+                </div>
+
+                <div className="form-group">
+                  <label>Street Address Line 2 (Area, Street, Landmark)</label>
+                  <input 
+                    type="text" 
+                    name="street2" 
+                    placeholder="Street Name, Area, Landmark"
+                    value={address.street2 || ""} 
+                    onChange={handleAddressChange}
+                  />
                 </div>
 
                 <div className="form-row">
@@ -614,11 +678,84 @@ function Checkout() {
                 ))}
               </div>
 
+              {/* Coupon Code Section */}
+              <div className="checkout-coupon-section">
+                {!appliedCoupon ? (
+                  <form onSubmit={handleApplyCoupon} className="coupon-input-group">
+                    <div className="coupon-input-wrapper">
+                      <FaTag className="coupon-field-icon" />
+                      <input 
+                        type="text" 
+                        placeholder="Enter Coupon Code" 
+                        value={couponInput}
+                        onChange={(e) => {
+                          setCouponInput(e.target.value.toUpperCase());
+                          if (couponError) setCouponError("");
+                        }}
+                        className="coupon-input"
+                      />
+                    </div>
+                    <button 
+                      type="submit" 
+                      disabled={!couponInput.trim()} 
+                      className="coupon-apply-btn"
+                    >
+                      Apply
+                    </button>
+                  </form>
+                ) : (
+                  <div className="applied-coupon-card">
+                    <div className="applied-coupon-left">
+                      <FaCheckCircle className="applied-check-icon" />
+                      <div>
+                        <div className="applied-code-row">
+                          <span className="applied-code">{appliedCoupon.code}</span>
+                          <span className="applied-label">{appliedCoupon.label}</span>
+                        </div>
+                        <span className="applied-saving">You save ₹{discountAmount.toFixed(2)}</span>
+                      </div>
+                    </div>
+                    <button type="button" onClick={handleRemoveCoupon} className="coupon-remove-btn">
+                      Remove
+                    </button>
+                  </div>
+                )}
+
+                {couponError && (
+                  <div className="coupon-error-msg">{couponError}</div>
+                )}
+
+                {!appliedCoupon && (
+                  <div className="available-coupons-wrapper">
+                    <span className="available-title">Available Offers:</span>
+                    <div className="available-chips">
+                      {AVAILABLE_COUPONS.map((c) => (
+                        <button
+                          key={c.code}
+                          type="button"
+                          className="available-chip"
+                          onClick={() => handleSelectCoupon(c)}
+                        >
+                          <span className="chip-code">{c.code}</span>
+                          <span className="chip-desc">{c.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="summary-totals">
                 <div className="total-row">
                   <span>Subtotal</span>
                   <span>₹{subTotal.toFixed(2)}</span>
                 </div>
+                {discountAmount > 0 && (
+                  <div className="total-row discount-row">
+                    <span>Coupon Discount ({appliedCoupon?.code})</span>
+                    <span className="discount-val">-₹{discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="total-row">
                   <span>Shipping</span>
                   <span>{shipping === 0 ? 'FREE' : `₹${shipping.toFixed(2)}`}</span>

@@ -5,12 +5,28 @@ import { productsData } from "../data/products";
 export const CAPSULE_API_BASE_URL = BASE_API_URL;
 export const STORE_API_BASE_URL = BASE_API_URL;
 
+// Track product IDs that exist in the remote Django DB (e.g. 20, 22)
+export const knownBackendProductIds = new Set([20, 22]);
+
+export const registerBackendProductId = (id) => {
+  const n = Number(id);
+  if (!isNaN(n) && n > 0) knownBackendProductIds.add(n);
+};
+
+export const isBackendProduct = (id) => {
+  const n = Number(id);
+  return !isNaN(n) && knownBackendProductIds.has(n);
+};
+
 /**
  * Normalizes raw product data from API into standard application product structure
  */
 export const normalizeProduct = (item, index = 0) => {
   if (!item) return null;
   const id = item.id || item.product_id || item._id || `store-1200-${index + 1}`;
+  if (item.id || item.product_id) {
+    registerBackendProductId(item.id || item.product_id);
+  }
   const price = Number(item.price || item.unit_price || item.selling_price || 1200);
   const oldPrice = Number(item.oldPrice || item.old_price || item.mrp || (price > 0 ? Math.round(price * 1.4) : 1800));
   const discount = Number(item.discount || (oldPrice > price ? Math.round(((oldPrice - price) / oldPrice) * 100) : 25));
@@ -58,8 +74,7 @@ export const normalizeProduct = (item, index = 0) => {
     hasNosePads: item.includes_adjustable_nose_pad ?? item.adjustable_nose_pad ?? true,
     applicable_for_buy_one_get_one: Boolean(item.applicable_for_buy_one_get_one ?? item.bogo ?? false),
     isBogo: Boolean(item.applicable_for_buy_one_get_one ?? item.bogo ?? false),
-    lensPower: item.lensPower || ["-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"],
-    store: item.store || "1200",
+    store: item.store ? String(item.store) : (Number(price) === 1200 ? "1200" : null),
     isCustom: true,
     isApiItem: true,
     created_at: item.created_at
@@ -83,6 +98,8 @@ export const getStoreProducts = async (params = "1200") => {
   if (page) queryParams.push(`page=${page}`);
   if (limit) queryParams.push(`limit=${limit}`);
 
+  const isStrict1200 = (p) => Number(p.price) === 1200 || p.store === "1200" || p.category === "₹1200 Store";
+
   try {
     const rawData = await apiRequest(`/product/?${queryParams.join("&")}`, "GET");
     let list = [];
@@ -100,10 +117,11 @@ export const getStoreProducts = async (params = "1200") => {
     }
 
     const normalized = list.map((item, idx) => normalizeProduct(item, idx)).filter(Boolean);
+    const strictly1200 = normalized.filter(isStrict1200).map(p => ({ ...p, price: 1200 }));
 
     // If backend database currently has 0 store 1200 products, seamlessly fallback to catalog 1200 products
-    if (normalized.length === 0) {
-      const fallback1200 = productsData.filter(p => p.price <= 1200 || p.store === "1200");
+    if (strictly1200.length === 0) {
+      const fallback1200 = productsData.filter(isStrict1200).map(p => ({ ...p, price: 1200 }));
       return {
         products: fallback1200,
         totalItems: fallback1200.length,
@@ -114,10 +132,10 @@ export const getStoreProducts = async (params = "1200") => {
     }
 
     const totalPages = Number(rawData?.total_pages || (rawData?.total_data ? Math.ceil(rawData.total_data / (limit || 10)) : 1));
-    const totalItems = Number(rawData?.total_items || rawData?.total_data || rawData?.count || normalized.length);
+    const totalItems = Number(rawData?.total_items || rawData?.total_data || rawData?.count || strictly1200.length);
 
     return {
-      products: normalized,
+      products: strictly1200,
       totalItems,
       totalPages,
       total_pages: totalPages,
@@ -125,7 +143,7 @@ export const getStoreProducts = async (params = "1200") => {
     };
   } catch (error) {
     console.error(`[getStoreProducts] GET /product/ failed:`, error.message);
-    const fallback1200 = productsData.filter(p => p.price <= 1200 || p.store === "1200");
+    const fallback1200 = productsData.filter(isStrict1200).map(p => ({ ...p, price: 1200 }));
     return {
       products: fallback1200,
       totalItems: fallback1200.length,
@@ -204,27 +222,56 @@ export const getGlassProducts = async (params = {}) => {
  * Create a new glass product
  * POST /glass-product/create/
  */
-export const createGlassProduct = async (productData) => {
-  const productName = productData.product_name || productData.model_name || productData.name;
+export const createGlassProduct = async (productData, imageFile = null) => {
+  let bodyPayload;
 
-  const payload = {
-    product_name: productName,
-    model_name: productName,
-    category_type: String(productData.category_type || productData.type || "eyeglasses").toLowerCase(),
-    frame_size: String(productData.frame_size || productData.size || "M").toUpperCase(),
-    price: Number(productData.price || 1200),
-    structure_style: String(productData.structure_style || productData.shape || "round").toLowerCase(),
-    target_audience: String(productData.target_audience || productData.gender || "men").toLowerCase(),
-    collection_tier: String(productData.collection_tier || productData.category || "premium").toLowerCase(),
-    available_colors: Array.isArray(productData.available_colors) && productData.available_colors.length > 0
+  if (typeof FormData !== "undefined" && productData instanceof FormData) {
+    bodyPayload = productData;
+    if (imageFile && !bodyPayload.has("image")) {
+      bodyPayload.append("image", imageFile);
+    }
+  } else {
+    const formData = new FormData();
+    const productName = productData.product_name || productData.model_name || productData.name || "";
+    formData.append("product_name", productName);
+    formData.append("model_name", productName);
+    formData.append("category_type", String(productData.category_type || productData.type || "eyeglasses").toLowerCase());
+    formData.append("frame_size", String(productData.frame_size || productData.size || "M").toUpperCase());
+    const isStore1200 = productData.category === "₹1200 Store" || 
+                        productData.collection_tier === "essential" || 
+                        productData.store === "1200" || 
+                        Number(productData.price) === 1200;
+    const finalPrice = (productData.category === "₹1200 Store" || productData.store === "1200") ? 1200 : Number(productData.price ?? 1200);
+
+    formData.append("price", String(finalPrice));
+    if (isStore1200) {
+      formData.append("store", "1200");
+    }
+    formData.append("structure_style", String(productData.structure_style || productData.shape || "round").toLowerCase());
+    formData.append("target_audience", String(productData.target_audience || productData.gender || "unisex").toLowerCase());
+    formData.append("collection_tier", isStore1200 ? "essential" : String(productData.collection_tier || productData.category || "classic").toLowerCase());
+
+    const colors = Array.isArray(productData.available_colors) && productData.available_colors.length > 0
       ? productData.available_colors
-      : (productData.colors?.length ? productData.colors : ["black", "blue", "brown"]),
-    adjustable_nose_pad: Boolean(productData.adjustable_nose_pad ?? productData.hasNosePads ?? false),
-    applicable_for_buy_one_get_one: Boolean(productData.applicable_for_buy_one_get_one ?? productData.isBogo ?? false)
-  };
+      : (productData.colors?.length ? productData.colors : ["black", "gold"]);
+    formData.append("available_colors", JSON.stringify(colors));
+
+    const nosePad = Boolean(productData.includes_adjustable_nose_pad ?? productData.adjustable_nose_pad ?? productData.hasNosePads ?? false);
+    formData.append("includes_adjustable_nose_pad", String(nosePad));
+
+    const bogo = Boolean(productData.applicable_for_buy_one_get_one ?? productData.isBogo ?? false);
+    formData.append("applicable_for_buy_one_get_one", String(bogo));
+
+    const fileToUpload = imageFile || productData.image || productData.file;
+    if (fileToUpload instanceof File || fileToUpload instanceof Blob) {
+      formData.append("image", fileToUpload);
+    }
+
+    bodyPayload = formData;
+  }
 
   try {
-    return await apiRequest("/glass-product/create/", "POST", payload);
+    return await apiRequest("/glass-product/create/", "POST", bodyPayload);
   } catch (error) {
     console.error(`[createGlassProduct] POST /glass-product/create/ failed:`, error.message);
     throw error;
@@ -551,7 +598,7 @@ export const getBuyOneGetOneApi = async (params = {}) => {
   const fallbackTotalPages = Math.max(1, Math.ceil(fallbackTotalItems / limit));
   const fallbackSlice = allBogo.slice(offset, offset + limit);
 
-  try {
+   try {
     const response = await apiRequest(`/buy-one-get-one/${queryString}`, "GET");
     console.log("[Buy One Get One API Response]", response);
 

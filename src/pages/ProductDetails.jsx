@@ -17,7 +17,8 @@ import {
   FaShoppingCart, 
   FaArrowRight, 
   FaCheck,
-  FaTag
+  FaTag,
+  FaExchangeAlt
 } from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import { productsData } from "../data/products";
@@ -27,6 +28,7 @@ import SizeGuideModal from "../components/SizeGuideModal";
 import VirtualTryOn from "../components/VirtualTryOn";
 import ProductInfoTabs from "../components/ProductInfoTabs";
 import RelatedProducts from "../components/RelatedProducts";
+import Footer from "../components/Footer";
 import { useToast } from "../context/ToastContext";
 import { getStoreProducts, getGlassProducts, getProductDetailsApi } from "../services/productService";
 import "./ProductDetails.css";
@@ -86,7 +88,23 @@ function ProductDetails() {
   const [currentCouponIndex, setCurrentCouponIndex] = useState(0);
   const [pincode, setPincode] = useState('');
   const [deliveryDate, setDeliveryDate] = useState(null);
-  const [selectedAssurances, setSelectedAssurances] = useState(['return', 'warranty']);
+  const [selectedAssurances, setSelectedAssurances] = useState(['return', 'exchange', 'warranty']);
+  const [includeCareKit, setIncludeCareKit] = useState(true);
+
+  // Determine if frame has nose pads (e.g. Aviators, metallic frames, or explicitly flagged)
+  const hasNosePads = Boolean(
+    product && (
+      product.hasNosePads !== undefined 
+        ? product.hasNosePads 
+        : (product.includes_adjustable_nose_pad ?? 
+           product.adjustable_nose_pad ?? 
+           (product.shape?.toLowerCase() === 'aviator' ||
+            product.description?.toLowerCase().includes('nose pad') ||
+            product.description?.toLowerCase().includes('metallic') ||
+            product.name?.toLowerCase().includes('aviator'))
+          )
+    )
+  );
 
   // Dynamic 3D Thumbnail Angle Definitions
   const angles = [
@@ -223,8 +241,20 @@ function ProductDetails() {
 
   const handleAddToCart = () => {
     if (!product) return;
-    addToCart(product, 1, selectedColor);
+    addToCart({ ...product, selectedColor, selectedSize }, 1);
     toast.success(`Added "${product.name}" to cart!`);
+  };
+
+  const handleBuyNow = () => {
+    if (!product) return;
+    const buyNowItem = {
+      ...product,
+      selectedSize,
+      selectedColor,
+      quantity: 1,
+      includeCareKit: hasNosePads ? includeCareKit : false
+    };
+    navigate("/checkout", { state: { buyNowProduct: buyNowItem } });
   };
 
   const coupons = [
@@ -376,7 +406,6 @@ function ProductDetails() {
             {/* Header Tags */}
             <div className="pd-header-tags">
               <span className="pd-brand-tag">{product.brand || "Mr.LensMaker"}</span>
-              <span className="pd-id-tag">Model #{product.id}</span>
               {isBogoEligible && (
                 <span style={{ fontSize: '11.5px', fontWeight: 800, background: '#fee2e2', color: '#b91c1c', padding: '3px 8px', borderRadius: '6px' }}>
                   BOGO OFFER
@@ -386,6 +415,11 @@ function ProductDetails() {
 
             {/* Product Title */}
             <h1 className="pd-product-title">{product.name}</h1>
+
+            {/* Product Model Number */}
+            <div className="pd-model-number-tag">
+              Model #{product.model_number || product.model_no || product.model || product.id}
+            </div>
 
             {/* Rating Row */}
             <div className="pd-rating-row">
@@ -476,21 +510,29 @@ function ProductDetails() {
               <div className="pd-features-row">
                 <span className="pd-feature-chip">Shape: {product.shape || 'Rectangle'}</span>
                 <span className="pd-feature-chip">Gender: {product.gender || 'Unisex'}</span>
-                <span className="pd-feature-chip">{product.hasNosePads ? 'Adjustable Nose Pads' : 'Comfort Fit Bridge'}</span>
+                <span className="pd-feature-chip">{hasNosePads ? 'Adjustable Nose Pads' : 'Comfort Fit Bridge'}</span>
               </div>
             </div>
 
             {/* CTAs Action Block */}
             <div className="pd-cta-block">
-              <button className="pd-btn-primary-select" onClick={handleSelectLenses}>
-                SELECT LENSES & BUY NOW <FaArrowRight />
+              {/* 14 Days Free Returns Badge */}
+              <div className="pd-free-returns-badge">
+                <FaUndo className="pd-returns-icon" />
+                <span>14 Days Free Returns</span>
+              </div>
+
+              {/* Primary Full-Width Select Lenses Button */}
+              <button className="pd-btn-cta pd-btn-select-lenses-full" onClick={handleSelectLenses}>
+                Select Lenses <FaArrowRight style={{ fontSize: '13px' }} />
               </button>
 
-              <div className="pd-btn-secondary-row">
-                <button className="pd-btn-secondary" onClick={handleAddToCart}>
-                  <FaShoppingCart style={{ color: '#0d6b6d' }} /> Add to Cart
+              {/* Under that: Add Yours and Live 3D Try-On in same row */}
+              <div className="pd-cta-row-secondary">
+                <button className="pd-btn-cta pd-btn-get-yours" onClick={handleAddToCart}>
+                  <FaShoppingCart style={{ color: '#0d6b6d' }} /> Add Yours
                 </button>
-                <button className="pd-btn-secondary" onClick={() => setIsTryOnOpen(true)}>
+                <button className="pd-btn-cta pd-btn-live-tryon" onClick={() => setIsTryOnOpen(true)}>
                   <FaCamera style={{ color: '#0d6b6d' }} /> Live 3D Try-On
                 </button>
               </div>
@@ -540,6 +582,17 @@ function ProductDetails() {
               </div>
 
               <div 
+                className={`pd-trust-item ${selectedAssurances.includes('exchange') ? 'active' : ''}`}
+                onClick={() => toggleAssurance('exchange')}
+              >
+                <FaExchangeAlt className="pd-trust-icon" />
+                <div>
+                  <div className="pd-trust-text-title">14-Day Free Exchange</div>
+                  <div className="pd-trust-text-sub">Hassle-Free Swap</div>
+                </div>
+              </div>
+
+              <div 
                 className={`pd-trust-item ${selectedAssurances.includes('warranty') ? 'active' : ''}`}
                 onClick={() => toggleAssurance('warranty')}
               >
@@ -550,6 +603,31 @@ function ProductDetails() {
                 </div>
               </div>
             </div>
+
+            {/* Free Frame Care Kit Checkbox (Only for frames with nose pads) */}
+            {hasNosePads && (
+              <div className="pd-care-kit-card">
+                <label className="pd-care-kit-label">
+                  <input 
+                    type="checkbox" 
+                    checked={includeCareKit} 
+                    onChange={(e) => setIncludeCareKit(e.target.checked)}
+                    className="pd-care-kit-checkbox"
+                  />
+                  <div className="pd-care-kit-content">
+                    <div className="pd-care-kit-header">
+                      <span className="pd-care-kit-name">Check Free Frame Care Kit</span>
+                      <span className="pd-care-kit-tag">FREE</span>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            )}
+
+            {/* Buy Now Button */}
+            <button className="pd-btn-buy-now" onClick={handleBuyNow}>
+              Buy Now <FaArrowRight style={{ fontSize: '13px' }} />
+            </button>
 
           </div>
         </div>
@@ -577,6 +655,7 @@ function ProductDetails() {
         product={product} 
       />
 
+      <Footer />
     </div>
   );
 }

@@ -182,11 +182,11 @@ function Navbar() {
       setIsMobileMenuOpen(false);
       setShowLogoutConfirm(false);
       toast.info("Logged out successfully");
-      navigate("/login");
+      navigate("/login", { replace: true });
     } catch (err) {
       console.error("Logout error:", err);
       setShowLogoutConfirm(false);
-      navigate("/login");
+      navigate("/login", { replace: true });
     } finally {
       setIsLoggingOut(false);
     }

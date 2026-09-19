@@ -5,6 +5,7 @@ import Filter from "../components/Filter";
 import ProductCard from "../components/ProductCard";
 import VirtualTryOn from "../components/VirtualTryOn";
 import Pagination from "../components/Pagination";
+import Footer from "../components/Footer";
 import { productsData } from "../data/products";
 import { getStoreProducts, getSunglassesApi, getEyeglassesApi, getKidsClubApi, getBuyOneGetOneApi, searchProductsApi } from "../services/productService";
 import { FaSearchMinus, FaRedo, FaSpinner } from "react-icons/fa";
@@ -12,7 +13,7 @@ import "./ProductsLayout.css";
 
 function Products() {
   const navigate = useNavigate();
-  const [filters, setFilters] = useState({ gender: [], brand: [], shape: [], size: [], color: [], price: [], material: [], bestSellers: [], sales: [], lensPower: [] });
+  const [filters, setFilters] = useState({ gender: [], brand: [], shape: [], size: [], color: [], price: [], material: [], bestSellers: [], sales: [] });
   const [sortOrder, setSortOrder] = useState("Recommended");
   const [is3DMode, setIs3DMode] = useState(false);
   
@@ -77,7 +78,7 @@ function Products() {
   };
 
   useEffect(() => {
-    setFilters({ gender: [], brand: [], shape: [], size: [], color: [], price: [], material: [], bestSellers: [], sales: [], lensPower: [] });
+    setFilters({ gender: [], brand: [], shape: [], size: [], color: [], price: [], material: [], bestSellers: [], sales: [] });
     setCurrentPage(1);
   }, [filterType, storeQuery]);
 
@@ -251,8 +252,9 @@ function Products() {
         .then((res) => {
           if (!isMounted) return;
           const prods = Array.isArray(res) ? res : (res?.products || []);
-          if (Array.isArray(prods) && prods.length > 0) {
-            setStoreApiProducts(prods);
+          const strictly1200 = prods.filter(p => Number(p.price) === 1200 || p.store === "1200" || p.category === "₹1200 Store").map(p => ({ ...p, price: 1200 }));
+          if (Array.isArray(strictly1200) && strictly1200.length > 0) {
+            setStoreApiProducts(strictly1200);
           } else {
             setStoreApiProducts([]);
           }
@@ -333,9 +335,10 @@ function Products() {
       ? categoryApiProducts 
       : allProductsList.filter(p => p.gender?.toLowerCase() === 'kids' || p.category?.toLowerCase().includes('kids'));
   } else if (is1200Store) {
+    const isStrict1200 = (p) => Number(p.price) === 1200 || p.store === "1200" || p.category === "₹1200 Store";
     baseProducts = storeApiProducts.length > 0 
-      ? storeApiProducts 
-      : allProductsList.filter(p => p.price <= 1200 || p.store === "1200");
+      ? storeApiProducts.filter(p => Number(p.price) === 1200).map(p => ({ ...p, price: 1200 })) 
+      : allProductsList.filter(isStrict1200).map(p => ({ ...p, price: 1200 }));
   } else if (searchQuery && searchQuery !== "kids") {
     baseProducts = searchApiProducts.length > 0 
       ? searchApiProducts 
@@ -352,7 +355,7 @@ function Products() {
     let items = baseProducts;
     if (type && type !== 'kids') items = items.filter(p => p.type === type);
     if (kids) items = items.filter(p => p.category?.toLowerCase().includes('kids') || p.name?.toLowerCase().includes('kids') || p.gender?.toLowerCase().includes('kids'));
-    if (is1200 && storeApiProducts.length === 0) items = items.filter(p => p.price <= 1200);
+    if (is1200) items = items.filter(p => Number(p.price) === 1200);
 
     if (!items.length) return { minPrice: 1000, maxPrice: 5000, maxDiscount: 33 };
     const prices = items.map(p => Number(p.price)).filter(p => !isNaN(p) && p > 0);
@@ -401,8 +404,10 @@ function Products() {
     }
   }
 
-  // 0.2 Max Price Filter (e.g. ₹1200 Store local fallback filter if API not used)
-  if (maxPriceQuery && (!is1200Store || storeApiProducts.length === 0)) {
+  // 0.2 Store Filter & Max Price Filter
+  if (is1200Store) {
+    processedProducts = processedProducts.filter(p => Number(p.price) === 1200);
+  } else if (maxPriceQuery) {
     const maxVal = Number(maxPriceQuery);
     if (!isNaN(maxVal)) {
       processedProducts = processedProducts.filter(p => p.price <= maxVal);
@@ -429,7 +434,7 @@ function Products() {
     );
   }
 
-  // 2. Sidebar Filters (Size, Color, Price, Material, Best Sellers, Sales, Lens Power)
+  // 2. Sidebar Filters (Size, Color, Price, Material, Best Sellers, Sales)
   if (filters.size && filters.size.length > 0) {
     const upperSizes = filters.size.map(s => s.toUpperCase());
     processedProducts = processedProducts.filter(p => 
@@ -469,17 +474,16 @@ function Products() {
     );
   }
 
-  if (filters.lensPower && filters.lensPower.length > 0) {
-    processedProducts = processedProducts.filter(p => 
-      p.lensPower && Array.isArray(p.lensPower) && filters.lensPower.some(power => p.lensPower.includes(power))
-    );
-  }
-
   // 3. Sorting
   if (sortOrder === "Price: Low to High") {
     processedProducts.sort((a, b) => a.price - b.price);
   } else if (sortOrder === "Price: High to Low") {
     processedProducts.sort((a, b) => b.price - a.price);
+  }
+
+  // Final safeguard: if ₹1200 Store is selected, ensure ONLY items with price 1200 are present
+  if (is1200Store) {
+    processedProducts = processedProducts.filter(p => Number(p.price) === 1200);
   }
 
   // Check if any client-side sidebar filters are active
@@ -492,8 +496,7 @@ function Products() {
     (filters.price && filters.price.length > 0) ||
     (filters.bestSellers && filters.bestSellers.length > 0) ||
     (filters.sales && filters.sales.length > 0) ||
-    (filters.material && filters.material.length > 0) ||
-    (filters.lensPower && filters.lensPower.length > 0)
+    (filters.material && filters.material.length > 0)
   );
 
   // 4. Pagination calculations
@@ -642,7 +645,7 @@ function Products() {
                       type="button" 
                       className="no-products-reset-btn"
                       onClick={() => {
-                        setFilters({ gender: [], brand: [], shape: [], size: [], color: [], price: [], material: [], bestSellers: [], sales: [], lensPower: [] });
+                        setFilters({ gender: [], brand: [], shape: [], size: [], color: [], price: [], material: [], bestSellers: [], sales: [] });
                         if (searchQuery) {
                           const currentParams = new URLSearchParams(location.search);
                           currentParams.delete('search');
@@ -692,6 +695,8 @@ function Products() {
         initialProduct={tryOnProduct}
         selectedColor={tryOnColor}
       />
+
+      <Footer />
     </div>
   );
 }

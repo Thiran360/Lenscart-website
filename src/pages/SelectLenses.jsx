@@ -1,11 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import { productsData } from "../data/products";
 import { useCart } from "../context/CartContext";
-import { FaCloudUploadAlt, FaCheckCircle, FaFileAlt } from "react-icons/fa";
+import { FaCloudUploadAlt, FaCheckCircle, FaFileAlt, FaGlasses } from "react-icons/fa";
 import { SPH_OPTIONS, CYL_OPTIONS, AXIS_OPTIONS } from "../utils/rxOptions";
+import { getPrescriptionsApi, getLocalPrescriptions } from "../services/profileService";
+import PDMeasurementModal from "../components/PDMeasurementModal";
 import "./SelectLenses.css";
+
+const PD_OPTIONS = Array.from({ length: 22 }, (_, i) => 54 + i);
+const DUAL_PD_OPTIONS = Array.from({ length: 25 }, (_, i) => (26 + i * 0.5).toFixed(1));
 
 function SelectLenses() {
   const { id } = useParams();
@@ -13,7 +19,7 @@ function SelectLenses() {
   const location = useLocation();
   const { addToCart } = useCart();
   
-  const product = productsData.find(p => p.id === parseInt(id));
+  const product = location.state?.product || productsData.find(p => p.id === parseInt(id));
   
   // Extract action from URL query params (e.g., ?action=buy)
   const queryParams = new URLSearchParams(location.search);
@@ -25,19 +31,60 @@ function SelectLenses() {
   const [rxMethod, setRxMethod] = useState(null);
   const [rxData, setRxData] = useState({ name: "", birthYear: "", rightSph: "", rightCyl: "", rightAxis: "", leftSph: "", leftCyl: "", leftAxis: "" });
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [savedPrescriptions, setSavedPrescriptions] = useState([]);
+  const [selectedSavedRx, setSelectedSavedRx] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [pdValue, setPdValue] = useState("");
+  const [isPdModalOpen, setIsPdModalOpen] = useState(false);
+  const [hasDualPd, setHasDualPd] = useState(false);
+  const [rightPd, setRightPd] = useState("");
+  const [leftPd, setLeftPd] = useState("");
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    const loadRx = async () => {
+      try {
+        const res = await getPrescriptionsApi(1, 10);
+        const list = Array.isArray(res?.data) ? res.data : getLocalPrescriptions();
+        setSavedPrescriptions(list);
+        if (list.length > 0 && !rxMethod) {
+          setRxMethod("saved");
+          setSelectedSavedRx(list[0]);
+        }
+      } catch {
+        const localList = getLocalPrescriptions();
+        setSavedPrescriptions(localList);
+        if (localList.length > 0 && !rxMethod) {
+          setRxMethod("saved");
+          setSelectedSavedRx(localList[0]);
+        }
+      }
+    };
+    loadRx();
+  }, []);
 
   const processFile = (file) => {
     if (!file) return;
     const isImage = file.type.startsWith("image/");
-    const fileData = {
-      name: file.name,
-      size: (file.size / 1024).toFixed(1) + " KB",
-      type: file.type,
-      url: isImage ? URL.createObjectURL(file) : null
-    };
-    setUploadedFile(fileData);
+    if (isImage) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploadedFile({
+          name: file.name,
+          size: (file.size / 1024).toFixed(1) + " KB",
+          type: file.type,
+          url: e.target.result
+        });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setUploadedFile({
+        name: file.name,
+        size: (file.size / 1024).toFixed(1) + " KB",
+        type: file.type,
+        url: null
+      });
+    }
   };
 
   const handleFileChange = (e) => {
@@ -88,13 +135,22 @@ function SelectLenses() {
   ];
 
   const getHighPowerSurcharge = () => {
-    if (lensType === "zero" || rxMethod !== "manual") return 0;
+    if (lensType === "zero") return 0;
     
-    // Parse floats, defaulting to 0 if invalid/empty
-    const rSph = parseFloat(rxData.rightSph) || 0;
-    const lSph = parseFloat(rxData.leftSph) || 0;
-    const rCyl = parseFloat(rxData.rightCyl) || 0;
-    const lCyl = parseFloat(rxData.leftCyl) || 0;
+    let rSph = 0, lSph = 0, rCyl = 0, lCyl = 0;
+    if (rxMethod === "manual") {
+      rSph = parseFloat(rxData.rightSph) || 0;
+      lSph = parseFloat(rxData.leftSph) || 0;
+      rCyl = parseFloat(rxData.rightCyl) || 0;
+      lCyl = parseFloat(rxData.leftCyl) || 0;
+    } else if (rxMethod === "saved" && selectedSavedRx) {
+      rSph = parseFloat(selectedSavedRx.right_sph) || 0;
+      lSph = parseFloat(selectedSavedRx.left_sph) || 0;
+      rCyl = parseFloat(selectedSavedRx.right_cyl) || 0;
+      lCyl = parseFloat(selectedSavedRx.left_cyl) || 0;
+    } else {
+      return 0;
+    }
 
     // Check if any SPH or CYL exceeds ±6.00
     if (Math.abs(rSph) > 6 || Math.abs(lSph) > 6 || Math.abs(rCyl) > 6 || Math.abs(lCyl) > 6) {
@@ -128,11 +184,35 @@ function SelectLenses() {
     
     let prescriptionDetails = null;
     if (lensType !== "zero") {
-      prescriptionDetails = {
-        method: rxMethod,
-        data: rxMethod === 'manual' ? rxData : null,
-        file: rxMethod === 'upload' ? uploadedFile : null
-      };
+      if (rxMethod === 'manual') {
+        prescriptionDetails = {
+          method: 'manual',
+          data: rxData,
+          file: null
+        };
+      } else if (rxMethod === 'upload') {
+        prescriptionDetails = {
+          method: 'upload',
+          data: null,
+          file: uploadedFile
+        };
+      } else if (rxMethod === 'saved' && selectedSavedRx) {
+        prescriptionDetails = {
+          method: 'saved',
+          savedId: selectedSavedRx.id,
+          data: {
+            name: selectedSavedRx.name,
+            birthYear: selectedSavedRx.birth_year,
+            rightSph: selectedSavedRx.right_sph,
+            rightCyl: selectedSavedRx.right_cyl,
+            rightAxis: selectedSavedRx.right_axis,
+            leftSph: selectedSavedRx.left_sph,
+            leftCyl: selectedSavedRx.left_cyl,
+            leftAxis: selectedSavedRx.left_axis,
+          },
+          file: selectedSavedRx.file || null
+        };
+      }
     }
 
     const finalProduct = {
@@ -143,7 +223,8 @@ function SelectLenses() {
         package: selectedPkg,
         surcharge: getHighPowerSurcharge(),
         additionalPrice: selectedType.price + selectedPkg.price + getHighPowerSurcharge(),
-        prescription: prescriptionDetails
+        prescription: prescriptionDetails,
+        pd: pdValue || "63"
       }
     };
 
@@ -221,9 +302,84 @@ function SelectLenses() {
                 <p className="subtitle">We need your eye power to craft your perfect lenses.</p>
                 
                 <div className="rx-method-tabs">
+                  {savedPrescriptions.length > 0 && (
+                    <button 
+                      className={`rx-tab ${rxMethod === 'saved' ? 'active' : ''}`} 
+                      onClick={() => setRxMethod('saved')}
+                    >
+                      Saved Prescription ({savedPrescriptions.length})
+                    </button>
+                  )}
                   <button className={`rx-tab ${rxMethod === 'upload' ? 'active' : ''}`} onClick={() => setRxMethod('upload')}>Upload File</button>
                   <button className={`rx-tab ${rxMethod === 'manual' ? 'active' : ''}`} onClick={() => setRxMethod('manual')}>Enter Manually</button>
                 </div>
+
+                {rxMethod === 'saved' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px' }}>
+                    {savedPrescriptions.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '30px', background: '#FAF6F0', borderRadius: '12px', border: '1px dashed #C5A059' }}>
+                        <FaGlasses size={32} color="#C5A059" style={{ marginBottom: '10px' }} />
+                        <p style={{ margin: 0, color: '#3A2415', fontWeight: 600 }}>No saved prescriptions found.</p>
+                        <p style={{ margin: '4px 0 12px 0', fontSize: '13px', color: '#6E4B34' }}>You can upload a file or enter details manually below.</p>
+                        <button 
+                          className="rx-tab active" 
+                          onClick={() => setRxMethod('manual')}
+                          style={{ padding: '8px 16px', fontSize: '13px' }}
+                        >
+                          Enter Manually
+                        </button>
+                      </div>
+                    ) : (
+                      savedPrescriptions.map((rx) => {
+                        const isSelected = selectedSavedRx?.id === rx.id;
+                        return (
+                          <div 
+                            key={rx.id} 
+                            onClick={() => setSelectedSavedRx(rx)}
+                            style={{
+                              border: isSelected ? '2px solid #0D6B6D' : '1px solid #E2E8F0',
+                              backgroundColor: isSelected ? '#F0FDFA' : '#FFFFFF',
+                              borderRadius: '12px',
+                              padding: '16px',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                              boxShadow: isSelected ? '0 4px 14px rgba(13, 107, 109, 0.12)' : 'none'
+                            }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <span style={{ fontSize: '18px' }}>👓</span>
+                                <div>
+                                  <strong style={{ color: '#0F172A', fontSize: '15px' }}>{rx.name}</strong>
+                                  {rx.birth_year && (
+                                    <span style={{ marginLeft: '8px', fontSize: '12px', color: '#64748B' }}>
+                                      (Born {rx.birth_year})
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <span style={{
+                                padding: '4px 12px',
+                                borderRadius: '20px',
+                                fontSize: '12px',
+                                fontWeight: 600,
+                                backgroundColor: isSelected ? '#0D6B6D' : '#E2E8F0',
+                                color: isSelected ? '#FFFFFF' : '#475569'
+                              }}>
+                                {isSelected ? 'Selected' : 'Use This Rx'}
+                              </span>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '12.5px', background: '#F8FAFC', padding: '10px', borderRadius: '8px' }}>
+                              <div><strong>OD (Right):</strong> SPH: {rx.right_sph || '0.00'} | CYL: {rx.right_cyl || '-'} | AXIS: {rx.right_axis ? `${rx.right_axis}°` : '-'}</div>
+                              <div><strong>OS (Left):</strong> SPH: {rx.left_sph || '0.00'} | CYL: {rx.left_cyl || '-'} | AXIS: {rx.left_axis ? `${rx.left_axis}°` : '-'}</div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                )}
 
                 {rxMethod === 'upload' && (
                   <div>
@@ -356,6 +512,102 @@ function SelectLenses() {
                         </select>
                       </div>
                     </div>
+
+                    {/* Compact PD section matching Screenshot 4 */}
+                    <div className="pd-compact-section">
+                      <div className="pd-compact-row">
+                        <div className="pd-compact-label">
+                          <span className="pd-compact-title">PD</span>
+                          <span className="pd-compact-subtitle">Pupillary</span>
+                          <span className="pd-compact-subtitle">Distance</span>
+                        </div>
+
+                        <div className="pd-compact-controls">
+                          <div className="pd-compact-input-row">
+                            <div className={`pd-compact-dropdown ${!pdValue ? "pd-has-error" : "pd-is-selected"}`}>
+                              <select 
+                                value={String(pdValue || "")} 
+                                onChange={(e) => setPdValue(e.target.value)}
+                                className="pd-compact-select"
+                                aria-label="Pupillary Distance"
+                              >
+                                <option value="">Enter your PD</option>
+                                {PD_OPTIONS.map((val) => (
+                                  <option key={val} value={String(val)}>{val}</option>
+                                ))}
+                              </select>
+                              <div className="pd-compact-chevron-box">
+                                <span className="pd-compact-chevron">▾</span>
+                              </div>
+                            </div>
+
+                            <button 
+                              type="button" 
+                              className="pd-compact-help-link"
+                              onClick={() => setIsPdModalOpen(true)}
+                            >
+                              Help me find my PD
+                            </button>
+                          </div>
+
+                          {!pdValue ? (
+                            <div className="pd-compact-warning">
+                              We couldn't find a PD value. Please enter your PD.
+                            </div>
+                          ) : (
+                            <div className="pd-compact-success">
+                              ✓ PD Selected: {pdValue} mm
+                            </div>
+                          )}
+
+                          <div className="pd-compact-dual-row">
+                            <label className="pd-compact-checkbox-label">
+                              <input 
+                                type="checkbox" 
+                                checked={hasDualPd} 
+                                onChange={(e) => setHasDualPd(e.target.checked)} 
+                              />
+                              <span>I have 2 PD numbers</span>
+                            </label>
+                          </div>
+
+                          {hasDualPd && (
+                            <div className="pd-compact-dual-grid">
+                              <div className="pd-compact-dual-item">
+                                <label>Right (OD)</label>
+                                <select 
+                                  value={rightPd} 
+                                  onChange={(e) => {
+                                    setRightPd(e.target.value);
+                                    if (leftPd) setPdValue(`${e.target.value}/${leftPd}`);
+                                    else setPdValue(e.target.value);
+                                  }}
+                                  className="pd-compact-select-sm"
+                                >
+                                  <option value="">Right PD</option>
+                                  {DUAL_PD_OPTIONS.map(val => <option key={val} value={val}>{val}</option>)}
+                                </select>
+                              </div>
+                              <div className="pd-compact-dual-item">
+                                <label>Left (OS)</label>
+                                <select 
+                                  value={leftPd} 
+                                  onChange={(e) => {
+                                    setLeftPd(e.target.value);
+                                    if (rightPd) setPdValue(`${rightPd}/${e.target.value}`);
+                                    else setPdValue(e.target.value);
+                                  }}
+                                  className="pd-compact-select-sm"
+                                >
+                                  <option value="">Left PD</option>
+                                  {DUAL_PD_OPTIONS.map(val => <option key={val} value={val}>{val}</option>)}
+                                </select>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -374,7 +626,8 @@ function SelectLenses() {
                   (step === 1 && !lensType) || 
                   (step === 2 && !lensPackage) || 
                   (step === 3 && !rxMethod) ||
-                  (step === 3 && rxMethod === 'upload' && !uploadedFile)
+                  (step === 3 && rxMethod === 'upload' && !uploadedFile) ||
+                  (step === 3 && rxMethod === 'saved' && !selectedSavedRx)
                 }
               >
                 {step === 3 || (step === 2 && lensType === "zero") ? (action === "buy" ? "Proceed to Checkout" : "Add to Cart") : "Continue to Next Step"}
@@ -414,6 +667,13 @@ function SelectLenses() {
             </div>
           )}
 
+          {pdValue && (
+            <div className="summary-row">
+              <span>Pupillary Distance (PD)</span>
+              <span>{pdValue} mm</span>
+            </div>
+          )}
+
           {getHighPowerSurcharge() > 0 && (
             <div className="summary-row" style={{ color: '#d32f2f' }}>
               <span>High Power Surcharge (&gt;&plusmn;6.00)</span>
@@ -431,6 +691,18 @@ function SelectLenses() {
           </p>
         </div>
       </div>
+
+      {/* Zenni-style Pupillary Distance Measurement Modal */}
+      <PDMeasurementModal 
+        isOpen={isPdModalOpen}
+        onClose={() => setIsPdModalOpen(false)}
+        onSelectPD={(pd) => {
+          setPdValue(pd.toString());
+          setHasDualPd(false);
+        }}
+      />
+
+      <Footer />
     </div>
   );
 }

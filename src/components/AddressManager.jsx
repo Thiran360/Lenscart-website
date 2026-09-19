@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { FaHome, FaPlus, FaTrash, FaMapMarkerAlt, FaPhoneAlt, FaUser, FaCity, FaRoad, FaEnvelope } from 'react-icons/fa';
+import { FaHome, FaPlus, FaTrash, FaMapMarkerAlt, FaPhoneAlt, FaUser, FaCity, FaRoad, FaEnvelope, FaBuilding } from 'react-icons/fa';
 import { getAddressesApi, saveAddressApi, deleteAddressApi } from '../services/profileService';
 import ConfirmModal from './ConfirmModal';
 import Pagination from './Pagination';
@@ -21,6 +21,7 @@ function AddressManager() {
     name: '',
     phone: '',
     street: '',
+    street2: '',
     city: '',
     state: '',
     pincode: ''
@@ -125,10 +126,14 @@ function AddressManager() {
 
     setSaving(true);
     try {
+      const combinedStreet = newAddr.street2?.trim()
+        ? `${newAddr.street.trim()}, ${newAddr.street2.trim()}`
+        : newAddr.street.trim();
+
       const payload = {
         full_name: newAddr.name,
         phone: newAddr.phone,
-        street_address: newAddr.street,
+        street_address: combinedStreet,
         city: newAddr.city,
         state: newAddr.state,
         pincode: newAddr.pincode
@@ -137,7 +142,7 @@ function AddressManager() {
       await saveAddressApi(payload);
 
       setShowAddModal(false);
-      setNewAddr({ name: '', phone: '', street: '', city: '', state: '', pincode: '' });
+      setNewAddr({ name: '', phone: '', street: '', street2: '', city: '', state: '', pincode: '' });
 
       toast.success("Address saved successfully!");
       // Re-fetch from API to get the latest list
@@ -350,16 +355,30 @@ function AddressManager() {
                   </div>
 
                   <div className="address-field-group full-width">
-                    <label>Street Address / Building / Flat *</label>
+                    <label>Street Address Line 1 (Flat, House no., Building) *</label>
                     <div className="input-with-icon">
                       <FaRoad className="input-prefix-icon" />
                       <input
                         type="text"
-                        placeholder="e.g. Flat 402, Green Avenue, North Street"
+                        placeholder="e.g. Flat 402, Green Avenue, North Block"
                         value={newAddr.street}
                         onChange={(e) => setNewAddr({ ...newAddr, street: e.target.value })}
                         className="modern-input"
                         required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="address-field-group full-width">
+                    <label>Street Address Line 2 (Street Name, Area, Locality)</label>
+                    <div className="input-with-icon">
+                      <FaBuilding className="input-prefix-icon" />
+                      <input
+                        type="text"
+                        placeholder="e.g. North Street, Near Gandhi Park"
+                        value={newAddr.street2}
+                        onChange={(e) => setNewAddr({ ...newAddr, street2: e.target.value })}
+                        className="modern-input"
                       />
                     </div>
                   </div>

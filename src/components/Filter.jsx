@@ -2,11 +2,6 @@ import { useState, useEffect } from "react";
 import { FaChevronDown, FaChevronUp, FaSortAmountDown, FaFilter } from "react-icons/fa";
 import "./Filter.css";
 
-const LENS_POWER_OPTIONS = [
-  "-4.00", "-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "-0.50",
-  "0.00", "+0.50", "+1.00", "+1.50", "+2.00", "+2.50", "+3.00", "+3.50", "+4.00"
-];
-
 function Filter({ filters, onApplyFilters, sortOrder, onSortChange, onTry3dToggle }) {
   const [openAccordion, setOpenAccordion] = useState("Gender"); // Default open
   const [localFilters, setLocalFilters] = useState(filters);
@@ -104,12 +99,6 @@ function Filter({ filters, onApplyFilters, sortOrder, onSortChange, onTry3dToggl
             <span className="chevron">{openAccordion === "Shape" ? <FaChevronUp /> : <FaChevronDown />}</span>
           </div>
           {openAccordion === "Shape" && renderCheckboxes("shape", ["Full Rim", "Half Rim", "Rimless", "Rectangle", "Round", "Aviator", "Wayfarer", "Cat Eye", "Square", "Oval"])}
-
-          <div className={`accordion-item ${openAccordion === "LensPower" ? "active" : ""}`} onClick={() => toggleAccordion("LensPower")}>
-            <span>Lens Power</span>
-            <span className="chevron">{openAccordion === "LensPower" ? <FaChevronUp /> : <FaChevronDown />}</span>
-          </div>
-          {openAccordion === "LensPower" && renderCheckboxes("lensPower", LENS_POWER_OPTIONS)}
 
           <div className={`accordion-item ${openAccordion === "Size" ? "active" : ""}`} onClick={() => toggleAccordion("Size")}>
             <span>Size</span>

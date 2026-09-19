@@ -1,11 +1,21 @@
 import { apiRequest } from "./api";
+import { isBackendProduct } from "./productService";
 
 /**
  * Fetch all items in user's wishlist via GET /wishlist/
  * Base URL: https://capsule-most-rundown.ngrok-free.dev/api
  */
 export const getWishlistApi = async () => {
-  return await apiRequest("/wishlist/", "GET");
+  const token = localStorage.getItem("user_token") || localStorage.getItem("userToken") || localStorage.getItem("token");
+  if (!token || token.startsWith("demo_token_") || token === "null" || token === "undefined") {
+    return { status: true, data: [] };
+  }
+  try {
+    return await apiRequest("/wishlist/", "GET", null, { timeout: 3500 });
+  } catch (err) {
+    console.warn("[getWishlistApi Notice]:", err.message);
+    return { status: false, data: [] };
+  }
 };
 
 /**
@@ -14,9 +24,23 @@ export const getWishlistApi = async () => {
  * @param {number|string} productId
  */
 export const addWishlistApi = async (productId) => {
-  return await apiRequest("/wishlist/", "POST", {
-    product_id: Number(productId),
-  });
+  const token = localStorage.getItem("user_token") || localStorage.getItem("userToken") || localStorage.getItem("token");
+  const numId = Number(productId);
+
+  // If unauthenticated, demo token, or purely local catalog product (not in Django DB):
+  // save locally immediately without making an 8-second hanging HTTP request!
+  if (!token || token.startsWith("demo_token_") || !isBackendProduct(numId)) {
+    return { status: true, message: "Product saved to local wishlist", localOnly: true };
+  }
+
+  try {
+    return await apiRequest("/wishlist/", "POST", {
+      product_id: numId,
+    }, { timeout: 3500 });
+  } catch (err) {
+    console.warn(`[addWishlistApi]: Product #${productId} saved locally:`, err.message);
+    return { status: false, message: err.message, localOnly: true };
+  }
 };
 
 /**
@@ -25,31 +49,19 @@ export const addWishlistApi = async (productId) => {
  * @param {number|string} productId
  */
 export const removeWishlistApi = async (productId) => {
-  const prodId = Number(productId);
+  const token = localStorage.getItem("user_token") || localStorage.getItem("userToken") || localStorage.getItem("token");
+  const numId = Number(productId);
+
+  if (!token || token.startsWith("demo_token_") || !isBackendProduct(numId)) {
+    return { status: true, message: "Product removed from local wishlist", localOnly: true };
+  }
 
   try {
-    // 1. Primary Method: DELETE /wishlist/ with payload { product_id: <id> }
     return await apiRequest("/wishlist/", "DELETE", {
-      product_id: prodId,
-    });
+      product_id: numId,
+    }, { timeout: 3500 });
   } catch (err) {
-    console.warn(
-      `[removeWishlistApi] DELETE /wishlist/ with body { product_id: ${prodId} } error:`,
-      err.message
-    );
-
-    // Fallback attempts in case backend expects query parameter or path variable
-    try {
-      return await apiRequest(`/wishlist/?product_id=${prodId}`, "DELETE");
-    } catch (err2) {
-      try {
-        return await apiRequest(`/wishlist/${prodId}/`, "DELETE");
-      } catch (err3) {
-        // Fallback toggle using POST
-        return await apiRequest("/wishlist/", "POST", {
-          product_id: prodId,
-        });
-      }
-    }
+    console.warn(`[removeWishlistApi]: Product #${numId} removed locally:`, err.message);
+    return { status: false, message: err.message, localOnly: true };
   }
 };

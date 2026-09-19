@@ -85,13 +85,27 @@ function PrescriptionManager() {
   const processFile = (file) => {
     if (!file) return;
     const isImage = file.type.startsWith("image/");
-    const fileData = {
-      name: file.name,
-      size: (file.size / 1024).toFixed(1) + " KB",
-      type: file.type,
-      url: isImage ? URL.createObjectURL(file) : null
-    };
-    setUploadedFile(fileData);
+    if (isImage) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploadedFile({
+          file: file,
+          name: file.name,
+          size: (file.size / 1024).toFixed(1) + " KB",
+          type: file.type,
+          url: e.target.result
+        });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setUploadedFile({
+        file: file,
+        name: file.name,
+        size: (file.size / 1024).toFixed(1) + " KB",
+        type: file.type,
+        url: null
+      });
+    }
   };
 
   const handleFileChange = (e) => {
@@ -130,7 +144,7 @@ function PrescriptionManager() {
     ))
   );
 
-  // Save Prescription to API
+  // Save Prescription to API / Local Storage
   const handleSave = async () => {
     if (!isRxValid || saving) return;
     setSaving(true);
@@ -138,16 +152,22 @@ function PrescriptionManager() {
     try {
       const payload = {
         name: rxData.name.trim(),
-        birth_year: rxData.birthYear ? parseInt(rxData.birthYear, 10) : null,
-        right_sph: rxData.rightSph || null,
+        birth_year: rxData.birthYear ? parseInt(rxData.birthYear, 10) : 2000,
+        right_sph: rxData.rightSph || "0.00",
         right_cyl: rxData.rightCyl || null,
         right_axis: rxData.rightAxis || null,
-        left_sph: rxData.leftSph || null,
+        left_sph: rxData.leftSph || "0.00",
         left_cyl: rxData.leftCyl || null,
-        left_axis: rxData.leftAxis || null
+        left_axis: rxData.leftAxis || null,
+        image: uploadedFile?.file || null,
+        file: uploadedFile ? {
+          name: uploadedFile.name,
+          size: uploadedFile.size,
+          url: uploadedFile.url
+        } : null
       };
 
-      await savePrescriptionApi(payload);
+      const res = await savePrescriptionApi(payload);
 
       setIsAdding(false);
       setUploadedFile(null);
@@ -164,7 +184,7 @@ function PrescriptionManager() {
 
       // Re-fetch prescriptions list on page 1
       await fetchPrescriptions(1);
-      toast.success("Prescription saved successfully!");
+      toast.success(res?.message || "Prescription saved successfully!");
     } catch (err) {
       console.error("Failed to save prescription:", err);
       toast.error(err.message || "Failed to save prescription. Please try again.");
@@ -267,16 +287,20 @@ function PrescriptionManager() {
                     )}
                   </div>
 
-                  {rx.file && (
+                  {(rx.file || rx.image) && (
                     <div className="rx-file-banner">
-                      {rx.file.url ? (
-                        <img src={rx.file.url} alt="Rx Document" className="rx-file-thumb" />
+                      {(rx.file?.url || rx.image) ? (
+                        <img 
+                          src={rx.file?.url || (String(rx.image).startsWith("http") ? rx.image : `https://capsule-most-rundown.ngrok-free.dev${String(rx.image).startsWith("/") ? "" : "/"}${rx.image}`)} 
+                          alt="Rx Document" 
+                          className="rx-file-thumb" 
+                        />
                       ) : (
                         <FaFileAlt size={30} color="#C5A059" />
                       )}
                       <div className="rx-file-info">
-                        <strong className="rx-file-title">📄 {rx.file.name}</strong>
-                        <span className="rx-file-size">Uploaded Document ({rx.file.size})</span>
+                        <strong className="rx-file-title">📄 {rx.file?.name || "Prescription Image"}</strong>
+                        <span className="rx-file-size">{rx.file?.size ? `Uploaded Document (${rx.file.size})` : "Uploaded Prescription File"}</span>
                       </div>
                     </div>
                   )}

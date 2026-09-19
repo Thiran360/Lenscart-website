@@ -1,5 +1,5 @@
 // Authentication Service using central API client
-import { apiRequest } from "./api";
+import { apiRequest, clearApiCache } from "./api";
 
 /**
  * Helper to ensure phone number is a clean 10-digit string without country code or symbols
@@ -85,11 +85,23 @@ export const loginUser = async (credentials) => {
 
 /**
  * Logout user via POST /logout/
- * Header includes token automatically via apiRequest helper
+ * Django backend requires { "token": "<token_string>" } in request body
  */
 export const logoutUser = async () => {
+  const token =
+    localStorage.getItem("user_token") ||
+    localStorage.getItem("userToken") ||
+    localStorage.getItem("token");
+
+  // Suppress erroneous "token is required" toast while logging out
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem("is_logging_out", "true");
+  }
+
   try {
-    await apiRequest("/logout/", "POST");
+    if (token) {
+      await apiRequest("/logout/", "POST", { token });
+    }
   } catch (err) {
     console.warn("[Logout API Warning]:", err.message);
   } finally {
@@ -102,7 +114,18 @@ export const logoutUser = async () => {
     localStorage.removeItem("pendingPhone");
     localStorage.removeItem("cleanPhone");
     localStorage.removeItem("pendingName");
-    sessionStorage.clear();
+
+    // Clear API caches
+    clearApiCache();
+
+    // Notify components that auth state changed
+    window.dispatchEvent(new Event("authStateChange"));
+    window.dispatchEvent(new CustomEvent("auth:logout"));
+
+    // Keep suppression flag active during transition, then remove
+    setTimeout(() => {
+      sessionStorage.removeItem("is_logging_out");
+    }, 1500);
   }
 };
 
@@ -121,11 +144,16 @@ export const verifyOtpApi = async (otpData) => {
 
   try {
     const response = await apiRequest("/verify-otp/", "POST", payload);
-    const token = response?.data?.user_token || response?.user_token;
-    const userType = response?.data?.user_type || response?.user_type || response?.data?.role || response?.role || response?.data?.user?.user_type;
+    const adminToken = response?.data?.admin_token || response?.admin_token;
+    const userToken = response?.data?.user_token || response?.user_token || response?.token;
+    const token = adminToken || userToken;
+    const userType = response?.data?.user_type || response?.user_type || response?.data?.role || response?.role || response?.data?.user?.user_type || (adminToken ? "admin" : "customer");
 
     if (token) {
       localStorage.setItem("user_token", token);
+      if (adminToken) {
+        localStorage.setItem("admin_token", adminToken);
+      }
     }
     if (userType) {
       localStorage.setItem("user_type", String(userType).toLowerCase());

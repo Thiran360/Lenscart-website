@@ -1,0 +1,649 @@
+/* PDMeasurementModal.css - Zenni-style Pupillary Distance Modal */
+
+.pd-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 16px;
+  animation: pdFadeIn 0.25s ease-out;
+}
+
+@keyframes pdFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.pd-modal-content {
+  background: #ffffff;
+  width: 100%;
+  max-width: 520px;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: pdSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pdSlideUp {
+  from {
+    transform: translateY(20px) scale(0.97);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Modal Header */
+.pd-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px 8px 24px;
+  position: relative;
+  z-index: 10;
+}
+
+.pd-modal-header-space {
+  flex: 1;
+}
+
+.pd-modal-icon-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #4a5568;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.pd-modal-icon-btn:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.pd-modal-icon-btn.close-btn {
+  border: 1.5px solid #cbd5e1;
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+}
+
+.pd-modal-icon-btn.close-btn:hover {
+  border-color: #94a3b8;
+}
+
+/* Step Wrapper Common */
+.pd-step-wrapper {
+  padding: 8px 32px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.pd-step-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0e6b77;
+  margin: 0 0 20px 0;
+  letter-spacing: -0.2px;
+}
+
+/* Sound Toggle Top Left */
+.pd-sound-toggle-row {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: -10px;
+  margin-bottom: 8px;
+}
+
+.pd-sound-toggle-btn {
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  color: #0e6b77;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.pd-sound-toggle-btn:hover {
+  background: #e2e8f0;
+}
+
+/* Primary Button */
+.pd-primary-btn {
+  background-color: #0d707f;
+  color: #ffffff;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 42px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(13, 112, 127, 0.3);
+  transition: all 0.2s ease;
+  min-width: 170px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pd-primary-btn:hover {
+  background-color: #09525e;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(13, 112, 127, 0.4);
+}
+
+.pd-secondary-btn {
+  background-color: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 30px;
+  padding: 10px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.pd-secondary-btn:hover {
+  background-color: #e2e8f0;
+  color: #0f172a;
+}
+
+/* STEP 1: Voice Instructions */
+.pd-speaker-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 24px 0 36px 0;
+}
+
+.pd-speaker-circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #e0f2fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  animation: pdPulse 2s infinite ease-in-out;
+}
+
+@keyframes pdPulse {
+  0% { box-shadow: 0 0 0 0 rgba(14, 107, 119, 0.2); }
+  70% { box-shadow: 0 0 0 16px rgba(14, 107, 119, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(14, 107, 119, 0); }
+}
+
+.pd-speaker-icon {
+  font-size: 42px;
+  color: #0e6b77;
+}
+
+.pd-speaker-subtitle {
+  font-size: 18px;
+  font-weight: 500;
+  color: #1e293b;
+  max-width: 320px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.pd-terms-note {
+  margin-top: 28px;
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.pd-terms-note span {
+  text-decoration: underline;
+  cursor: pointer;
+  color: #0e6b77;
+  font-weight: 500;
+}
+
+/* STEP 2: Before We Start */
+.pd-illustration-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.pd-card-head-graphic {
+  width: 120px;
+  height: 120px;
+  border: 3px solid #334155;
+  border-radius: 50% 50% 45% 45%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f8fafc;
+  margin-bottom: 20px;
+  padding-top: 14px;
+}
+
+.pd-forehead-card {
+  width: 68px;
+  height: 38px;
+  background: #ffffff;
+  border: 2px solid #0e6b77;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 6px;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.pd-card-stripe {
+  width: 85%;
+  height: 6px;
+  background: #0e6b77;
+  border-radius: 1px;
+}
+
+.pd-eyes-dots {
+  display: flex;
+  gap: 26px;
+  margin-top: 14px;
+}
+
+.pd-eyes-dots .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #334155;
+  display: inline-block;
+}
+
+.pd-instruction-main {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 6px 0;
+}
+
+.pd-instruction-sub {
+  font-size: 15px;
+  color: #64748b;
+  margin: 0;
+}
+
+.pd-tip-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: #475569;
+  font-style: italic;
+  margin-bottom: 28px;
+  padding: 8px 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.pd-tip-icon {
+  color: #eab308;
+  font-size: 16px;
+}
+
+/* STEP 3: Demo Media */
+.pd-demo-media-container {
+  width: 100%;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  margin-bottom: 24px;
+  background: #000;
+}
+
+.pd-demo-image {
+  width: 100%;
+  height: 290px;
+  object-fit: cover;
+  display: block;
+}
+
+.pd-card-highlight-guide {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.pd-guide-card-overlay {
+  border: 2px dashed #38bdf8;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: rgba(14, 165, 233, 0.25);
+  backdrop-filter: blur(2px);
+}
+
+.pd-guide-card-overlay span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.pd-media-overlay-banner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.5) 70%, transparent 100%);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 24px 20px 14px 20px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* STEP 4: Camera Scanner */
+.pd-scan-guide-text {
+  font-size: 14px;
+  color: #64748b;
+  margin: -10px 0 16px 0;
+}
+
+.pd-camera-viewport {
+  width: 100%;
+  height: 280px;
+  background: #0f172a;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+  margin-bottom: 20px;
+}
+
+.pd-live-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* Mirror view */
+}
+
+.pd-camera-fallback {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.pd-fallback-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.9);
+}
+
+.pd-cam-warning-banner {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  background: rgba(239, 68, 68, 0.9);
+  color: #ffffff;
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* Augmented Overlay */
+.pd-scan-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pd-scan-card-box {
+  position: absolute;
+  top: 22%;
+  width: 150px;
+  height: 60px;
+  border: 2px dashed #00f2fe;
+  border-radius: 6px;
+  background: rgba(0, 242, 254, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pd-card-text {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #00f2fe;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.pd-scan-eyes-box {
+  position: absolute;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.pd-pupil-target {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #22c55e;
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.6);
+}
+
+.pd-pupil-target .crosshair-x {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  right: 2px;
+  height: 1.5px;
+  background: #22c55e;
+  transform: translateY(-50%);
+}
+
+.pd-pupil-target .crosshair-y {
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  bottom: 2px;
+  width: 1.5px;
+  background: #22c55e;
+  transform: translateX(-50%);
+}
+
+.pd-pupil-distance-line {
+  position: relative;
+  width: 90px;
+  height: 2px;
+  background: #22c55e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pd-pupil-distance-line span {
+  background: rgba(15, 23, 42, 0.85);
+  color: #4ade80;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  border: 1px solid #22c55e;
+}
+
+.pd-laser-scanner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #00f2fe, #38bdf8, transparent);
+  box-shadow: 0 0 15px #00f2fe;
+  animation: pdLaserMove 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes pdLaserMove {
+  0% { top: 15%; opacity: 0.8; }
+  100% { top: 80%; opacity: 0.9; }
+}
+
+/* Progress Bar */
+.pd-scanning-status {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.pd-progress-track {
+  width: 100%;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.pd-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0e6b77, #14b8a6);
+  transition: width 0.25s linear;
+}
+
+.pd-status-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0e6b77;
+}
+
+/* Result Card */
+.pd-result-card {
+  width: 100%;
+  background: #ecfdf5;
+  border: 1.5px solid #a7f3d0;
+  border-radius: 12px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.pd-success-icon {
+  font-size: 30px;
+  color: #059669;
+}
+
+.pd-result-details {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.pd-result-label {
+  font-size: 12px;
+  color: #047857;
+  font-weight: 500;
+}
+
+.pd-result-val-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.pd-result-number {
+  font-size: 26px;
+  font-weight: 700;
+  color: #065f46;
+}
+
+.pd-result-unit {
+  font-size: 14px;
+  color: #047857;
+  font-weight: 600;
+}
+
+.pd-adjuster {
+  display: flex;
+  gap: 6px;
+}
+
+.pd-adj-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #10b981;
+  background: #ffffff;
+  color: #065f46;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.pd-adj-btn:hover {
+  background: #d1fae5;
+}
+
+.pd-scan-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  width: 100%;
+}

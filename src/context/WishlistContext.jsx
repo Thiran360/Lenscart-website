@@ -10,7 +10,13 @@ export function useWishlist() {
 }
 
 export function WishlistProvider({ children }) {
-  const [wishlist, setWishlist] = useState([]);
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("local_wishlist") || "[]");
+    } catch {
+      return [];
+    }
+  });
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -36,19 +42,22 @@ export function WishlistProvider({ children }) {
     return {
       id: numId,
       name: rawItem.product_name || rawItem.name || (rawItem.product && rawItem.product.name) || `Eyewear #${numId}`,
-      price: rawItem.price || (rawItem.product && rawItem.product.price) || 1500,
-      image: rawItem.image || rawItem.product_image || (rawItem.product && rawItem.product.image) || '/sunglass1.png',
+      price: rawItem.price || (rawItem.product && rawItem.product.price) || 1200,
+      image: rawItem.image || rawItem.product_image || (rawItem.product && rawItem.product.image) || '/eyeglass1.png',
       rating: rawItem.rating || 4.8,
       category: 'Classic',
       colors: ['black']
     };
   }, []);
 
-  // Fetch wishlist directly from GET /wishlist/ API
+  // Fetch wishlist from GET /wishlist/ API and sync with local storage
   const fetchWishlist = useCallback(async () => {
-    const token = localStorage.getItem('user_token');
-    if (!token) {
-      setWishlist([]);
+    const token = localStorage.getItem('user_token') || localStorage.getItem('userToken');
+    const localSaved = JSON.parse(localStorage.getItem("local_wishlist") || "[]");
+
+    // If no valid backend token, use local wishlist directly
+    if (!token || token.startsWith("demo_token_") || token === "null" || token === "undefined") {
+      setWishlist(localSaved);
       return;
     }
 
@@ -59,21 +68,28 @@ export function WishlistProvider({ children }) {
 
       if (Array.isArray(response)) {
         rawList = response;
-      } else if (Array.isArray(response?.results)) {
-        rawList = response.results;
-      } else if (Array.isArray(response?.data?.results)) {
-        rawList = response.data.results;
       } else if (Array.isArray(response?.data)) {
         rawList = response.data;
+      } else if (Array.isArray(response?.results)) {
+        rawList = response.results;
       } else if (Array.isArray(response?.wishlist)) {
         rawList = response.wishlist;
       }
 
-      const resolved = rawList.map(resolveProduct).filter(Boolean);
-      setWishlist(resolved);
+      if (rawList && rawList.length > 0) {
+        const resolved = rawList.map(resolveProduct).filter(Boolean);
+        const map = new Map();
+        localSaved.forEach(item => map.set(Number(item.id), item));
+        resolved.forEach(item => map.set(Number(item.id), item));
+        const combined = Array.from(map.values());
+        setWishlist(combined);
+        localStorage.setItem("local_wishlist", JSON.stringify(combined));
+      } else {
+        setWishlist(localSaved);
+      }
     } catch (err) {
-      console.warn('[Wishlist API Warning]: Could not fetch wishlist from API:', err.message);
-      setWishlist([]);
+      console.warn('[Wishlist API Notice]: Using local wishlist:', err.message);
+      setWishlist(localSaved);
     } finally {
       setLoading(false);
     }
@@ -84,56 +100,47 @@ export function WishlistProvider({ children }) {
     fetchWishlist();
   }, [fetchWishlist]);
 
-  // Toggle wishlist (Make POST /wishlist/ API call, then re-fetch directly from GET /wishlist/)
+  // Toggle wishlist (Optimistic update + backend sync)
   const toggleWishlist = async (product) => {
     if (!product || !product.id) return;
 
-    const token = localStorage.getItem('user_token');
-    if (!token) {
-      toast.warning("Please login to save items to your wishlist");
-      return;
-    }
-
     const isWishlisted = wishlist.some(item => Number(item.id) === Number(product.id));
+    let nextList = [];
 
     if (isWishlisted) {
-      try {
-        await removeWishlistApi(product.id);
-        toast.info(`"${product.name || 'Item'}" removed from Wishlist`);
-      } catch (err) {
-        console.warn('[Wishlist Remove Error]:', err.message);
-        toast.error("Failed to remove item from wishlist");
-      }
-    } else {
-      try {
-        await addWishlistApi(product.id);
-        toast.success(`"${product.name || 'Item'}" added to Wishlist!`);
-      } catch (err) {
-        console.warn('[Wishlist Add Error]:', err.message);
-        toast.error("Failed to add item to wishlist");
-      }
-    }
+      nextList = wishlist.filter(item => Number(item.id) !== Number(product.id));
+      setWishlist(nextList);
+      localStorage.setItem("local_wishlist", JSON.stringify(nextList));
+      toast.info(`"${product.name || 'Item'}" removed from Wishlist`);
 
-    // Always re-fetch directly from the GET API to display server state
-    await fetchWishlist();
+      removeWishlistApi(product.id).catch(err => {
+        console.warn("[Wishlist Sync Notice]:", err.message);
+      });
+    } else {
+      nextList = [...wishlist, product];
+      setWishlist(nextList);
+      localStorage.setItem("local_wishlist", JSON.stringify(nextList));
+      toast.success(`"${product.name || 'Item'}" added to Wishlist!`);
+
+      addWishlistApi(product.id).catch(err => {
+        console.warn("[Wishlist Sync Notice]:", err.message);
+      });
+    }
   };
 
-  // Remove explicitly from wishlist (Call API, then re-fetch from GET API)
+  // Remove explicitly from wishlist
   const removeFromWishlist = async (productId) => {
     const item = wishlist.find(p => Number(p.id) === Number(productId));
-    
-    try {
-      await removeWishlistApi(productId);
-      toast.info(`"${item?.name || 'Item'}" removed from Wishlist`);
-    } catch (err) {
-      console.warn('[Wishlist Remove Error]:', err.message);
-      toast.error("Failed to remove item from wishlist");
-    }
+    const nextList = wishlist.filter(p => Number(p.id) !== Number(productId));
+    setWishlist(nextList);
+    localStorage.setItem("local_wishlist", JSON.stringify(nextList));
+    toast.info(`"${item?.name || 'Item'}" removed from Wishlist`);
 
-    // Re-fetch directly from GET API
-    await fetchWishlist();
+    removeWishlistApi(productId).catch(err => {
+      console.warn("[Wishlist Sync Notice]:", err.message);
+    });
   };
-  
+
   const isInWishlist = (productId) => {
     return wishlist.some(item => Number(item.id) === Number(productId));
   };

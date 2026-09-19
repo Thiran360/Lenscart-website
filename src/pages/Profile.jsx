@@ -49,6 +49,24 @@ function Profile() {
 
   // Fetch live user profile data from GET /profile/ API directly
   const fetchUserProfile = async () => {
+    const token = localStorage.getItem("user_token") || localStorage.getItem("userToken");
+    if (!token) return;
+
+    const userType = localStorage.getItem("user_type");
+    if (userType === "admin") {
+      const local = JSON.parse(localStorage.getItem("user")) || {};
+      setSavedUser({
+        name: local.name || "madhu",
+        email: local.email || "admin@lensmaker.com",
+        phone: local.phone || "9659039379",
+        user_type: "admin"
+      });
+      setEditName(local.name || "madhu");
+      setEditEmail(local.email || "admin@lensmaker.com");
+      setLoadingProfile(false);
+      return;
+    }
+
     try {
       setLoadingProfile(true);
       const response = await getProfileApi();
@@ -93,11 +111,11 @@ function Profile() {
       await logoutUser();
       setShowLogoutConfirm(false);
       toast.info("Logged out successfully");
-      navigate("/login");
+      navigate("/login", { replace: true });
     } catch (err) {
       console.error("Logout error:", err);
       setShowLogoutConfirm(false);
-      navigate("/login");
+      navigate("/login", { replace: true });
     } finally {
       setIsLoggingOut(false);
     }

@@ -16,7 +16,6 @@ export const productsData = [
     image: "/sunglass1.png",
     description: "Classic UV-protected urban wayfarer sunglasses with sleek polarized finish.",
     colors: ["black", "red", "pink", "gold"],
-    lensPower: ["-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   {
     id: 40,
@@ -34,7 +33,6 @@ export const productsData = [
     image: "/sunglass2.png",
     description: "Premium metallic gold teardrop aviators with gradient brown lenses.",
     colors: ["gold", "black", "grey", "brown"],
-    lensPower: ["-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "0.00", "+1.00", "+1.50", "+2.00", "+2.50", "+3.00"]
   },
   {
     id: 41,
@@ -52,7 +50,6 @@ export const productsData = [
     image: "/sunglass3.png",
     description: "Chic winged cat-eye sunglasses with anti-scratch coating.",
     colors: ["brown", "gold", "green", "black"],
-    lensPower: ["-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00"]
   },
   {
     id: 42,
@@ -70,7 +67,6 @@ export const productsData = [
     image: "/sunglass4.png",
     description: "Timeless vintage circular frames with UV400 dark tint.",
     colors: ["blue", "pink", "silver", "black"],
-    lensPower: ["-4.00", "-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "0.00", "+1.00", "+1.50", "+2.00", "+2.50"]
   },
   {
     id: 44,
@@ -88,7 +84,6 @@ export const productsData = [
     image: "/sunglass6.png",
     description: "Sophisticated oval curves with high-grade acetate frame.",
     colors: ["black", "gold", "pink", "brown"],
-    lensPower: ["-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50", "+2.00", "+2.50"]
   },
   {
     id: 45,
@@ -106,7 +101,6 @@ export const productsData = [
     image: "/sunglass7.png",
     description: "Structured square profile with glare-reducing polarized lenses.",
     colors: ["red", "black", "green", "pink"],
-    lensPower: ["-3.50", "-3.00", "-2.50", "-2.00", "-1.50", "-1.00", "0.00", "+1.00", "+1.50", "+2.00", "+3.00"]
   },
   {
     id: 4,
@@ -124,7 +118,6 @@ export const productsData = [
     image: "/sunglass8.png",
     description: "Everyday matte black wayfarer shades with UV protection.",
     colors: ["black", "blue", "brown"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 5,
@@ -142,7 +135,6 @@ export const productsData = [
     image: "/sunglass9.png",
     description: "Ultra-flexible lightweight sports sunglasses with rubber grip temples.",
     colors: ["black", "grey", "blue"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 6,
@@ -160,7 +152,6 @@ export const productsData = [
     image: "/sunglass10.png",
     description: "Iconic military style gold aviators with green G-15 lenses.",
     colors: ["gold", "black", "silver"],
-    lensPower: ["-3.00", "-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 7,
@@ -178,7 +169,6 @@ export const productsData = [
     image: "/sunglass11.png",
     description: "Glamorous rose-gold tinted cat eye frames.",
     colors: ["pink", "gold", "black"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 17,
@@ -196,7 +186,6 @@ export const productsData = [
     image: "/sunglass12.png",
     description: "Minimalist circular dark sunshades with silver rim.",
     colors: ["silver", "black", "gold"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 18,
@@ -214,7 +203,6 @@ export const productsData = [
     image: "/sunglass13.png",
     description: "High impact aerodynamic wrap sunglasses designed for speed and cycling.",
     colors: ["black", "red", "blue"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 19,
@@ -232,7 +220,6 @@ export const productsData = [
     image: "/sunglass14.png",
     description: "Bold oversized celebrity square sunglasses with gradient UV lenses.",
     colors: ["black", "brown", "gold"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 46,
@@ -250,7 +237,6 @@ export const productsData = [
     image: "/sun_aviator.png",
     description: "Classic double-bridge pilot sunglasses with lightweight steel frame.",
     colors: ["black", "gold", "silver"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 47,
@@ -268,7 +254,6 @@ export const productsData = [
     image: "/sun_cateye.png",
     description: "Luxury Italian style cat eye sun specs with premium finish.",
     colors: ["black", "pink", "brown"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 48,
@@ -286,7 +271,6 @@ export const productsData = [
     image: "/sun_round.png",
     description: "Bohemian round sunglasses with dark UV-shield lenses.",
     colors: ["gold", "black", "brown"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 49,
@@ -304,7 +288,6 @@ export const productsData = [
     image: "/sun_square.png",
     description: "Stealth matte black square frame with high-definition polarized lenses.",
     colors: ["black", "grey", "blue"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 50,
@@ -322,7 +305,6 @@ export const productsData = [
     image: "/sun_wayfarer.png",
     description: "Tortoise-tone wayfarer sun frame with warm brown gradient.",
     colors: ["brown", "black", "gold"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
 
   // --- EYEGLASSES (18 Items) ---
@@ -330,7 +312,8 @@ export const productsData = [
     id: 1,
     brand: "Mr.LensMaker",
     name: "Classic Rectangle Pro",
-    category: "Classic",
+    category: "₹1200 Store",
+    store: "1200",
     type: "eyeglasses",
     gender: "Unisex",
     shape: "Rectangle",
@@ -342,7 +325,6 @@ export const productsData = [
     image: "/eyeglass1.png",
     description: "Signature lightweight rectangle optical frames with spring hinges.",
     colors: ["black", "blue", "brown", "gold"],
-    lensPower: ["-4.00", "-3.00", "-2.00", "-1.00", "0.00", "+1.00", "+2.00", "+3.00"]
   },
   {
     id: 2,
@@ -360,7 +342,6 @@ export const productsData = [
     image: "/eyeglass2.png",
     description: "Minimalist transparent TR90 circular frames with blue-cut coating.",
     colors: ["transparent", "black", "pink", "gold"],
-    lensPower: ["-3.00", "-2.00", "-1.00", "0.00", "+1.00", "+2.00", "+3.00"]
   },
   {
     id: 3,
@@ -378,7 +359,6 @@ export const productsData = [
     image: "/eyeglass_21.png",
     description: "Featherlight rimless titanium spectacles for executive comfort.",
     colors: ["silver", "gold", "black"],
-    lensPower: ["-3.00", "-2.00", "-1.00", "0.00", "+1.00", "+2.00", "+3.00"]
   },
   {
     id: 8,
@@ -396,7 +376,6 @@ export const productsData = [
     image: "/eyeglass4.png",
     description: "Graceful oval profile crafted from aerospace-grade ultra-thin titanium.",
     colors: ["gold", "rose gold", "silver", "black"],
-    lensPower: ["-3.00", "-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 11,
@@ -414,7 +393,6 @@ export const productsData = [
     image: "/eyeglass5.png",
     description: "Classic aviator spectacle frames with double brow bar styling.",
     colors: ["gold", "black", "silver"],
-    lensPower: ["-4.00", "-2.00", "0.00", "+2.00", "+4.00"]
   },
   {
     id: 12,
@@ -432,7 +410,6 @@ export const productsData = [
     image: "/eyeglass6.png",
     description: "Weighing only 12 grams, this ultra-flexible frame guarantees all-day comfort.",
     colors: ["black", "blue", "grey", "brown"],
-    lensPower: ["-3.00", "-2.00", "-1.00", "0.00", "+1.00", "+2.00", "+3.00"]
   },
   {
     id: 13,
@@ -450,7 +427,6 @@ export const productsData = [
     image: "/eyeglass7.png",
     description: "Vintage style slim round metal wireframe spectacles.",
     colors: ["black", "gold", "silver"],
-    lensPower: ["-2.50", "-1.50", "0.00", "+1.50", "+2.50"]
   },
   {
     id: 14,
@@ -468,7 +444,6 @@ export const productsData = [
     image: "/bold_square.png",
     description: "Heavy-gauge acetate bold square frame with rich hand-polished shine.",
     colors: ["black", "brown", "grey"],
-    lensPower: ["-3.00", "-2.00", "-1.00", "0.00", "+1.00", "+2.00", "+3.00"]
   },
   {
     id: 15,
@@ -486,7 +461,6 @@ export const productsData = [
     image: "/half_rim.png",
     description: "Sleek half-rim optical frame for crisp vision and intelligent looks.",
     colors: ["black", "silver", "gold"],
-    lensPower: ["-3.00", "-2.00", "-1.00", "0.00", "+1.00", "+2.00", "+3.00"]
   },
   {
     id: 16,
@@ -504,7 +478,6 @@ export const productsData = [
     image: "/clear_wayfarer.png",
     description: "Modern crystal-clear wayfarer frames with embedded wire core.",
     colors: ["transparent", "black", "brown"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 24,
@@ -522,7 +495,6 @@ export const productsData = [
     image: "/eye_glass.png",
     description: "Rich navy blue rectangular specs with adjustable nose pads.",
     colors: ["blue", "black", "brown"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 25,
@@ -540,7 +512,6 @@ export const productsData = [
     image: "/black_rectangle.png",
     description: "Deep obsidian matte black rectangular eyeglass frame.",
     colors: ["black", "grey", "silver"],
-    lensPower: ["-3.00", "-2.00", "-1.00", "0.00", "+1.00", "+2.00", "+3.00"]
   },
   {
     id: 26,
@@ -558,7 +529,6 @@ export const productsData = [
     image: "/clear_square.png",
     description: "Contemporary transparent square glasses suitable for all prescriptions.",
     colors: ["transparent", "black", "blue"],
-    lensPower: ["-2.50", "-1.50", "0.00", "+1.50", "+2.50"]
   },
   {
     id: 27,
@@ -576,7 +546,6 @@ export const productsData = [
     image: "/golden_aviator.png",
     description: "Shining gold wire aviator optical frames with clear demo lenses.",
     colors: ["gold", "silver", "black"],
-    lensPower: ["-3.00", "-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 28,
@@ -594,7 +563,6 @@ export const productsData = [
     image: "/metal_oval.png",
     description: "Delicate feminine oval eyeglass frame in rose gold metal.",
     colors: ["gold", "silver", "pink", "black"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 29,
@@ -612,7 +580,6 @@ export const productsData = [
     image: "/mini_round.png",
     description: "Compact round retro spectacles with comfortable temple tips.",
     colors: ["black", "gold", "brown"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 30,
@@ -630,7 +597,6 @@ export const productsData = [
     image: "/round_tortoise.png",
     description: "Handcrafted Havana tortoiseshell circular frames with Italian hinges.",
     colors: ["brown", "gold", "black"],
-    lensPower: ["-3.00", "-2.00", "-1.00", "0.00", "+1.00", "+2.00", "+3.00"]
   },
   {
     id: 31,
@@ -648,7 +614,6 @@ export const productsData = [
     image: "/ultralight_feather.png",
     description: "Micro-thin rimmed rectangle spectacles engineered for zero nose fatigue.",
     colors: ["black", "silver", "blue"],
-    lensPower: ["-3.00", "-2.00", "-1.00", "0.00", "+1.00", "+2.00", "+3.00"]
   },
 
   // --- KIDS GLASSES (18 Items) ---
@@ -668,7 +633,6 @@ export const productsData = [
     image: "/kids1.png",
     description: "Durable and flexible rectangle glasses for kids. Perfect for school and screen time.",
     colors: ["blue", "red", "black"],
-    lensPower: ["-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00"]
   },
   {
     id: 902,
@@ -686,7 +650,6 @@ export const productsData = [
     image: "/kids2.png",
     description: "Super cute round glasses for your little ones. Unbreakable TR90 material.",
     colors: ["red", "blue", "transparent"],
-    lensPower: ["-2.50", "-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00", "+1.50"]
   },
   {
     id: 903,
@@ -704,7 +667,6 @@ export const productsData = [
     image: "/kids3.png",
     description: "Colorful square glasses that are bendable and drop-resistant.",
     colors: ["yellow", "green", "pink", "blue"],
-    lensPower: ["-2.00", "-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00"]
   },
   {
     id: 904,
@@ -722,7 +684,6 @@ export const productsData = [
     image: "/kids4.png",
     description: "Sporty 100% UV-protected aviators for active outdoor kids.",
     colors: ["black", "silver", "blue"],
-    lensPower: ["-1.50", "-1.00", "-0.50", "0.00", "+0.50", "+1.00"]
   },
   {
     id: 905,
@@ -740,7 +701,6 @@ export const productsData = [
     image: "/kids5.png",
     description: "Chic cat eye frames for stylish little girls with soft silicone nose bridge.",
     colors: ["pink", "purple", "white"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 906,
@@ -758,7 +718,6 @@ export const productsData = [
     image: "/kids6.png",
     description: "Shockproof flexible wayfarer frames for young explorers.",
     colors: ["blue", "black", "red"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 907,
@@ -776,7 +735,6 @@ export const productsData = [
     image: "/kids1.png",
     description: "Lightweight vibrant circular spectacle frame with anti-glare lenses.",
     colors: ["red", "blue", "pink"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 908,
@@ -794,7 +752,6 @@ export const productsData = [
     image: "/kids2.png",
     description: "With an elastic head strap, these glasses stay secure during football and running.",
     colors: ["blue", "black", "yellow"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 909,
@@ -812,7 +769,6 @@ export const productsData = [
     image: "/kids3.png",
     description: "Fun pastel shades with 100% UV400 polarized eye protection.",
     colors: ["pink", "yellow", "transparent"],
-    lensPower: ["-1.00", "0.00", "+1.00"]
   },
   {
     id: 910,
@@ -830,7 +786,6 @@ export const productsData = [
     image: "/kids4.png",
     description: "Classroom-ready oval frames designed for sharp vision and study comfort.",
     colors: ["black", "blue", "brown"],
-    lensPower: ["-2.50", "-1.50", "0.00", "+1.50", "+2.50"]
   },
   {
     id: 911,
@@ -848,7 +803,6 @@ export const productsData = [
     image: "/kids5.png",
     description: "Bright neon accents on shatterproof kid-safe sunglasses.",
     colors: ["green", "blue", "black"],
-    lensPower: ["-1.00", "0.00", "+1.00"]
   },
   {
     id: 912,
@@ -866,7 +820,6 @@ export const productsData = [
     image: "/kids6.png",
     description: "Adorable winged frame with glitter temples and blue-light filter.",
     colors: ["pink", "purple", "gold"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 913,
@@ -884,7 +837,6 @@ export const productsData = [
     image: "/kids1.png",
     description: "Modern styling for kids aged 8-12 with lightweight flexible hinges.",
     colors: ["black", "grey", "blue"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 914,
@@ -902,7 +854,6 @@ export const productsData = [
     image: "/kids2.png",
     description: "Mirror coated ocean blue aviator lenses for bright sunny holidays.",
     colors: ["blue", "silver", "black"],
-    lensPower: ["-1.00", "0.00", "+1.00"]
   },
   {
     id: 915,
@@ -920,7 +871,6 @@ export const productsData = [
     image: "/kids3.png",
     description: "Ultra-cool clear crystal round frame loved by young teens.",
     colors: ["transparent", "pink", "blue"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 916,
@@ -938,7 +888,6 @@ export const productsData = [
     image: "/kids4.png",
     description: "Ergonomic curved temples that hug young ears gently without slipping.",
     colors: ["red", "black", "blue"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 917,
@@ -956,7 +905,6 @@ export const productsData = [
     image: "/kids5.png",
     description: "Multi-colored rim with anti-scratch protective coating.",
     colors: ["pink", "yellow", "purple"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
   },
   {
     id: 918,
@@ -974,6 +922,223 @@ export const productsData = [
     image: "/kids6.png",
     description: "Special blue ray blocking lenses tailored for computer and tablet use.",
     colors: ["black", "blue", "green"],
-    lensPower: ["-2.00", "-1.00", "0.00", "+1.00", "+2.00"]
+  },
+
+  // --- ₹1200 STORE DEDICATED COLLECTION (Flat ₹1200) ---
+  {
+    id: 1201,
+    brand: "Mr.LensMaker",
+    name: "Store 1200 Signature Rectangle",
+    category: "₹1200 Store",
+    store: "1200",
+    type: "eyeglasses",
+    gender: "Unisex",
+    shape: "Rectangle",
+    size: "M",
+    rating: 4.9,
+    price: 1200,
+    oldPrice: 1800,
+    discount: 33,
+    image: "/classic_rectangle.png",
+    description: "Essential precision rectangle optical frames designed exclusively for the ₹1200 Store collection.",
+    colors: ["black", "silver", "blue"],
+  },
+  {
+    id: 1202,
+    brand: "Mr.LensMaker",
+    name: "Store 1200 Tortoise Round Lens",
+    category: "₹1200 Store",
+    store: "1200",
+    type: "eyeglasses",
+    gender: "Unisex",
+    shape: "Round",
+    size: "M",
+    rating: 4.8,
+    price: 1200,
+    oldPrice: 1800,
+    discount: 33,
+    image: "/round_tortoise.png",
+    description: "Vintage handcrafted tortoise-shell circular optical frame with blue-light coating.",
+    colors: ["brown", "black", "gold"],
+  },
+  {
+    id: 1203,
+    brand: "Mr.LensMaker",
+    name: "Store 1200 Matte Black Classic",
+    category: "₹1200 Store",
+    store: "1200",
+    type: "eyeglasses",
+    gender: "Men",
+    shape: "Rectangle",
+    size: "L",
+    rating: 4.9,
+    price: 1200,
+    oldPrice: 1800,
+    discount: 33,
+    image: "/black_rectangle.png",
+    description: "Ultra-matte featherweight polymer frame with ergonomic nose bridge for all-day comfort.",
+    colors: ["black", "grey", "transparent"],
+  },
+  {
+    id: 1204,
+    brand: "Mr.LensMaker",
+    name: "Store 1200 Bold Square Blue-Cut",
+    category: "₹1200 Store",
+    store: "1200",
+    type: "eyeglasses",
+    gender: "Women",
+    shape: "Square",
+    size: "M",
+    rating: 4.8,
+    price: 1200,
+    oldPrice: 1800,
+    discount: 33,
+    image: "/bold_square.png",
+    description: "Contemporary oversized square frame fitted with zero-glare anti-reflective lenses.",
+    colors: ["black", "pink", "brown"],
+  },
+  {
+    id: 1205,
+    brand: "Mr.LensMaker",
+    name: "Store 1200 Clear Wayfarer Optical",
+    category: "₹1200 Store",
+    store: "1200",
+    type: "eyeglasses",
+    gender: "Unisex",
+    shape: "Wayfarer",
+    size: "M",
+    rating: 4.9,
+    price: 1200,
+    oldPrice: 1800,
+    discount: 33,
+    image: "/clear_wayfarer.png",
+    description: "Trendy crystal-clear acetate wayfarer specs with durable reinforced metal hinges.",
+    colors: ["transparent", "black", "blue"],
+  },
+  {
+    id: 1206,
+    brand: "Mr.LensMaker",
+    name: "Store 1200 Metallic Oval Specs",
+    category: "₹1200 Store",
+    store: "1200",
+    type: "eyeglasses",
+    gender: "Women",
+    shape: "Oval",
+    size: "S",
+    rating: 4.7,
+    price: 1200,
+    oldPrice: 1800,
+    discount: 33,
+    image: "/metal_oval.png",
+    description: "Sleek electroplated metallic oval eyewear with soft hypoallergenic silicone nose pads.",
+    colors: ["gold", "silver", "black"],
+  },
+  {
+    id: 1207,
+    brand: "Mr.LensMaker",
+    name: "Store 1200 Half-Rim Executive",
+    category: "₹1200 Store",
+    store: "1200",
+    type: "eyeglasses",
+    gender: "Men",
+    shape: "Rectangle",
+    size: "M",
+    rating: 4.8,
+    price: 1200,
+    oldPrice: 1800,
+    discount: 33,
+    image: "/eyeglass3.png",
+    description: "Professional semi-rimless optical frame tailored for corporate elegance and daily clarity.",
+    colors: ["black", "silver", "gunmetal"],
+  },
+  {
+    id: 1208,
+    brand: "Mr.LensMaker",
+    name: "Store 1200 Minimalist Air Frame",
+    category: "₹1200 Store",
+    store: "1200",
+    type: "eyeglasses",
+    gender: "Unisex",
+    shape: "Round",
+    size: "M",
+    rating: 4.9,
+    price: 1200,
+    oldPrice: 1800,
+    discount: 33,
+    image: "/eyeglass4.png",
+    description: "Ultralight aerodynamic flexible frame that weighs less than 15 grams for extreme comfort.",
+    colors: ["black", "transparent", "gold"],
+  },
+  {
+    id: 1209,
+    brand: "Mr.LensMaker",
+    name: "Store 1200 Urban Polarized Sun",
+    category: "₹1200 Store",
+    store: "1200",
+    type: "sunglasses",
+    gender: "Unisex",
+    shape: "Wayfarer",
+    size: "M",
+    rating: 4.8,
+    price: 1200,
+    oldPrice: 1800,
+    discount: 33,
+    image: "/sunglass1.png",
+    description: "UV400 full ultraviolet block sunglasses in classic wayfarer silhouette from the ₹1200 Store.",
+    colors: ["black", "brown", "blue"],
+  },
+  {
+    id: 1210,
+    brand: "Mr.LensMaker",
+    name: "Store 1200 Retro Round Sunshades",
+    category: "₹1200 Store",
+    store: "1200",
+    type: "sunglasses",
+    gender: "Unisex",
+    shape: "Round",
+    size: "M",
+    rating: 4.8,
+    price: 1200,
+    oldPrice: 1800,
+    discount: 33,
+    image: "/sun_round.png",
+    description: "Signature round polarized sunglasses engineered for driving, outdoor travel, and styling.",
+    colors: ["black", "gold", "green"],
+  },
+  {
+    id: 1211,
+    brand: "Mr.LensMaker",
+    name: "Store 1200 Cat-Eye Glam Shades",
+    category: "₹1200 Store",
+    store: "1200",
+    type: "sunglasses",
+    gender: "Women",
+    shape: "Cat Eye",
+    size: "S",
+    rating: 4.9,
+    price: 1200,
+    oldPrice: 1800,
+    discount: 33,
+    image: "/floral_cateye.png",
+    description: "Fashion-forward cat-eye sun frame offering high UV protection with shatter-resistant lenses.",
+    colors: ["black", "brown", "red"],
+  },
+  {
+    id: 1212,
+    brand: "Mr.LensMaker",
+    name: "Store 1200 Titanium Rimless Pro",
+    category: "₹1200 Store",
+    store: "1200",
+    type: "eyeglasses",
+    gender: "Men",
+    shape: "Rectangle",
+    size: "M",
+    rating: 4.9,
+    price: 1200,
+    oldPrice: 1800,
+    discount: 33,
+    image: "/rimless_elegance.png",
+    description: "Featherlight rimless rectangular optical frame with flexible memory temples.",
+    colors: ["silver", "black", "gold"],
   }
 ];
