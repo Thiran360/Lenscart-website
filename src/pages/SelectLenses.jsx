@@ -560,51 +560,7 @@ function SelectLenses() {
                             </div>
                           )}
 
-                          <div className="pd-compact-dual-row">
-                            <label className="pd-compact-checkbox-label">
-                              <input 
-                                type="checkbox" 
-                                checked={hasDualPd} 
-                                onChange={(e) => setHasDualPd(e.target.checked)} 
-                              />
-                              <span>I have 2 PD numbers</span>
-                            </label>
-                          </div>
 
-                          {hasDualPd && (
-                            <div className="pd-compact-dual-grid">
-                              <div className="pd-compact-dual-item">
-                                <label>Right (OD)</label>
-                                <select 
-                                  value={rightPd} 
-                                  onChange={(e) => {
-                                    setRightPd(e.target.value);
-                                    if (leftPd) setPdValue(`${e.target.value}/${leftPd}`);
-                                    else setPdValue(e.target.value);
-                                  }}
-                                  className="pd-compact-select-sm"
-                                >
-                                  <option value="">Right PD</option>
-                                  {DUAL_PD_OPTIONS.map(val => <option key={val} value={val}>{val}</option>)}
-                                </select>
-                              </div>
-                              <div className="pd-compact-dual-item">
-                                <label>Left (OS)</label>
-                                <select 
-                                  value={leftPd} 
-                                  onChange={(e) => {
-                                    setLeftPd(e.target.value);
-                                    if (rightPd) setPdValue(`${rightPd}/${e.target.value}`);
-                                    else setPdValue(e.target.value);
-                                  }}
-                                  className="pd-compact-select-sm"
-                                >
-                                  <option value="">Left PD</option>
-                                  {DUAL_PD_OPTIONS.map(val => <option key={val} value={val}>{val}</option>)}
-                                </select>
-                              </div>
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>

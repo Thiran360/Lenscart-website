@@ -576,7 +576,7 @@ function ProductDetails() {
               >
                 <FaBoxOpen className="pd-trust-icon" />
                 <div>
-                  <div className="pd-trust-text-title">14-Day Free Returns</div>
+                  <div className="pd-trust-text-title">14 Days Free Returns</div>
                   <div className="pd-trust-text-sub">100% Money Back</div>
                 </div>
               </div>
@@ -587,7 +587,7 @@ function ProductDetails() {
               >
                 <FaExchangeAlt className="pd-trust-icon" />
                 <div>
-                  <div className="pd-trust-text-title">14-Day Free Exchange</div>
+                  <div className="pd-trust-text-title">14 Days Free Exchange</div>
                   <div className="pd-trust-text-sub">Hassle-Free Swap</div>
                 </div>
               </div>

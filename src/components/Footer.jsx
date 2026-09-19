@@ -90,7 +90,7 @@ function Footer() {
               <li><Link to="/track-order">Track My Order</Link></li>
               <li><Link to="/profile?tab=address">Saved Delivery Addresses</Link></li>
               <li><Link to="/profile?tab=prescriptions">My Prescriptions</Link></li>
-              <li><Link to="/about">14-Day Free Returns</Link></li>
+              <li><Link to="/about">14 Days Free Returns</Link></li>
               <li><Link to="/about">1-Year Warranty Information</Link></li>
               <li><Link to="/try-at-home">Try At Home Service</Link></li>
               <li><Link to="/stores">Find Optical Stores</Link></li>
