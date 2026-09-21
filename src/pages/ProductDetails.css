@@ -220,13 +220,8 @@
   transform: translateY(-50%) scale(1.08);
 }
 
-.pd-nav-arrow.left {
-  left: 16px;
-}
-
-.pd-nav-arrow.right {
-  right: 16px;
-}
+.pd-nav-arrow.left { left: 16px; }
+.pd-nav-arrow.right { right: 16px; }
 
 /* Main Frame Image */
 .pd-main-frame-img {
@@ -264,6 +259,11 @@
   transform: translateX(-50%) translateY(-2px);
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.35), 0 0 20px rgba(56, 189, 248, 0.7);
   border-color: #7dd3fc;
+}
+
+/* Mobile Slide Dots (Hidden on Desktop) */
+.pd-mobile-dots {
+  display: none;
 }
 
 /* ================= RIGHT INFO COLUMN ================= */
@@ -522,8 +522,7 @@
 }
 
 .pd-swatch-ring.active {
-  border-color: #d97706;
-  /* Luxury Amber Outline */
+  border-color: #d97706; /* Luxury Amber Outline */
   box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.25);
 }
 
@@ -675,14 +674,12 @@
   .pd-cta-row-three {
     gap: 6px;
   }
-
   .pd-btn-cta {
     font-size: 11px;
     padding: 0 4px;
     height: 44px;
     gap: 4px;
   }
-
   .pd-free-returns-badge {
     font-size: 12.5px;
     padding: 6px 10px;
@@ -838,8 +835,7 @@
   min-width: 0;
 }
 
-.pd-trust-item:hover,
-.pd-trust-item.active {
+.pd-trust-item:hover, .pd-trust-item.active {
   background: var(--pd-primary-light);
   border-color: var(--pd-primary);
 }
@@ -954,48 +950,240 @@
 @media (max-width: 1024px) {
   .pd-grid-layout {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 28px;
   }
 
   .pd-showcase-column {
     position: static;
-    flex-direction: column-reverse;
+    flex-direction: column;
+    gap: 16px;
   }
 
   .pd-thumbnails-strip {
     flex-direction: row;
     width: 100%;
+    justify-content: center;
     overflow-x: auto;
-    padding-bottom: 8px;
+    padding: 4px 0 8px 0;
+    gap: 10px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .pd-thumbnails-strip::-webkit-scrollbar {
+    display: none;
   }
 
   .pd-studio-card {
-    min-height: 400px;
+    min-height: 380px;
+    touch-action: pan-y;
+  }
+
+  .pd-mobile-dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    position: absolute;
+    bottom: 58px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+  }
+
+  .pd-mobile-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(148, 163, 184, 0.5);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .pd-mobile-dot.active {
+    width: 22px;
+    background: var(--pd-primary);
+    border-radius: 10px;
   }
 }
 
 @media (max-width: 640px) {
   .pd-page-container {
-    padding: 16px 12px 40px 12px;
+    padding: 12px 12px 40px 12px;
+  }
+
+  .pd-breadcrumbs {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+
+  .pd-showcase-column {
+    gap: 12px;
   }
 
   .pd-studio-card {
-    min-height: 320px;
+    min-height: 280px;
+    height: 310px;
+    border-radius: 18px;
+  }
+
+  .pd-studio-badge {
+    top: 10px;
+    left: 10px;
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+
+  .pd-wishlist-float-btn {
+    top: 10px;
+    right: 10px;
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
+
+  .pd-nav-arrow {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+
+  .pd-nav-arrow.left { left: 8px; }
+  .pd-nav-arrow.right { right: 8px; }
+
+  .pd-main-frame-img {
+    max-width: 85%;
+    max-height: 170px;
+  }
+
+  .pd-tryon-pill-btn {
+    bottom: 10px;
+    padding: 7px 16px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .pd-mobile-dots {
+    bottom: 48px;
+  }
+
+  .pd-thumb-btn {
+    width: 60px;
+    height: 60px;
+    padding: 4px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .pd-thumb-label {
+    font-size: 9px;
   }
 
   .pd-product-title {
-    font-size: 24px;
+    font-size: 20px;
+    line-height: 1.3;
   }
 
   .pd-price-current {
-    font-size: 28px;
+    font-size: 24px;
   }
 
   .pd-btn-secondary-row {
     grid-template-columns: 1fr;
   }
 
+  /* Trust & Assurance Cards Grid on Mobile: Perfectly aligned in 1 line */
   .pd-trust-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 16px;
+    width: 100%;
+  }
+
+  .pd-trust-item {
+    padding: 8px 4px;
+    gap: 4px;
+    border-radius: 10px;
+    min-width: 0;
+  }
+
+  .pd-trust-icon {
+    font-size: 16px;
+  }
+
+  .pd-trust-text-title {
+    font-size: 10px;
+    line-height: 1.2;
+    font-weight: 700;
+    word-break: break-word;
+  }
+
+  .pd-trust-text-sub {
+    font-size: 8.5px;
+    line-height: 1.1;
+  }
+
+  .pd-pincode-input-row {
+    gap: 6px;
+  }
+
+  .pd-pincode-input {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .pd-pincode-btn {
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+
+  .pd-cta-row-secondary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .pd-cta-row-secondary .pd-btn-cta {
+    padding: 12px 8px;
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 380px) {
+  .pd-page-container {
+    padding: 10px 8px 36px 8px;
+  }
+
+  .pd-studio-card {
+    height: 270px;
+    min-height: 250px;
+  }
+
+  .pd-trust-grid {
+    gap: 4px;
+  }
+
+  .pd-trust-item {
+    padding: 6px 2px;
+  }
+
+  .pd-trust-icon {
+    font-size: 14px;
+  }
+
+  .pd-trust-text-title {
+    font-size: 9px;
+  }
+
+  .pd-trust-text-sub {
+    font-size: 8px;
+  }
+
+  .pd-cta-row-secondary .pd-btn-cta {
+    font-size: 11.5px;
+    padding: 10px 6px;
   }
 }

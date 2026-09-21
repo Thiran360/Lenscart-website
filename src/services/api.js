@@ -175,9 +175,11 @@ export const apiRequest = async (endpoint, method = "GET", body = null, customHe
     }
   }
 
+  const { timeout, ...safeCustomHeaders } = customHeaders;
+
   const headers = {
     "ngrok-skip-browser-warning": "true",
-    ...customHeaders,
+    ...safeCustomHeaders,
   };
 
   // Only set Content-Type to application/json if there is a non-FormData request body

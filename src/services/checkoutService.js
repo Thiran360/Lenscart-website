@@ -142,10 +142,12 @@ export const placeOrderApi = async ({
 
   if (backendItems.length > 0) {
     try {
+      const formattedAddress = `${payload.shipping_address.street_address}, ${payload.shipping_address.city}, ${payload.shipping_address.state} - ${payload.shipping_address.pincode}`.trim();
       const backendRes = await apiRequest("/order/create/", "POST", {
         items: backendItems,
         total_amount: totalAmount,
-        shipping_address: `${payload.shipping_address.street_address}, ${payload.shipping_address.city}, ${payload.shipping_address.state} - ${payload.shipping_address.pincode}`,
+        address: formattedAddress,
+        shipping_address: formattedAddress,
         payment_method: paymentMethod || "card",
       }, { timeout: 2500 });
 
