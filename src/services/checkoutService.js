@@ -120,21 +120,32 @@ export const placeOrderApi = async ({
 
   console.log("[Checkout] Sending payload to /checkout/:", JSON.stringify(payload, null, 2));
 
-  // 1. Proactively save shipping address in background without blocking checkout
+  // 1. Save shipping address to backend to obtain the address ID
+  let addressId = address?.id || address?.address_id || null;
+
   if (payload.shipping_address.street_address && payload.shipping_address.city) {
-    apiRequest("/address/save/", "POST", {
-      full_name: payload.shipping_address.full_name,
-      phone: payload.shipping_address.phone,
-      street_address: payload.shipping_address.street_address,
-      city: payload.shipping_address.city,
-      state: payload.shipping_address.state,
-      pincode: payload.shipping_address.pincode,
-    }, { timeout: 2000 }).catch((addrErr) => {
+    try {
+      const addrRes = await apiRequest("/address/save/", "POST", {
+        full_name: payload.shipping_address.full_name,
+        phone: payload.shipping_address.phone,
+        street_address: payload.shipping_address.street_address,
+        city: payload.shipping_address.city,
+        state: payload.shipping_address.state,
+        pincode: payload.shipping_address.pincode,
+      }, { timeout: 3000 });
+
+      const returnedId = addrRes?.id || addrRes?.data?.id || addrRes?.address_id || addrRes?.data?.address_id;
+      if (returnedId && !isNaN(Number(returnedId))) {
+        addressId = Number(returnedId);
+      }
+    } catch (addrErr) {
       console.warn("[Checkout] Address save background note:", addrErr.message);
-    });
+    }
   }
 
-  // 2. Proactively sync order to Django Order storage (/order/create/) only for products that exist in Django DB
+  const finalAddressId = (addressId && !isNaN(Number(addressId))) ? Number(addressId) : 1;
+
+  // 2. Sync order to Django Order storage (/order/create/) only for products that exist in Django DB
   const generatedId = `LK${Math.floor(10000000 + Math.random() * 90000000)}`;
   const backendItems = items
     .filter((item) => isBackendProduct(item.id || item.product_id))
@@ -146,10 +157,10 @@ export const placeOrderApi = async ({
       const backendRes = await apiRequest("/order/create/", "POST", {
         items: backendItems,
         total_amount: totalAmount,
-        address: formattedAddress,
+        address: finalAddressId,
         shipping_address: formattedAddress,
         payment_method: paymentMethod || "card",
-      }, { timeout: 2500 });
+      }, { timeout: 3000 });
 
       const backendId = backendRes?.order_id || backendRes?.id || backendRes?.data?.id || backendRes?.data?.order_id;
       if (backendId) {
