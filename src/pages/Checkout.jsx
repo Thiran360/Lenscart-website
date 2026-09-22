@@ -27,7 +27,7 @@ function Checkout() {
   const checkoutItems = buyNowProduct ? [buyNowProduct] : cartItems;
   
   // Check if current order items qualify for Buy 1 Get 1 Shop (isBogo, applicable_for_buy_one_get_one, or price >= 2500)
-  const isBogoEligibleOrder = checkoutItems.length > 0 && checkoutItems.every(item => 
+  const isBogoEligibleOrder = checkoutItems.some(item => 
     item.isBogo === true || 
     item.applicable_for_buy_one_get_one === true || 
     String(item.category || "").toLowerCase().includes("buy 1 get 1") ||
