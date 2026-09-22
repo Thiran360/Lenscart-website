@@ -396,7 +396,7 @@
 
 .form-grid-modern {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 20px;
 }
 
@@ -416,6 +416,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .input-prefix-icon {
@@ -1073,6 +1074,9 @@
   .dashboard-container {
     padding: 0 12px;
     margin: 18px auto 40px;
+  }
+  .profile-card-section {
+    padding: 20px 16px;
   }
   .sidebar-nav {
     grid-template-columns: 1fr;

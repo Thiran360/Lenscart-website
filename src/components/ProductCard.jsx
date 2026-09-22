@@ -194,15 +194,19 @@ function ProductCard({ product, is3DMode, onTryOn }) {
               background: '#0d6b6d', 
               color: '#fff', 
               border: 'none', 
-              padding: '12px 15px', 
+              padding: '10px 8px', 
               borderRadius: '8px', 
               fontWeight: '900', 
-              fontSize: '13px', 
+              fontSize: '12px', 
               cursor: 'pointer',
               transition: 'all 0.2s ease',
               flex: 1,
               letterSpacing: '0.5px',
-              boxShadow: '0 4px 10px rgba(13, 107, 109, 0.2)'
+              boxShadow: '0 4px 10px rgba(13, 107, 109, 0.2)',
+              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }} onClick={(e) => { 
               e.preventDefault(); 
               navigate(`/select-lenses/${p.id}`, { state: { product: p, selectedColor, quantity: 1 } });

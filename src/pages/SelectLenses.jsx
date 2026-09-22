@@ -123,8 +123,8 @@ function SelectLenses() {
   if (!product) return null;
 
   const lensTypes = [
-    { id: "single", title: "Single Vision", desc: "For distance or near vision", price: 0 },
     { id: "zero", title: "Zero Power", desc: "For computer & smartphone protection", price: 0 },
+    { id: "single", title: "Single Vision", desc: "For distance or near vision", price: 0 },
     { id: "bifocal", title: "Bifocal / Progressive", desc: "For both distance & near vision", price: 500 },
   ];
 
@@ -170,8 +170,7 @@ function SelectLenses() {
   const handleNext = () => {
     if (step === 1 && lensType) setStep(2);
     else if (step === 2 && lensPackage) {
-      if (lensType !== "zero") setStep(3);
-      else submitSelection();
+      setStep(3);
     }
     else if (step === 3 && rxMethod) {
       submitSelection();
@@ -217,6 +216,7 @@ function SelectLenses() {
 
     const finalProduct = {
       ...product,
+      framePrice: product.price,
       price: calculateTotal(),
       lensDetails: {
         type: selectedType,
@@ -453,7 +453,7 @@ function SelectLenses() {
 
                 {rxMethod === 'manual' && (
                   <div className="rx-manual-form">
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: 20 }}>
+                    <div className="name-birth-grid" style={{ marginBottom: 20 }}>
                       <div className="rx-eye-section" style={{ margin: 0 }}>
                         <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, color: '#333' }}>Name</label>
                         <input 
@@ -586,7 +586,7 @@ function SelectLenses() {
                   (step === 3 && rxMethod === 'saved' && !selectedSavedRx)
                 }
               >
-                {step === 3 || (step === 2 && lensType === "zero") ? (action === "buy" ? "Proceed to Checkout" : "Add to Cart") : "Continue to Next Step"}
+                {step === 3 ? (action === "buy" ? "Proceed to Checkout" : "Add to Cart") : "Continue to Next Step"}
               </button>
             </div>
           </div>

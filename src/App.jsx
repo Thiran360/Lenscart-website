@@ -22,6 +22,8 @@ const Analytics = lazy(() => import("./pages/Analytics"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Wishlist = lazy(() => import("./pages/Wishlist"));
 const TrackOrder = lazy(() => import("./pages/TrackOrder"));
+const ReturnPolicy = lazy(() => import("./pages/ReturnPolicy"));
+const PolicyInfo = lazy(() => import("./pages/PolicyInfo"));
 
 const RouteLoader = () => (
   <div style={{
@@ -108,6 +110,8 @@ function App() {
             <Route path="/select-lenses/:id" element={<SelectLenses />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/return-policy" element={<ReturnPolicy />} />
+            <Route path="/policy-info/:type" element={<PolicyInfo />} />
             <Route path="/order-confirmed" element={<OrderConfirmed />} />
             <Route path="/track-order" element={<TrackOrder />} />
             <Route path="/about" element={<About />} />

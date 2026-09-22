@@ -91,6 +91,18 @@ function ProductDetails() {
   const [selectedAssurances, setSelectedAssurances] = useState(['return', 'exchange', 'warranty']);
   const [includeCareKit, setIncludeCareKit] = useState(true);
 
+  // Check if product is sunglasses (care kit only applies to eyeglasses / specs, NOT sunglasses)
+  const isSunglasses = Boolean(
+    product && (
+      String(product.type || "").toLowerCase().includes("sunglass") ||
+      String(product.category || "").toLowerCase().includes("sunglass") ||
+      String(product.name || "").toLowerCase().includes("sunglass") ||
+      String(product.name || "").toLowerCase().includes("shades") ||
+      product.isSunglasses === true ||
+      product.is_sunglasses === true
+    )
+  );
+
   // Determine if frame has nose pads (e.g. Aviators, metallic frames, or explicitly flagged)
   const hasNosePads = Boolean(
     product && (
@@ -198,6 +210,9 @@ function ProductDetails() {
     );
   };
 
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
   const handleNextAngle = () => {
     const currentIndex = angles.findIndex(a => a.id === selectedAngle.id);
     const nextIndex = (currentIndex + 1) % angles.length;
@@ -208,6 +223,26 @@ function ProductDetails() {
     const currentIndex = angles.findIndex(a => a.id === selectedAngle.id);
     const prevIndex = (currentIndex - 1 + angles.length) % angles.length;
     setSelectedAngle(angles[prevIndex]);
+  };
+
+  const handleTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const minSwipeDistance = 35;
+    if (distance > minSwipeDistance) {
+      handleNextAngle();
+    } else if (distance < -minSwipeDistance) {
+      handlePrevAngle();
+    }
   };
 
   const handleCheckPincode = () => {
@@ -228,31 +263,36 @@ function ProductDetails() {
 
   const handleSelectLenses = () => {
     if (!product) return;
+    const effectiveCareKit = !isSunglasses && includeCareKit;
     navigate(`/select-lenses/${product.id}`, { 
       state: { 
         product: {
           ...product,
-          selectedSize: selectedSize
+          selectedSize: selectedSize,
+          includeCareKit: effectiveCareKit
         }, 
-        selectedColor 
+        selectedColor,
+        includeCareKit: effectiveCareKit
       } 
     });
   };
 
   const handleAddToCart = () => {
     if (!product) return;
-    addToCart({ ...product, selectedColor, selectedSize }, 1);
-    toast.success(`Added "${product.name}" to cart!`);
+    const effectiveCareKit = !isSunglasses && includeCareKit;
+    addToCart({ ...product, selectedColor, selectedSize, includeCareKit: effectiveCareKit }, 1);
+    toast.success(`Added "${product.name}" to cart!${effectiveCareKit ? ' (Includes Free Frame Care Kit)' : ''}`);
   };
 
   const handleBuyNow = () => {
     if (!product) return;
+    const effectiveCareKit = !isSunglasses && includeCareKit;
     const buyNowItem = {
       ...product,
       selectedSize,
       selectedColor,
       quantity: 1,
-      includeCareKit: hasNosePads ? includeCareKit : false
+      includeCareKit: effectiveCareKit
     };
     navigate("/checkout", { state: { buyNowProduct: buyNowItem } });
   };
@@ -358,7 +398,12 @@ function ProductDetails() {
             </div>
 
             {/* Main Interactive Studio Card */}
-            <div className="pd-studio-card">
+            <div 
+              className="pd-studio-card"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
               
               {/* Studio 360 Badge */}
               <div className="pd-studio-badge">
@@ -375,10 +420,10 @@ function ProductDetails() {
               </button>
 
               {/* Carousel Arrows */}
-              <button className="pd-nav-arrow left" onClick={handlePrevAngle} title="Previous Angle">
+              <button className="pd-nav-arrow left" onClick={handlePrevAngle} title="Previous Angle" aria-label="Previous image">
                 <FaChevronLeft />
               </button>
-              <button className="pd-nav-arrow right" onClick={handleNextAngle} title="Next Angle">
+              <button className="pd-nav-arrow right" onClick={handleNextAngle} title="Next Angle" aria-label="Next image">
                 <FaChevronRight />
               </button>
 
@@ -392,6 +437,19 @@ function ProductDetails() {
                   transform: selectedAngle.transform 
                 }} 
               />
+
+              {/* Mobile Slide Indicator Dots */}
+              <div className="pd-mobile-dots">
+                {angles.map((angle) => (
+                  <button
+                    key={angle.id}
+                    className={`pd-mobile-dot ${selectedAngle.id === angle.id ? 'active' : ''}`}
+                    onClick={() => setSelectedAngle(angle)}
+                    title={angle.label}
+                    aria-label={angle.label}
+                  />
+                ))}
+              </div>
 
               {/* Floating 3D Virtual Try-On Pill */}
               <button className="pd-tryon-pill-btn" onClick={() => setIsTryOnOpen(true)}>
@@ -516,23 +574,56 @@ function ProductDetails() {
 
             {/* CTAs Action Block */}
             <div className="pd-cta-block">
-              {/* 14 Days Free Returns Badge */}
-              <div className="pd-free-returns-badge">
-                <FaUndo className="pd-returns-icon" />
-                <span>14 Days Free Returns</span>
+              {/* Badges Row: 14 Days Free Returns & Frame Care Kit Checkbox */}
+              <div className="pd-badges-row">
+                <div className="pd-free-returns-badge">
+                  <FaUndo className="pd-returns-icon" />
+                  <span>4 Days Free Returns</span>
+                </div>
+
+                {!isSunglasses && (
+                  <label className="pd-carekit-checkbox-badge" title="Check to include a free frame care kit with your order">
+                    <input
+                      type="checkbox"
+                      checked={includeCareKit}
+                      onChange={(e) => setIncludeCareKit(e.target.checked)}
+                      className="pd-carekit-input"
+                    />
+                    <FaBoxOpen className="pd-carekit-icon" />
+                    <span className="pd-carekit-text">
+                      Frame Care Kit <span className="pd-carekit-free-tag">FREE</span>
+                    </span>
+                  </label>
+                )}
               </div>
 
-              {/* Primary Full-Width Select Lenses Button */}
-              <button className="pd-btn-cta pd-btn-select-lenses-full" onClick={handleSelectLenses}>
-                Select Lenses <FaArrowRight style={{ fontSize: '13px' }} />
-              </button>
-
-              {/* Under that: Add Yours and Live 3D Try-On in same row */}
-              <div className="pd-cta-row-secondary">
-                <button className="pd-btn-cta pd-btn-get-yours" onClick={handleAddToCart}>
-                  <FaShoppingCart style={{ color: '#0d6b6d' }} /> Add Yours
+              {/* Primary Action Buttons Row */}
+              <div className="pd-cta-row-primary" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' }}>
+                <button 
+                  className="pd-btn-cta pd-btn-select-lenses-full" 
+                  style={{ marginBottom: 0 }} 
+                  onClick={handleSelectLenses}
+                >
+                  Select Lenses
                 </button>
-                <button className="pd-btn-cta pd-btn-live-tryon" onClick={() => setIsTryOnOpen(true)}>
+                <button 
+                  className="pd-btn-cta pd-btn-select-without-lenses" 
+                  style={{ marginBottom: 0 }} 
+                  onClick={() => {
+                    handleAddToCart();
+                    navigate("/cart");
+                  }}
+                >
+                  Select without Lenses
+                </button>
+              </div>
+
+              {/* Secondary Actions: Add to Cart and Live 3D Try-On */}
+              <div className="pd-cta-row-secondary" style={{ display: 'flex', gap: '10px' }}>
+                <button className="pd-btn-cta pd-btn-get-yours" style={{ flex: 1 }} onClick={handleAddToCart}>
+                  <FaShoppingCart style={{ color: '#0d6b6d' }} /> Add to Cart
+                </button>
+                <button className="pd-btn-cta pd-btn-live-tryon" style={{ flex: 1 }} onClick={() => setIsTryOnOpen(true)}>
                   <FaCamera style={{ color: '#0d6b6d' }} /> Live 3D Try-On
                 </button>
               </div>
@@ -541,12 +632,12 @@ function ProductDetails() {
             {/* Delivery Pincode Checker */}
             <div className="pd-delivery-card">
               <div className="pd-delivery-header">
-                <FaTruck style={{ color: '#0d6b6d', fontSize: '18px' }} /> Check Delivery & Serviceability
+                <FaTruck style={{ color: '#0d6b6d', fontSize: '18px' }} /> Serviceability
               </div>
               <div className="pd-pincode-input-row">
                 <input 
                   type="text" 
-                  placeholder="Enter 6-digit Pincode (e.g. 600001)" 
+                  placeholder="Enter 6-digit Pincode" 
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value.replace(/\D/g, ""))}
                   maxLength={6}
@@ -572,18 +663,18 @@ function ProductDetails() {
             <div className="pd-trust-grid">
               <div 
                 className={`pd-trust-item ${selectedAssurances.includes('return') ? 'active' : ''}`}
-                onClick={() => toggleAssurance('return')}
+                onClick={() => navigate('/policy-info/return')}
               >
                 <FaBoxOpen className="pd-trust-icon" />
                 <div>
-                  <div className="pd-trust-text-title">14 Days Free Returns</div>
+                  <div className="pd-trust-text-title">4 Days Free Returns</div>
                   <div className="pd-trust-text-sub">100% Money Back</div>
                 </div>
               </div>
 
               <div 
                 className={`pd-trust-item ${selectedAssurances.includes('exchange') ? 'active' : ''}`}
-                onClick={() => toggleAssurance('exchange')}
+                onClick={() => navigate('/policy-info/exchange')}
               >
                 <FaExchangeAlt className="pd-trust-icon" />
                 <div>
@@ -594,7 +685,7 @@ function ProductDetails() {
 
               <div 
                 className={`pd-trust-item ${selectedAssurances.includes('warranty') ? 'active' : ''}`}
-                onClick={() => toggleAssurance('warranty')}
+                onClick={() => navigate('/policy-info/warranty')}
               >
                 <FaShieldAlt className="pd-trust-icon" />
                 <div>
@@ -604,30 +695,7 @@ function ProductDetails() {
               </div>
             </div>
 
-            {/* Free Frame Care Kit Checkbox (Only for frames with nose pads) */}
-            {hasNosePads && (
-              <div className="pd-care-kit-card">
-                <label className="pd-care-kit-label">
-                  <input 
-                    type="checkbox" 
-                    checked={includeCareKit} 
-                    onChange={(e) => setIncludeCareKit(e.target.checked)}
-                    className="pd-care-kit-checkbox"
-                  />
-                  <div className="pd-care-kit-content">
-                    <div className="pd-care-kit-header">
-                      <span className="pd-care-kit-name">Check Free Frame Care Kit</span>
-                      <span className="pd-care-kit-tag">FREE</span>
-                    </div>
-                  </div>
-                </label>
-              </div>
-            )}
 
-            {/* Buy Now Button */}
-            <button className="pd-btn-buy-now" onClick={handleBuyNow}>
-              Buy Now <FaArrowRight style={{ fontSize: '13px' }} />
-            </button>
 
           </div>
         </div>

@@ -199,6 +199,12 @@
   border: 1px solid #eee;
 }
 
+.name-birth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
 .rx-eye-section {
   margin-bottom: 25px;
 }
@@ -558,16 +564,19 @@
     padding: 20px 15px;
   }
   .step-indicator {
-    flex-wrap: nowrap;
-    gap: 5px;
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
     margin-bottom: 20px;
-    overflow-x: auto;
-    padding-bottom: 5px;
   }
   .step-pill {
-    padding: 6px 10px;
-    font-size: 11px;
+    flex: 1;
+    text-align: center;
+    padding: 6px 4px;
+    font-size: 10px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .step-content h2 {
     font-size: 16px;
@@ -614,6 +623,45 @@
   
   .rx-manual-form {
     padding: 15px;
+  }
+
+  .pd-compact-row {
+    gap: 10px;
+  }
+  .pd-compact-label {
+    min-width: 70px;
+  }
+  .pd-compact-title {
+    font-size: 16px;
+  }
+  .pd-compact-subtitle {
+    font-size: 12px;
+  }
+  .pd-compact-dropdown {
+    width: 100%;
+    max-width: 200px;
+    height: 40px;
+  }
+  .pd-compact-select {
+    padding: 0 30px 0 10px;
+    font-size: 14px;
+  }
+  .pd-compact-input-row {
+    gap: 10px;
+  }
+  
+  .rx-method-tabs {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .rx-tab {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .name-birth-grid {
+    grid-template-columns: 1fr;
   }
 }
 

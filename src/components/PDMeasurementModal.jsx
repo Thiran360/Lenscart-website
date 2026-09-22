@@ -131,6 +131,11 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
         videoRef.current.play().catch(() => {});
       }
       playVoiceInstructions("Hold your card straight against your forehead and look directly into the camera.");
+      
+      // Automatically start scan after 2 seconds
+      setTimeout(() => {
+        handleStartScan();
+      }, 2000);
     }
   };
 
@@ -160,8 +165,7 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
         scanTimerRef.current = null;
         setIsScanning(false);
         setScanComplete(true);
-        // Realistic calculated PD between 62 and 65mm
-        const calculated = 62 + Math.floor(Math.random() * 3);
+        const calculated = 63;
         setMeasuredPD(calculated);
         playVoiceInstructions(`Scan complete. Your measured pupillary distance is ${calculated} millimeters.`);
       }
@@ -274,10 +278,14 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
             </div>
 
             <div className="pd-demo-media-container">
-              <img 
-                src="/pd_card_demo.jpg" 
-                alt="Pupillary Distance Card Placement Demonstration" 
+              <video 
+                src="/demo_video.mp4" 
                 className="pd-demo-image"
+                autoPlay
+                muted
+                loop
+                playsInline
+                style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
               />
               <div className="pd-card-highlight-guide">
                 <div className="pd-guide-card-overlay">
@@ -314,7 +322,6 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
                 />
               ) : (
                 <div className="pd-camera-fallback">
-                  <img src="/pd_card_demo.jpg" alt="PD Scan Preview" className="pd-fallback-img" />
                   <div className="pd-cam-warning-banner">
                     {cameraError || "Camera starting or waiting for browser permission..."}
                   </div>
@@ -413,10 +420,10 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
               {!scanComplete ? (
                 <button 
                   className="pd-primary-btn scan-btn"
-                  onClick={handleStartScan}
-                  disabled={isScanning}
+                  disabled={true}
+                  style={{ opacity: 0.7 }}
                 >
-                  <FaCamera /> {isScanning ? "Scanning..." : "Scan My PD Now"}
+                  <FaCamera /> {isScanning ? "Scanning..." : "Initializing Auto-Scan..."}
                 </button>
               ) : (
                 <>

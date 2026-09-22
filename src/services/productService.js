@@ -593,7 +593,7 @@ export const getBuyOneGetOneApi = async (params = {}) => {
   const offset = (page - 1) * limit;
   const queryString = `?page=${page}&limit=${limit}&page_size=${limit}&page_number=${page}&offset=${offset}`;
 
-  const allBogo = productsData.filter(p => p.isBogo || p.applicable_for_buy_one_get_one || (p.price && p.price <= 1500));
+  const allBogo = productsData.filter(p => Number(p.price) >= 2500);
   const fallbackTotalItems = allBogo.length;
   const fallbackTotalPages = Math.max(1, Math.ceil(fallbackTotalItems / limit));
   const fallbackSlice = allBogo.slice(offset, offset + limit);
@@ -631,11 +631,14 @@ export const getBuyOneGetOneApi = async (params = {}) => {
       list = response.data.data;
     }
 
-    const normalized = list.map((item, idx) => normalizeProduct({
-      ...item,
-      applicable_for_buy_one_get_one: true,
-      isBogo: true,
-    }, idx)).filter(Boolean);
+    const normalized = list
+      .map((item, idx) => normalizeProduct({
+        ...item,
+        applicable_for_buy_one_get_one: true,
+        isBogo: true,
+      }, idx))
+      .filter(Boolean)
+      .filter(p => Number(p.price) >= 2500);
 
     // Fallback if empty
     if (normalized.length === 0) {

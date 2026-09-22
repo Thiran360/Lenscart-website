@@ -438,12 +438,14 @@ function Navbar() {
                         <div className="dropdown-user-sub">Login to access your profile & orders</div>
                       </div>
                       <div className="profile-dropdown-divider"></div>
-                      <Link to="/login" className="profile-dropdown-action-btn primary" onClick={() => navigate("/login")}>
-                        Login
-                      </Link>
-                      <Link to="/register" className="profile-dropdown-action-btn secondary" onClick={() => navigate("/register")}>
-                        Register / Sign Up
-                      </Link>
+                      <div className="profile-dropdown-actions">
+                        <Link to="/login" className="profile-dropdown-action-btn primary" onClick={() => navigate("/login")}>
+                          Login
+                        </Link>
+                        <Link to="/register" className="profile-dropdown-action-btn secondary" onClick={() => navigate("/register")}>
+                          Register / Sign Up
+                        </Link>
+                      </div>
                     </>
                   )}
                 </div>

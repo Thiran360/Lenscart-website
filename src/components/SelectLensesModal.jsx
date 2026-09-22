@@ -62,8 +62,8 @@ function SelectLensesModal({ isOpen, onClose, onConfirm, basePrice }) {
   if (!isOpen) return null;
 
   const lensTypes = [
-    { id: "single", title: "Single Vision", desc: "For distance or near vision", price: 0 },
     { id: "zero", title: "Zero Power", desc: "For computer & smartphone protection", price: 0 },
+    { id: "single", title: "Single Vision", desc: "For distance or near vision", price: 0 },
     { id: "bifocal", title: "Bifocal / Progressive", desc: "For both distance & near vision", price: 500 },
   ];
 
