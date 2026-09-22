@@ -10,8 +10,9 @@
   max-width: 1200px;
   margin: 40px auto;
   gap: 40px;
-  padding: 0 20px;
+  padding: 0 16px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .lens-steps-area {
@@ -280,7 +281,8 @@
 
 .pd-compact-dropdown {
   position: relative;
-  width: 215px;
+  width: 100%;
+  max-width: 215px;
   height: 46px;
   background: #ffffff;
   border-radius: 6px;
@@ -538,6 +540,11 @@
 }
 
 @media (max-width: 600px) {
+  .lens-selection-container {
+    padding: 0 12px;
+    margin: 12px auto;
+    gap: 16px;
+  }
   .lens-summary-area {
     padding: 20px 15px;
   }
@@ -662,6 +669,26 @@
 
   .name-birth-grid {
     grid-template-columns: 1fr;
+  }
+
+  .pd-compact-row {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .pd-compact-label {
+    text-align: left;
+    min-width: unset;
+    padding-top: 0;
+  }
+
+  .pd-compact-controls {
+    width: 100%;
+  }
+
+  .pd-compact-dropdown {
+    max-width: 100%;
   }
 }
 
