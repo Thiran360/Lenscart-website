@@ -598,7 +598,7 @@ function ProductDetails() {
               </div>
 
               {/* Primary Action Buttons Row */}
-              <div className="pd-cta-row-primary" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' }}>
+              <div className="pd-cta-row-primary">
                 <button 
                   className="pd-btn-cta pd-btn-select-lenses-full" 
                   style={{ marginBottom: 0 }} 
@@ -619,11 +619,11 @@ function ProductDetails() {
               </div>
 
               {/* Secondary Actions: Add to Cart and Live 3D Try-On */}
-              <div className="pd-cta-row-secondary" style={{ display: 'flex', gap: '10px' }}>
-                <button className="pd-btn-cta pd-btn-get-yours" style={{ flex: 1 }} onClick={handleAddToCart}>
+              <div className="pd-cta-row-secondary">
+                <button className="pd-btn-cta pd-btn-get-yours" onClick={handleAddToCart}>
                   <FaShoppingCart style={{ color: '#0d6b6d' }} /> Add to Cart
                 </button>
-                <button className="pd-btn-cta pd-btn-live-tryon" style={{ flex: 1 }} onClick={() => setIsTryOnOpen(true)}>
+                <button className="pd-btn-cta pd-btn-live-tryon" onClick={() => setIsTryOnOpen(true)}>
                   <FaCamera style={{ color: '#0d6b6d' }} /> Live 3D Try-On
                 </button>
               </div>
