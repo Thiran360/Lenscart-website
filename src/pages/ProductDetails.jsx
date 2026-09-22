@@ -91,6 +91,18 @@ function ProductDetails() {
   const [selectedAssurances, setSelectedAssurances] = useState(['return', 'exchange', 'warranty']);
   const [includeCareKit, setIncludeCareKit] = useState(true);
 
+  // Check if product is sunglasses (care kit only applies to eyeglasses / specs, NOT sunglasses)
+  const isSunglasses = Boolean(
+    product && (
+      String(product.type || "").toLowerCase().includes("sunglass") ||
+      String(product.category || "").toLowerCase().includes("sunglass") ||
+      String(product.name || "").toLowerCase().includes("sunglass") ||
+      String(product.name || "").toLowerCase().includes("shades") ||
+      product.isSunglasses === true ||
+      product.is_sunglasses === true
+    )
+  );
+
   // Determine if frame has nose pads (e.g. Aviators, metallic frames, or explicitly flagged)
   const hasNosePads = Boolean(
     product && (
@@ -251,31 +263,36 @@ function ProductDetails() {
 
   const handleSelectLenses = () => {
     if (!product) return;
+    const effectiveCareKit = !isSunglasses && includeCareKit;
     navigate(`/select-lenses/${product.id}`, { 
       state: { 
         product: {
           ...product,
-          selectedSize: selectedSize
+          selectedSize: selectedSize,
+          includeCareKit: effectiveCareKit
         }, 
-        selectedColor 
+        selectedColor,
+        includeCareKit: effectiveCareKit
       } 
     });
   };
 
   const handleAddToCart = () => {
     if (!product) return;
-    addToCart({ ...product, selectedColor, selectedSize }, 1);
-    toast.success(`Added "${product.name}" to cart!`);
+    const effectiveCareKit = !isSunglasses && includeCareKit;
+    addToCart({ ...product, selectedColor, selectedSize, includeCareKit: effectiveCareKit }, 1);
+    toast.success(`Added "${product.name}" to cart!${effectiveCareKit ? ' (Includes Free Frame Care Kit)' : ''}`);
   };
 
   const handleBuyNow = () => {
     if (!product) return;
+    const effectiveCareKit = !isSunglasses && includeCareKit;
     const buyNowItem = {
       ...product,
       selectedSize,
       selectedColor,
       quantity: 1,
-      includeCareKit: hasNosePads ? includeCareKit : false
+      includeCareKit: effectiveCareKit
     };
     navigate("/checkout", { state: { buyNowProduct: buyNowItem } });
   };
@@ -557,10 +574,27 @@ function ProductDetails() {
 
             {/* CTAs Action Block */}
             <div className="pd-cta-block">
-              {/* 14 Days Free Returns Badge */}
-              <div className="pd-free-returns-badge">
-                <FaUndo className="pd-returns-icon" />
-                <span>14 Days Free Returns</span>
+              {/* Badges Row: 14 Days Free Returns & Frame Care Kit Checkbox */}
+              <div className="pd-badges-row">
+                <div className="pd-free-returns-badge">
+                  <FaUndo className="pd-returns-icon" />
+                  <span>14 Days Free Returns</span>
+                </div>
+
+                {!isSunglasses && (
+                  <label className="pd-carekit-checkbox-badge" title="Check to include a free frame care kit with your order">
+                    <input
+                      type="checkbox"
+                      checked={includeCareKit}
+                      onChange={(e) => setIncludeCareKit(e.target.checked)}
+                      className="pd-carekit-input"
+                    />
+                    <FaBoxOpen className="pd-carekit-icon" />
+                    <span className="pd-carekit-text">
+                      Frame Care Kit <span className="pd-carekit-free-tag">FREE</span>
+                    </span>
+                  </label>
+                )}
               </div>
 
               {/* Primary Full-Width Select Lenses Button */}

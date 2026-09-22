@@ -327,9 +327,10 @@ function Products() {
   // Base list: prioritize API data when available; seamlessly fallback to local catalog data if backend/ngrok is offline
   let baseProducts = [];
   if (isBogoShop) {
-    baseProducts = bogoApiProducts.length > 0 
-      ? bogoApiProducts 
-      : allProductsList.filter(p => p.price <= 1500 || p.isBogo || p.applicable_for_buy_one_get_one);
+    const bogoFilteredApi = bogoApiProducts.filter(p => Number(p.price) >= 2500);
+    baseProducts = bogoFilteredApi.length > 0 
+      ? bogoFilteredApi 
+      : allProductsList.filter(p => Number(p.price) >= 2500);
   } else if (filterType === "kids" || searchQuery === "kids") {
     baseProducts = categoryApiProducts.length > 0 
       ? categoryApiProducts 

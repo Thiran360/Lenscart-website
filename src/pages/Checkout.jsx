@@ -12,6 +12,7 @@ import { FaCreditCard, FaTag, FaCheckCircle } from "react-icons/fa";
 import "./Checkout.css";
 
 const AVAILABLE_COUPONS = [
+  { code: "BUY1GET1", discount: 50, type: "percent", label: "Buy 1 Get 1 Free", desc: "Buy 1 Get 1 Free Promo", isBogo: true },
   { code: "FIRST15", discount: 15, type: "percent", label: "Flat 15% OFF", desc: "15% off first order" },
   { code: "HDFC10", discount: 10, type: "percent", label: "Extra 10% OFF", desc: "10% instant discount" },
   { code: "UPI150", discount: 150, type: "flat", label: "₹150 Flat OFF", desc: "₹150 instant off" },
@@ -25,6 +26,18 @@ function Checkout() {
   const buyNowProduct = location.state?.buyNowProduct;
   const checkoutItems = buyNowProduct ? [buyNowProduct] : cartItems;
   
+  // Check if current order items qualify for Buy 1 Get 1 Shop (isBogo, applicable_for_buy_one_get_one, or price >= 2500)
+  const isBogoEligibleOrder = checkoutItems.some(item => 
+    item.isBogo === true || 
+    item.applicable_for_buy_one_get_one === true || 
+    String(item.category || "").toLowerCase().includes("buy 1 get 1") ||
+    String(item.category || "").toLowerCase().includes("bogo") ||
+    Number(item.price) >= 2500
+  );
+
+  // Available coupons filtered so BUY1GET1 only appears when ordering BOGO products
+  const displayCoupons = AVAILABLE_COUPONS.filter(c => !c.isBogo || isBogoEligibleOrder);
+
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState("");
@@ -51,15 +64,21 @@ function Checkout() {
     const cleanCode = couponInput.trim().toUpperCase();
     if (!cleanCode) return;
 
-    const matched = AVAILABLE_COUPONS.find(c => c.code === cleanCode);
+    const matched = AVAILABLE_COUPONS.find(c => c.code === cleanCode || (c.isBogo && (cleanCode === "BOGO" || cleanCode === "BOGOFREE")));
     if (matched) {
+      if (matched.isBogo && !isBogoEligibleOrder) {
+        const errMsg = `Coupon "${cleanCode}" is only valid for Buy 1 Get 1 Store products!`;
+        setCouponError(errMsg);
+        toast.error(errMsg);
+        return;
+      }
       setAppliedCoupon(matched);
       setCouponInput("");
       const saved = matched.type === "percent" ? Math.round((subTotal * matched.discount) / 100) : matched.discount;
-      toast.success(`Coupon "${matched.code}" applied! Saved ₹${saved}`);
+      toast.success(`Coupon "${matched.code}" applied! ${matched.isBogo ? '🎁 Buy 1 Get 1 Free ' : ''}Saved ₹${saved}`);
     } else {
-      setCouponError(`Invalid coupon "${cleanCode}". Try FIRST15, HDFC10, or UPI150.`);
-      toast.error(`Invalid coupon "${cleanCode}". Try FIRST15, HDFC10, or UPI150.`);
+      setCouponError(`Invalid coupon "${cleanCode}". Try ${isBogoEligibleOrder ? 'BUY1GET1, ' : ''}FIRST15, HDFC10, or UPI150.`);
+      toast.error(`Invalid coupon "${cleanCode}". Try ${isBogoEligibleOrder ? 'BUY1GET1, ' : ''}FIRST15, HDFC10, or UPI150.`);
     }
   };
 
@@ -72,6 +91,12 @@ function Checkout() {
   };
 
   const handleSelectCoupon = (c) => {
+    if (c.isBogo && !isBogoEligibleOrder) {
+      const errMsg = `Coupon "${c.code}" is only valid for Buy 1 Get 1 Store products!`;
+      setCouponError(errMsg);
+      toast.error(errMsg);
+      return;
+    }
     setAppliedCoupon(c);
     setCouponError("");
     const saved = c.type === "percent" ? Math.round((subTotal * c.discount) / 100) : c.discount;
@@ -729,14 +754,14 @@ function Checkout() {
                   <div className="available-coupons-wrapper">
                     <span className="available-title">Available Offers:</span>
                     <div className="available-chips">
-                      {AVAILABLE_COUPONS.map((c) => (
+                      {displayCoupons.map((c) => (
                         <button
                           key={c.code}
                           type="button"
-                          className="available-chip"
+                          className={`available-chip ${c.isBogo ? 'bogo-chip' : ''}`}
                           onClick={() => handleSelectCoupon(c)}
                         >
-                          <span className="chip-code">{c.code}</span>
+                          <span className="chip-code">{c.isBogo ? '🎁 ' : ''}{c.code}</span>
                           <span className="chip-desc">{c.label}</span>
                         </button>
                       ))}

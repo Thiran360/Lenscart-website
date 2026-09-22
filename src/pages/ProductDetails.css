@@ -560,6 +560,14 @@
   margin-bottom: 28px;
 }
 
+/* Badges Row */
+.pd-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 /* 14 Days Free Returns Badge */
 .pd-free-returns-badge {
   display: inline-flex;
@@ -580,6 +588,60 @@
 .pd-free-returns-badge .pd-returns-icon {
   color: #0d6b6d;
   font-size: 14px;
+}
+
+/* Frame Care Kit Checkbox Badge */
+.pd-carekit-checkbox-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: #f0fdf9;
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid #0d6b6d;
+  border-radius: 8px;
+  color: #0f766e;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.pd-carekit-checkbox-badge:hover {
+  background: #e6fffa;
+  border-color: #0d6b6d;
+  box-shadow: 0 2px 8px rgba(13, 107, 109, 0.12);
+}
+
+.pd-carekit-input {
+  accent-color: #0d6b6d;
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.pd-carekit-icon {
+  color: #0d6b6d;
+  font-size: 14px;
+}
+
+.pd-carekit-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pd-carekit-free-tag {
+  background: #0d6b6d;
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 /* CTA Button Layout: Select Lenses on top, Add Yours & Live 3D Try-On below */

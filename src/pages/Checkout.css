@@ -556,16 +556,24 @@
   transform: translateY(-1px);
 }
 
-.chip-code {
-  font-size: 11.5px;
-  font-weight: 800;
-  color: #0d6b6d;
-  letter-spacing: 0.3px;
+.available-chip.bogo-chip {
+  background: #f0fdf9;
+  border: 1px dashed #0d6b6d;
 }
 
-.chip-desc {
-  font-size: 11px;
-  color: #475569;
+.available-chip.bogo-chip:hover {
+  background: #e6fffa;
+  border-style: solid;
+  transform: translateY(-1px);
+}
+
+.available-chip.bogo-chip .chip-code {
+  color: #0d6b6d;
+  font-weight: 800;
+}
+
+.available-chip.bogo-chip .chip-desc {
+  color: #0f766e;
   font-weight: 600;
 }
 
