@@ -18,6 +18,9 @@
   padding: 24px 20px 60px 20px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--pd-dark);
+  box-sizing: border-box;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 /* ================= BREADCRUMBS ================= */
@@ -57,6 +60,8 @@
   grid-template-columns: 1.15fr 0.85fr;
   gap: 48px;
   align-items: start;
+  width: 100%;
+  min-width: 0;
 }
 
 /* ================= LEFT SHOWCASE ================= */
@@ -270,6 +275,9 @@
 .pd-info-column {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 /* Category & Title Header */
@@ -1114,7 +1122,10 @@
 
 @media (max-width: 640px) {
   .pd-page-container {
-    padding: 12px 12px 40px 12px;
+    padding: 10px 12px 40px 12px;
+    overflow-x: hidden;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .pd-breadcrumbs {
