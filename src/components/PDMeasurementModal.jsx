@@ -1,16 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { 
-  FaVolumeUp, 
-  FaVolumeMute, 
-  FaTimes, 
-  FaArrowLeft, 
-  FaSun, 
-  FaCreditCard, 
-  FaCamera, 
-  FaCheckCircle, 
-  FaRedo 
-} from "react-icons/fa";
+import { FaVolumeUp, FaVolumeMute, FaTimes, FaArrowLeft, FaSun, FaCreditCard, FaCamera, FaCheckCircle, FaRedo } from "react-icons/fa";
 import "./PDMeasurementModal.css";
+import { usePDScanner } from "../utils/usePDScanner";
 
 export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
   const [step, setStep] = useState(1);
@@ -24,6 +15,33 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
 
   const videoRef = useRef(null);
   const scanTimerRef = useRef(null);
+
+  // Use the actual Mediapipe PD Scanner
+  const { pdResult: realPdResult, scanProgress: realScanProgress } = usePDScanner(
+    videoRef, 
+    isScanning
+  );
+
+  useEffect(() => {
+    if (isScanning) {
+      setScanProgress(realScanProgress);
+      if (realPdResult !== null) {
+        setIsScanning(false);
+        setScanComplete(true);
+        
+        // Validation check for human limits
+        if (realPdResult >= 45 && realPdResult <= 80) {
+          setMeasuredPD(realPdResult);
+          playVoiceInstructions(`Scan complete. Your measured pupillary distance is ${realPdResult} millimeters.`);
+          stopCamera(); // Stop camera when successful
+        } else {
+          setMeasuredPD(0); // Flag as invalid
+          setCameraError("Scan was inaccurate. Please reposition your face and card and scan again.");
+          playVoiceInstructions("Scan was inaccurate. Please reposition and scan again.");
+        }
+      }
+    }
+  }, [realScanProgress, realPdResult, isScanning]);
 
   // Reset state on modal open
   useEffect(() => {
@@ -59,7 +77,7 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
     videoRef.current = el;
     if (el && cameraStream && el.srcObject !== cameraStream) {
       el.srcObject = cameraStream;
-      el.play().catch(() => {});
+      el.play().catch(() => { });
     }
   };
 
@@ -106,10 +124,10 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
     try {
       // First try user-facing ideal resolution
       stream = await navigator.mediaDevices.getUserMedia({
-        video: { 
-          width: { ideal: 640 }, 
+        video: {
+          width: { ideal: 640 },
           height: { ideal: 480 },
-          facingMode: "user" 
+          facingMode: "user"
         }
       });
     } catch (err1) {
@@ -128,10 +146,10 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
       setCameraStream(stream);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play().catch(() => {});
+        videoRef.current.play().catch(() => { });
       }
       playVoiceInstructions("Hold your card straight against your forehead and look directly into the camera.");
-      
+
       // Automatically start scan after 2 seconds
       setTimeout(() => {
         handleStartScan();
@@ -155,21 +173,7 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
     setScanProgress(0);
     setScanComplete(false);
     playVoiceInstructions("Scanning your pupillary distance. Keep steady.");
-
-    let current = 0;
-    scanTimerRef.current = setInterval(() => {
-      current += 10;
-      setScanProgress(current);
-      if (current >= 100) {
-        clearInterval(scanTimerRef.current);
-        scanTimerRef.current = null;
-        setIsScanning(false);
-        setScanComplete(true);
-        const calculated = 63;
-        setMeasuredPD(calculated);
-        playVoiceInstructions(`Scan complete. Your measured pupillary distance is ${calculated} millimeters.`);
-      }
-    }, 250);
+    // The usePDScanner hook will take over from here and update automatically!
   };
 
   const handleConfirmPD = () => {
@@ -183,7 +187,7 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
   return (
     <div className="pd-modal-backdrop" onClick={onClose}>
       <div className="pd-modal-content" onClick={(e) => e.stopPropagation()}>
-        
+
         {/* Top Header */}
         <div className="pd-modal-header">
           {step > 1 && (
@@ -201,7 +205,7 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
         {step === 1 && (
           <div className="pd-step-wrapper step-1">
             <h2 className="pd-step-title">Voice instructions</h2>
-            
+
             <div className="pd-speaker-hero">
               <div className="pd-speaker-circle">
                 <FaVolumeUp className="pd-speaker-icon" />
@@ -225,7 +229,7 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
         {step === 2 && (
           <div className="pd-step-wrapper step-2">
             <div className="pd-sound-toggle-row">
-              <button 
+              <button
                 className="pd-sound-toggle-btn"
                 onClick={() => setIsMuted(!isMuted)}
                 title={isMuted ? "Unmute audio" : "Mute audio"}
@@ -268,7 +272,7 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
         {step === 3 && (
           <div className="pd-step-wrapper step-3">
             <div className="pd-sound-toggle-row">
-              <button 
+              <button
                 className="pd-sound-toggle-btn"
                 onClick={() => setIsMuted(!isMuted)}
                 title={isMuted ? "Unmute audio" : "Mute audio"}
@@ -278,8 +282,8 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
             </div>
 
             <div className="pd-demo-media-container">
-              <video 
-                src="/demo_video.mp4" 
+              <video
+                src="/demo_video.mp4"
                 className="pd-demo-image"
                 autoPlay
                 muted
@@ -313,11 +317,11 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
 
             <div className="pd-camera-viewport">
               {cameraStream ? (
-                <video 
-                  ref={attachVideoRef} 
-                  autoPlay 
-                  playsInline 
-                  muted 
+                <video
+                  ref={attachVideoRef}
+                  autoPlay
+                  playsInline
+                  muted
                   className="pd-live-video"
                 />
               ) : (
@@ -325,8 +329,8 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
                   <div className="pd-cam-warning-banner">
                     {cameraError || "Camera starting or waiting for browser permission..."}
                   </div>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={startCamera}
                     style={{
                       position: "absolute",
@@ -355,7 +359,7 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
                 <div className="pd-scan-card-box">
                   <span className="pd-card-text">ALIGN CARD HERE</span>
                 </div>
-                
+
                 <div className="pd-scan-eyes-box">
                   <div className="pd-pupil-target left">
                     <div className="crosshair-x" />
@@ -386,7 +390,7 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
               </div>
             )}
 
-            {scanComplete && (
+            {scanComplete && measuredPD > 0 && (
               <div className="pd-result-card">
                 <FaCheckCircle className="pd-success-icon" />
                 <div className="pd-result-details">
@@ -397,16 +401,16 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
                   </div>
                 </div>
                 <div className="pd-adjuster">
-                  <button 
-                    type="button" 
-                    className="pd-adj-btn" 
+                  <button
+                    type="button"
+                    className="pd-adj-btn"
                     onClick={() => setMeasuredPD(Math.max(50, measuredPD - 1))}
                   >
                     -
                   </button>
-                  <button 
-                    type="button" 
-                    className="pd-adj-btn" 
+                  <button
+                    type="button"
+                    className="pd-adj-btn"
                     onClick={() => setMeasuredPD(Math.min(78, measuredPD + 1))}
                   >
                     +
@@ -414,11 +418,23 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
                 </div>
               </div>
             )}
+            
+            {scanComplete && measuredPD === 0 && (
+              <div className="pd-result-card" style={{ backgroundColor: "#fee2e2", border: "1px solid #ef4444" }}>
+                <FaTimes className="pd-success-icon" style={{ color: "#ef4444" }} />
+                <div className="pd-result-details">
+                  <span className="pd-result-label" style={{ color: "#991b1b" }}>Scan Inaccurate</span>
+                  <p style={{ margin: "5px 0 0 0", fontSize: "13px", color: "#b91c1c" }}>
+                    We couldn't get a precise measurement. Please reposition your face and scan again.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="pd-scan-actions">
               {!scanComplete ? (
-                <button 
+                <button
                   className="pd-primary-btn scan-btn"
                   disabled={true}
                   style={{ opacity: 0.7 }}
@@ -427,14 +443,20 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
                 </button>
               ) : (
                 <>
-                  <button className="pd-primary-btn" onClick={handleConfirmPD}>
-                    Use This PD ({measuredPD} mm)
-                  </button>
-                  <button 
-                    className="pd-secondary-btn" 
-                    onClick={handleStartScan}
+                  {measuredPD > 0 && (
+                    <button className="pd-primary-btn" onClick={handleConfirmPD}>
+                      Use This PD ({measuredPD} mm)
+                    </button>
+                  )}
+                  <button
+                    className="pd-secondary-btn"
+                    onClick={() => {
+                      startCamera();
+                      handleStartScan();
+                    }}
+                    style={measuredPD === 0 ? { backgroundColor: "#0f3460", color: "white" } : {}}
                   >
-                    <FaRedo /> Retake Scan
+                    <FaRedo /> {measuredPD === 0 ? "Scan Again" : "Retake Scan"}
                   </button>
                 </>
               )}

@@ -93,9 +93,10 @@ function Products() {
     }
 
     let isMounted = true;
+    const controller = new AbortController();
     setIsLoadingSearch(true);
 
-    searchProductsApi({ filter: searchQuery.trim(), page: currentPage, limit: itemsPerPage })
+    searchProductsApi({ filter: searchQuery.trim(), page: currentPage, limit: itemsPerPage, signal: controller.signal })
       .then((res) => {
         if (!isMounted) return;
         const prods = Array.isArray(res) ? res : res?.products || [];
@@ -113,6 +114,11 @@ function Products() {
         }
       })
       .catch((err) => {
+        if (!isMounted) return;
+        if (err.name === "AbortError" || err.message?.includes("aborted")) {
+          console.log("[Products] Search aborted");
+          return;
+        }
         console.warn("[Search API Warning]:", err.message);
         setSearchApiProducts([]);
         setSearchApiTotalItems(0);
@@ -124,6 +130,7 @@ function Products() {
 
     return () => {
       isMounted = false;
+      controller.abort();
     };
   }, [searchQuery, currentPage]);
 
@@ -252,7 +259,7 @@ function Products() {
         .then((res) => {
           if (!isMounted) return;
           const prods = Array.isArray(res) ? res : (res?.products || []);
-          const strictly1200 = prods.filter(p => Number(p.price) === 1200 || p.store === "1200" || p.category === "₹1200 Store").map(p => ({ ...p, price: 1200 }));
+          const strictly1200 = prods.filter(p => Number(p.price) <= 1200 || p.store === "1200" || p.category === "₹1200 Store");
           if (Array.isArray(strictly1200) && strictly1200.length > 0) {
             setStoreApiProducts(strictly1200);
           } else {
@@ -327,19 +334,22 @@ function Products() {
   // Base list: prioritize API data when available; seamlessly fallback to local catalog data if backend/ngrok is offline
   let baseProducts = [];
   if (isBogoShop) {
-    const bogoFilteredApi = bogoApiProducts.filter(p => Number(p.price) >= 2500);
+    const bogoFilteredApi = bogoApiProducts.filter(p => Number(p.price) > 2500);
     baseProducts = bogoFilteredApi.length > 0 
       ? bogoFilteredApi 
-      : allProductsList.filter(p => Number(p.price) >= 2500);
+      : allProductsList.filter(p => Number(p.price) > 2500);
   } else if (filterType === "kids" || searchQuery === "kids") {
     baseProducts = categoryApiProducts.length > 0 
       ? categoryApiProducts 
       : allProductsList.filter(p => p.gender?.toLowerCase() === 'kids' || p.category?.toLowerCase().includes('kids'));
   } else if (is1200Store) {
-    const isStrict1200 = (p) => Number(p.price) === 1200 || p.store === "1200" || p.category === "₹1200 Store";
-    baseProducts = storeApiProducts.length > 0 
-      ? storeApiProducts.filter(p => Number(p.price) === 1200).map(p => ({ ...p, price: 1200 })) 
-      : allProductsList.filter(isStrict1200).map(p => ({ ...p, price: 1200 }));
+    const isUnder1200 = (p) => Number(p.price) <= 1200 || p.store === "1200" || p.category === "₹1200 Store";
+    // Always include all local products matching the condition
+    const localMatches = allProductsList.filter(isUnder1200);
+    // Merge any extra API products not already in local list
+    const localIds = new Set(localMatches.map(p => p.id));
+    const apiExtras = storeApiProducts.filter(p => isUnder1200(p) && !localIds.has(p.id));
+    baseProducts = [...localMatches, ...apiExtras];
   } else if (searchQuery && searchQuery !== "kids") {
     baseProducts = searchApiProducts.length > 0 
       ? searchApiProducts 
@@ -356,7 +366,7 @@ function Products() {
     let items = baseProducts;
     if (type && type !== 'kids') items = items.filter(p => p.type === type);
     if (kids) items = items.filter(p => p.category?.toLowerCase().includes('kids') || p.name?.toLowerCase().includes('kids') || p.gender?.toLowerCase().includes('kids'));
-    if (is1200) items = items.filter(p => Number(p.price) === 1200);
+    if (is1200) items = items.filter(p => Number(p.price) <= 1200);
 
     if (!items.length) return { minPrice: 1000, maxPrice: 5000, maxDiscount: 33 };
     const prices = items.map(p => Number(p.price)).filter(p => !isNaN(p) && p > 0);
@@ -375,7 +385,7 @@ function Products() {
     if (searchQuery && searchQuery !== 'kids') return `Search: "${searchQuery}"`;
     if (bogo) return 'Buy 1 Get 1 Exclusive';
     if (kids) return 'Kids Club';
-    if (is1200) return '₹1200 Store';
+    if (is1200) return 'Under ₹1200 Store';
     switch (type) {
       case 'eyeglasses': return 'Eyeglasses';
       case 'sunglasses': return 'Sunglasses';
@@ -407,7 +417,7 @@ function Products() {
 
   // 0.2 Store Filter & Max Price Filter
   if (is1200Store) {
-    processedProducts = processedProducts.filter(p => Number(p.price) === 1200);
+    processedProducts = processedProducts.filter(p => Number(p.price) <= 1200);
   } else if (maxPriceQuery) {
     const maxVal = Number(maxPriceQuery);
     if (!isNaN(maxVal)) {
@@ -482,9 +492,9 @@ function Products() {
     processedProducts.sort((a, b) => b.price - a.price);
   }
 
-  // Final safeguard: if ₹1200 Store is selected, ensure ONLY items with price 1200 are present
+  // Final safeguard: Under ₹1200 Store — include all products priced ₹1200 and below
   if (is1200Store) {
-    processedProducts = processedProducts.filter(p => Number(p.price) === 1200);
+    processedProducts = processedProducts.filter(p => Number(p.price) <= 1200);
   }
 
   // Check if any client-side sidebar filters are active

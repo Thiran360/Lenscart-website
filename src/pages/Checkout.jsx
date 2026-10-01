@@ -8,7 +8,7 @@ import PaymentGatewayModal from "../components/PaymentGatewayModal";
 import { saveAddressApi } from "../services/profileService";
 import { placeOrderApi } from "../services/checkoutService";
 import { useToast } from "../context/ToastContext";
-import { FaCreditCard, FaTag, FaCheckCircle } from "react-icons/fa";
+import { FaCreditCard, FaTag, FaCheckCircle, FaMoneyBillWave } from "react-icons/fa";
 import "./Checkout.css";
 
 const AVAILABLE_COUPONS = [
@@ -26,14 +26,16 @@ function Checkout() {
   const buyNowProduct = location.state?.buyNowProduct;
   const checkoutItems = buyNowProduct ? [buyNowProduct] : cartItems;
   
-  // Check if current order items qualify for Buy 1 Get 1 Shop (isBogo, applicable_for_buy_one_get_one, or price >= 2500)
-  const isBogoEligibleOrder = checkoutItems.some(item => 
+  // Check if current order items qualify for Buy 1 Get 1 Shop (only price > 2500)
+  const getBogoEligibleItems = () => checkoutItems.filter(item => 
     item.isBogo === true || 
     item.applicable_for_buy_one_get_one === true || 
     String(item.category || "").toLowerCase().includes("buy 1 get 1") ||
     String(item.category || "").toLowerCase().includes("bogo") ||
-    Number(item.price) >= 2500
+    Number(item.price) > 2500
   );
+
+  const isBogoEligibleOrder = getBogoEligibleItems().length > 0;
 
   // Available coupons filtered so BUY1GET1 only appears when ordering BOGO products
   const displayCoupons = AVAILABLE_COUPONS.filter(c => !c.isBogo || isBogoEligibleOrder);
@@ -46,16 +48,39 @@ function Checkout() {
     ? (buyNowProduct.price + (buyNowProduct.additionalPrice || 0)) * (buyNowProduct.quantity || 1) 
     : totalPrice;
 
+  const calculateBogoDiscount = () => {
+    let eligiblePrices = [];
+    getBogoEligibleItems().forEach(item => {
+      const p = item.price + (item.additionalPrice || 0);
+      for (let i = 0; i < (item.quantity || 1); i++) {
+        eligiblePrices.push(p);
+      }
+    });
+    // Sort ascending to get the cheapest eligible items
+    eligiblePrices.sort((a, b) => a - b);
+    const freeCount = Math.floor(eligiblePrices.length / 2);
+    let totalFree = 0;
+    for (let i = 0; i < freeCount; i++) {
+      totalFree += eligiblePrices[i];
+    }
+    return totalFree;
+  };
+
   const discountAmount = appliedCoupon 
-    ? (appliedCoupon.type === "percent" 
-        ? Math.round((subTotal * appliedCoupon.discount) / 100) 
-        : Math.min(subTotal, appliedCoupon.discount))
+    ? (appliedCoupon.code === "BUY1GET1" || appliedCoupon.code === "BOGO" || appliedCoupon.code === "BOGOFREE"
+        ? calculateBogoDiscount()
+        : (appliedCoupon.type === "percent" 
+            ? Math.round((subTotal * appliedCoupon.discount) / 100) 
+            : Math.min(subTotal, appliedCoupon.discount)))
     : 0;
 
   const discountedSubTotal = Math.max(0, subTotal - discountAmount);
-  const tax = discountedSubTotal * 0.18; // 18% tax simulation
+  // GST is inclusive in Lenskart pricing. Taxable amount = total / 1.18, GST = total - taxable amount.
+  const taxRate = 0.18; // Configurable 18% GST
+  const taxableAmount = discountedSubTotal / (1 + taxRate);
+  const tax = discountedSubTotal - taxableAmount;
   const shipping = discountedSubTotal > 1000 ? 0 : 50;
-  const checkoutTotal = discountedSubTotal + tax + shipping;
+  const checkoutTotal = discountedSubTotal + shipping; // Tax is already included in discountedSubTotal
   const { toast } = useToast();
 
   const handleApplyCoupon = (e) => {
@@ -74,7 +99,9 @@ function Checkout() {
       }
       setAppliedCoupon(matched);
       setCouponInput("");
-      const saved = matched.type === "percent" ? Math.round((subTotal * matched.discount) / 100) : matched.discount;
+      const saved = (matched.code === "BUY1GET1" || matched.code === "BOGO" || matched.code === "BOGOFREE")
+        ? calculateBogoDiscount()
+        : (matched.type === "percent" ? Math.round((subTotal * matched.discount) / 100) : matched.discount);
       toast.success(`Coupon "${matched.code}" applied! ${matched.isBogo ? '🎁 Buy 1 Get 1 Free ' : ''}Saved ₹${saved}`);
     } else {
       setCouponError(`Invalid coupon "${cleanCode}". Try ${isBogoEligibleOrder ? 'BUY1GET1, ' : ''}FIRST15, HDFC10, or UPI150.`);
@@ -99,7 +126,9 @@ function Checkout() {
     }
     setAppliedCoupon(c);
     setCouponError("");
-    const saved = c.type === "percent" ? Math.round((subTotal * c.discount) / 100) : c.discount;
+    const saved = (c.code === "BUY1GET1" || c.code === "BOGO" || c.code === "BOGOFREE")
+        ? calculateBogoDiscount()
+        : (c.type === "percent" ? Math.round((subTotal * c.discount) / 100) : c.discount);
     toast.success(`Coupon "${c.code}" applied! Saved ₹${saved}`);
   };
 
@@ -112,6 +141,13 @@ function Checkout() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Ensure COD is deselected if total exceeds 1200
+  useEffect(() => {
+    if (checkoutTotal > 1200 && paymentMethod === 'cod') {
+      setPaymentMethod('gpay');
+    }
+  }, [checkoutTotal, paymentMethod]);
 
   // Address Form State
   const [address, setAddress] = useState({
@@ -615,6 +651,24 @@ function Checkout() {
                 <p className="payment-subtitle">All transactions are secure and encrypted.</p>
                 
                 <div className="payment-methods-accordion">
+                  {/* Cash on Delivery (COD) - Only for <= 1200 */}
+                  {checkoutTotal <= 1200 && (
+                    <div className={`payment-method-item ${paymentMethod === 'cod' ? 'active' : ''}`}>
+                      <label className="payment-method-header">
+                        <input type="radio" name="payment" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} />
+                        <span className="method-title">Cash on Delivery (COD)</span>
+                        <div className="method-icons">
+                          <FaMoneyBillWave style={{ fontSize: '18px', color: '#27ae60' }} />
+                        </div>
+                      </label>
+                      {paymentMethod === 'cod' && (
+                        <div className="payment-method-content">
+                          <p>You can pay in cash when the product is delivered to your doorstep.</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* UPI */}
                   <div className={`payment-method-item ${paymentMethod === 'gpay' ? 'active' : ''}`}>
                     <label className="payment-method-header">
@@ -786,7 +840,7 @@ function Checkout() {
                   <span>{shipping === 0 ? 'FREE' : `₹${shipping.toFixed(2)}`}</span>
                 </div>
                 <div className="total-row">
-                  <span>Estimated Tax (18%)</span>
+                  <span>Estimated Tax (Included, 18%)</span>
                   <span>₹{tax.toFixed(2)}</span>
                 </div>
                 

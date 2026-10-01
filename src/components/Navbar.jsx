@@ -294,7 +294,7 @@ function Navbar() {
                   to="/products?store=1200"
                   className={is1200Active ? 'active-nav-box' : ''}
                 >
-                  ₹1200 STORE
+                  UNDER ₹1200
                 </Link>
               </li>
               {isAdmin && (
@@ -468,7 +468,7 @@ function Navbar() {
               BUY 1 GET 1 SHOP
             </Link>
             <Link to="/products?store=1200" className={is1200Active ? 'active' : ''}>
-              ₹1200 STORE
+              UNDER ₹1200
             </Link>
             {isAdmin && (
               <Link to="/admin" className={location.pathname === '/admin' || location.pathname === '/analytics' ? 'active' : ''}>
@@ -477,6 +477,18 @@ function Navbar() {
             )}
           </div>
         </nav>
+        
+        {/* Scrolling Announcement Bar */}
+        <div className="announcement-bar">
+          <div className="announcement-text-wrapper">
+            {/* Render multiple spans to ensure enough width for seamless -50% translateX loop */}
+            {[...Array(6)].map((_, index) => (
+              <span key={index} className="announcement-text">
+                EXCLUSIVE PREPAID OFFER <span style={{ color: '#E8C779' }}>✦</span> PAY ONLINE &amp; ENJOY EXTRA SAVINGS <span style={{ color: '#E8C779' }}>✦</span>
+              </span>
+            ))}
+          </div>
+        </div>
       </header>
 
       {/* Mobile Drawer Overlay */}
@@ -532,7 +544,7 @@ function Navbar() {
                 <FaTag className="mobile-link-icon" /> Buy 1 Get 1 Shop
               </Link>
               <Link to="/products?store=1200" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-                <FaTag className="mobile-link-icon" style={{ color: '#0d6b6d' }} /> ₹1200 Store
+                <FaTag className="mobile-link-icon" style={{ color: '#0d6b6d' }} /> Under ₹1200 Store
               </Link>
 
               {isLoggedIn && (

@@ -21,26 +21,64 @@ function TrackOrder() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (!orderId.trim()) return;
+    const cleanOrderId = orderId.replace(/[^a-zA-Z0-9]/g, '');
+    if (!cleanOrderId) return;
 
     setIsSearching(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setTrackingData({
-        orderId: orderId.toUpperCase(),
-        datePlaced: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
-        estimatedDelivery: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' }),
-        status: "shipped", // "placed", "processing", "shipped", "out_for_delivery", "delivered"
-        items: 1,
-        carrier: "BlueDart Express"
-      });
-      setIsSearching(false);
-    }, 800);
+    // Fetch live order tracking from API
+    import("../services/api").then(({ apiRequest }) => {
+      apiRequest(`/orders/${cleanOrderId}/`, "GET")
+        .then(data => {
+          if (!data) throw new Error("No data returned");
+          const payload = data.data || data;
+          
+          if (payload.detail === "Not found." || payload.error) {
+             throw new Error("Order not found");
+          }
+          
+          setTrackingData({
+            orderId: payload.orderId || payload.id || orderId.toUpperCase(),
+            datePlaced: payload.datePlaced || payload.created_at || "N/A",
+            estimatedDelivery: payload.estimatedDelivery || "N/A",
+            status: payload.status || "processing",
+            items: payload.items || 1,
+            carrier: payload.carrier || "Standard Delivery"
+          });
+          setIsSearching(false);
+        })
+        .catch(err => {
+          console.error("Error tracking order from API, attempting local fallback:", err);
+          
+          // Fallback to local storage if API fails (useful if backend returns 404 for newly created orders)
+          try {
+            const storedOrders = JSON.parse(localStorage.getItem("placedOrders")) || [];
+            const foundLocal = storedOrders.find(o => String(o.id) === cleanOrderId || String(o.order_id) === cleanOrderId);
+            
+            if (foundLocal) {
+              setTrackingData({
+                orderId: foundLocal.id || foundLocal.order_id || cleanOrderId,
+                datePlaced: foundLocal.date || "N/A",
+                estimatedDelivery: "3 - 5 Business Days", // Default fallback
+                status: "processing",
+                items: foundLocal.items?.length || 1,
+                carrier: "Standard Delivery"
+              });
+              setIsSearching(false);
+              return;
+            }
+          } catch (localErr) {
+            console.error("Local fallback failed:", localErr);
+          }
+
+          setTrackingData({ error: "Order not found. Please check your Order ID or contact support." });
+          setIsSearching(false);
+        });
+    });
   };
 
   const getStepStatus = (stepName) => {
-    if (!trackingData) return "";
+    if (!trackingData || trackingData.error) return "";
     const statuses = ["placed", "processing", "shipped", "out_for_delivery", "delivered"];
     const currentIndex = statuses.indexOf(trackingData.status);
     const stepIndex = statuses.indexOf(stepName);
@@ -69,7 +107,12 @@ function TrackOrder() {
           </button>
         </form>
 
-        {trackingData && (
+        {trackingData && trackingData.error ? (
+          <div className="tracking-results-card" style={{ textAlign: 'center', padding: '40px', color: '#e74c3c' }}>
+            <h3 style={{ marginBottom: '10px' }}>⚠️ {trackingData.error}</h3>
+            <p style={{ color: '#666' }}>We couldn't find an order matching that ID in our system.</p>
+          </div>
+        ) : trackingData && (
           <div className="tracking-results-card">
             
             <div className="tracking-header">
@@ -92,7 +135,6 @@ function TrackOrder() {
                 <div className="step-content">
                   <h4>Order Placed</h4>
                   <p>We have received your order.</p>
-                  <span className="step-time">2 days ago, 10:45 AM</span>
                 </div>
               </div>
 
@@ -104,7 +146,6 @@ function TrackOrder() {
                 <div className="step-content">
                   <h4>Processing</h4>
                   <p>Your lenses are being cut and fitted to the frame.</p>
-                  <span className="step-time">Yesterday, 02:15 PM</span>
                 </div>
               </div>
 
@@ -115,8 +156,7 @@ function TrackOrder() {
                 </div>
                 <div className="step-content">
                   <h4>Shipped</h4>
-                  <p>Your order has been handed over to {trackingData.carrier}.</p>
-                  <span className="step-time">Today, 09:30 AM</span>
+                  <p>Your order has been handed over to delivery carrier.</p>
                 </div>
               </div>
 

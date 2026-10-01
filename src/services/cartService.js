@@ -4,12 +4,12 @@ import { apiRequest } from "./api";
  * Fetch all items in user's cart via GET /cart/
  * Backend URL: https://capsule-most-rundown.ngrok-free.dev/api/cart/
  */
-export const getCartApi = async () => {
+export const getCartApi = async (options = {}) => {
   const token = localStorage.getItem("user_token") || localStorage.getItem("userToken") || localStorage.getItem("token");
   if (!token) {
     return { status: true, data: [] };
   }
-  return await apiRequest("/cart/", "GET");
+  return await apiRequest("/cart/", "GET", null, { signal: options.signal });
 };
 
 /**

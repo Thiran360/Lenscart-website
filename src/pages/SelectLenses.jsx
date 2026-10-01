@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { productsData } from "../data/products";
 import { useCart } from "../context/CartContext";
-import { FaCloudUploadAlt, FaCheckCircle, FaFileAlt, FaGlasses } from "react-icons/fa";
+import { FaCloudUploadAlt, FaCheckCircle, FaFileAlt, FaGlasses, FaStar } from "react-icons/fa";
 import { SPH_OPTIONS, CYL_OPTIONS, AXIS_OPTIONS } from "../utils/rxOptions";
 import { getPrescriptionsApi, getLocalPrescriptions } from "../services/profileService";
 import PDMeasurementModal from "../components/PDMeasurementModal";
@@ -29,7 +29,7 @@ function SelectLenses() {
   const [lensType, setLensType] = useState(null);
   const [lensPackage, setLensPackage] = useState(null);
   const [rxMethod, setRxMethod] = useState(null);
-  const [rxData, setRxData] = useState({ name: "", birthYear: "", rightSph: "", rightCyl: "", rightAxis: "", leftSph: "", leftCyl: "", leftAxis: "" });
+  const [rxData, setRxData] = useState({ name: "", dob: { day: "", month: "", year: "" }, rightSph: "", rightCyl: "", rightAxis: "", leftSph: "", leftCyl: "", leftAxis: "" });
   const [uploadedFile, setUploadedFile] = useState(null);
   const [savedPrescriptions, setSavedPrescriptions] = useState([]);
   const [selectedSavedRx, setSelectedSavedRx] = useState(null);
@@ -39,6 +39,8 @@ function SelectLenses() {
   const [hasDualPd, setHasDualPd] = useState(false);
   const [rightPd, setRightPd] = useState("");
   const [leftPd, setLeftPd] = useState("");
+  const [rxRating, setRxRating] = useState(0);
+  const [rxRatingHover, setRxRatingHover] = useState(0);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -167,12 +169,44 @@ function SelectLenses() {
     return total;
   };
 
+  // Returns true only when a real (non-zero) CYL value is present
+  const isCylActive = (cylVal) => cylVal && cylVal !== "0.00";
+
   const handleNext = () => {
     if (step === 1 && lensType) setStep(2);
     else if (step === 2 && lensPackage) {
-      setStep(3);
+      // Zero Power needs no prescription — skip step 3
+      if (lensType === "zero") {
+        submitSelection();
+      } else {
+        setStep(3);
+      }
     }
     else if (step === 3 && rxMethod) {
+      // Validate: if a non-zero CYL is selected, AXIS must also be selected
+      if (rxMethod === 'manual') {
+        if (isCylActive(rxData.rightCyl) && !rxData.rightAxis) {
+          alert("Please select AXIS for Right Eye — it is required when CYL is entered.");
+          return;
+        }
+        if (isCylActive(rxData.leftCyl) && !rxData.leftAxis) {
+          alert("Please select AXIS for Left Eye — it is required when CYL is entered.");
+          return;
+        }
+      }
+      // Validate manual form: name, DOB, and rating are required
+      if (rxMethod === 'manual' && !rxData.name.trim()) {
+        alert('Please enter the patient name before continuing.');
+        return;
+      }
+      if (rxMethod === 'manual' && (!rxData.dob.day || !rxData.dob.month || !rxData.dob.year)) {
+        alert('Please enter your complete Date of Birth before continuing.');
+        return;
+      }
+      if (rxMethod === 'manual' && rxRating === 0) {
+        alert('Please rate your current vision before continuing.');
+        return;
+      }
       submitSelection();
     }
   };
@@ -186,6 +220,10 @@ function SelectLenses() {
       if (rxMethod === 'manual') {
         prescriptionDetails = {
           method: 'manual',
+          name: rxData.name.trim(),
+          dob: rxData.dob,
+          rating: rxRating,
+          ratingLabel: ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][rxRating] || '',
           data: rxData,
           file: null
         };
@@ -248,7 +286,9 @@ function SelectLenses() {
           <div className="step-indicator">
             <span className={`step-pill ${step >= 1 ? 'active' : ''}`}>1. Lens Type</span>
             <span className={`step-pill ${step >= 2 ? 'active' : ''}`}>2. Lens Package</span>
-            <span className={`step-pill ${step >= 3 ? 'active' : ''}`}>3. Prescription</span>
+            {lensType !== "zero" && (
+              <span className={`step-pill ${step >= 3 ? 'active' : ''}`}>3. Prescription</span>
+            )}
           </div>
 
           <div className="step-content">
@@ -453,8 +493,76 @@ function SelectLenses() {
 
                 {rxMethod === 'manual' && (
                   <div className="rx-manual-form">
-                    <div className="name-birth-grid" style={{ marginBottom: 20 }}>
-                      <div className="rx-eye-section" style={{ margin: 0 }}>
+
+                    {/* ── Frame Info Card ── */}
+                    <div style={{
+                      marginBottom: 24, borderRadius: 12,
+                      border: '1.5px solid #C5A059', background: 'linear-gradient(135deg,#FAF6F0 0%,#fff 100%)',
+                      overflow: 'hidden', boxShadow: '0 2px 12px rgba(197,160,89,0.1)'
+                    }}>
+                      {/* Card Header */}
+                      <div style={{ background: '#3A2415', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span style={{ fontSize: 18 }}>🕶️</span>
+                        <span style={{ color: '#C5A059', fontWeight: 700, fontSize: 13, letterSpacing: 1 }}>SELECTED FRAME DETAILS</span>
+                      </div>
+
+                      <div style={{ padding: '16px' }}>
+                        {/* Name + Model */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12, flexWrap: 'wrap', gap: 6 }}>
+                          <div>
+                            <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: '#1a1a1a' }}>{product.name}</p>
+                            <p style={{ margin: '2px 0 0', fontSize: 13, color: '#6E4B34' }}>Model #{product.id} &nbsp;·&nbsp; {product.brand}</p>
+                          </div>
+                          <span style={{ background: '#C5A059', color: '#fff', borderRadius: 20, padding: '3px 12px', fontSize: 12, fontWeight: 700 }}>
+                            {product.category || product.type}
+                          </span>
+                        </div>
+
+                        {/* Fit & Size */}
+                        <div style={{ marginBottom: 12, padding: '10px 14px', background: '#F4EDE2', borderRadius: 8, border: '1px solid #e8ddd0' }}>
+                          <p style={{ margin: '0 0 6px', fontSize: 12, fontWeight: 700, color: '#3A2415', textTransform: 'uppercase', letterSpacing: 0.8 }}>📐 Fit & Size</p>
+                          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                            {product.size && (
+                              <span style={{ background: '#fff', border: '1px solid #C5A059', borderRadius: 6, padding: '4px 12px', fontSize: 13, fontWeight: 600, color: '#3A2415' }}>
+                                Size: {product.size === 'S' ? 'Small' : product.size === 'M' ? 'Medium' : product.size === 'L' ? 'Large' : product.size}
+                              </span>
+                            )}
+                            {product.shape && (
+                              <span style={{ background: '#fff', border: '1px solid #C5A059', borderRadius: 6, padding: '4px 12px', fontSize: 13, fontWeight: 600, color: '#3A2415' }}>
+                                Shape: {product.shape}
+                              </span>
+                            )}
+                            {product.gender && (
+                              <span style={{ background: '#fff', border: '1px solid #C5A059', borderRadius: 6, padding: '4px 12px', fontSize: 13, fontWeight: 600, color: '#3A2415' }}>
+                                {product.gender}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Features */}
+                        <div style={{ marginBottom: 12, padding: '10px 14px', background: '#F4EDE2', borderRadius: 8, border: '1px solid #e8ddd0' }}>
+                          <p style={{ margin: '0 0 6px', fontSize: 12, fontWeight: 700, color: '#3A2415', textTransform: 'uppercase', letterSpacing: 0.8 }}>✨ Features</p>
+                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                            {product.type && <span style={{ background: '#3A2415', color: '#C5A059', borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>{product.type.charAt(0).toUpperCase() + product.type.slice(1)}</span>}
+                            {product.material && <span style={{ background: '#3A2415', color: '#C5A059', borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>{product.material}</span>}
+                            {product.discount > 0 && <span style={{ background: '#2e7d32', color: '#fff', borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>{product.discount}% OFF</span>}
+                            {product.colors && <span style={{ background: '#3A2415', color: '#C5A059', borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>{product.colors.length} Colours</span>}
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        {product.description && (
+                          <div style={{ padding: '10px 14px', background: '#F4EDE2', borderRadius: 8, border: '1px solid #e8ddd0' }}>
+                            <p style={{ margin: '0 0 4px', fontSize: 12, fontWeight: 700, color: '#3A2415', textTransform: 'uppercase', letterSpacing: 0.8 }}>📋 Description</p>
+                            <p style={{ margin: 0, fontSize: 13, color: '#4a3728', lineHeight: 1.6 }}>{product.description}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: 20 }}>
+                      <div className="rx-eye-section" style={{ margin: '0 0 16px 0' }}>
                         <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, color: '#333' }}>Name</label>
                         <input 
                           type="text" 
@@ -465,51 +573,150 @@ function SelectLenses() {
                         />
                       </div>
                       <div className="rx-eye-section" style={{ margin: 0 }}>
-                        <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, color: '#333' }}>Birth Year</label>
-                        <select 
-                          value={rxData.birthYear} 
-                          onChange={e => setRxData({...rxData, birthYear: e.target.value})} 
-                          style={{ width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '15px', backgroundColor: '#fff' }}
-                        >
-                          <option value="">Select Birth Year</option>
-                          {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(year => (
-                            <option key={year} value={year}>{year}</option>
-                          ))}
-                        </select>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                          <label style={{ fontWeight: 600, color: '#333' }}>Date of Birth</label>
+                          <span style={{
+                            fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '20px',
+                            background: (!rxData.dob.day || !rxData.dob.month || !rxData.dob.year) ? '#e53935' : '#2e7d32',
+                            color: '#fff', letterSpacing: '0.5px'
+                          }}>
+                            {(!rxData.dob.day || !rxData.dob.month || !rxData.dob.year) ? 'REQUIRED' : 'DONE ✓'}
+                          </span>
+                        </div>
+                        <div style={{
+                          display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px',
+                          padding: '8px', borderRadius: '8px',
+                          minWidth: 0,
+                          border: (!rxData.dob.day || !rxData.dob.month || !rxData.dob.year) ? '2px solid #e53935' : '2px solid #c8e6c9',
+                          background: (!rxData.dob.day || !rxData.dob.month || !rxData.dob.year) ? '#fff5f5' : '#f1f8e9',
+                          transition: 'all 0.2s ease'
+                        }}>
+                          <select
+                            value={rxData.dob.day}
+                            onChange={e => setRxData({...rxData, dob: {...rxData.dob, day: e.target.value}})}
+                            style={{ width: '100%', boxSizing: 'border-box', padding: '10px 4px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', backgroundColor: '#fff', minWidth: 0 }}
+                          >
+                            <option value="">Day</option>
+                            {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
+                              <option key={d} value={d}>{d}</option>
+                            ))}
+                          </select>
+                          <select
+                            value={rxData.dob.month}
+                            onChange={e => setRxData({...rxData, dob: {...rxData.dob, month: e.target.value}})}
+                            style={{ width: '100%', boxSizing: 'border-box', padding: '10px 4px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', backgroundColor: '#fff', minWidth: 0 }}
+                          >
+                            <option value="">Month</option>
+                            {['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].map((m, i) => (
+                              <option key={i+1} value={i+1}>{m}</option>
+                            ))}
+                          </select>
+                          <select
+                            value={rxData.dob.year}
+                            onChange={e => setRxData({...rxData, dob: {...rxData.dob, year: e.target.value}})}
+                            style={{ width: '100%', boxSizing: 'border-box', padding: '10px 4px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', backgroundColor: '#fff', minWidth: 0 }}
+                          >
+                            <option value="">Year</option>
+                            {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                              <option key={year} value={year}>{year}</option>
+                            ))}
+                          </select>
+                        </div>
+                        {(!rxData.dob.day || !rxData.dob.month || !rxData.dob.year) && (
+                          <p style={{ margin: '6px 0 0 2px', fontSize: '12px', color: '#e53935', fontWeight: 500 }}>
+                            ⚠ Please select Day, Month and Year
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="rx-eye-section">
                       <h4>Right Eye (OD)</h4>
                       <div className="rx-grid">
-                        <select value={rxData.rightSph} onChange={e => setRxData({...rxData, rightSph: e.target.value})} style={{ padding: '12px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '15px' }}>
+                        <select
+                          value={rxData.rightSph}
+                          onChange={e => setRxData({...rxData, rightSph: e.target.value})}
+                          style={{ padding: '12px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '15px' }}
+                        >
                           <option value="">SPH</option>
                           {SPH_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                         </select>
-                        <select value={rxData.rightCyl} onChange={e => setRxData({...rxData, rightCyl: e.target.value})} style={{ padding: '12px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '15px' }}>
+                        <select
+                          value={rxData.rightCyl}
+                          onChange={e => {
+                            const val = e.target.value;
+                            setRxData({...rxData, rightCyl: val, rightAxis: isCylActive(val) ? rxData.rightAxis : ''});
+                          }}
+                          style={{ padding: '12px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '15px' }}
+                        >
                           <option value="">CYL (Optional)</option>
                           {CYL_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                         </select>
-                        <select value={rxData.rightAxis} onChange={e => setRxData({...rxData, rightAxis: e.target.value})} style={{ padding: '12px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '15px' }}>
-                          <option value="">AXIS (Optional)</option>
-                          {AXIS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                        </select>
+                        <div>
+                          <select
+                            value={rxData.rightAxis}
+                            disabled={!isCylActive(rxData.rightCyl)}
+                            onChange={e => setRxData({...rxData, rightAxis: e.target.value})}
+                            style={{
+                              padding: '12px', borderRadius: '6px', fontSize: '15px', width: '100%',
+                              backgroundColor: isCylActive(rxData.rightCyl) ? '#fff' : '#f5f5f5',
+                              color: isCylActive(rxData.rightCyl) ? '#222' : '#aaa',
+                              border: isCylActive(rxData.rightCyl) && !rxData.rightAxis ? '2px solid #e53935' : '1px solid #ccc',
+                              cursor: isCylActive(rxData.rightCyl) ? 'pointer' : 'not-allowed',
+                              opacity: isCylActive(rxData.rightCyl) ? 1 : 0.6,
+                            }}
+                          >
+                            <option value="">{isCylActive(rxData.rightCyl) ? 'AXIS (Required)' : 'AXIS (Select CYL first)'}</option>
+                            {AXIS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                          </select>
+                          {isCylActive(rxData.rightCyl) && !rxData.rightAxis && (
+                            <p style={{ margin: '4px 0 0 2px', fontSize: '12px', color: '#e53935', fontWeight: 500 }}>⚠ AXIS is required when CYL is selected</p>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="rx-eye-section">
                       <h4>Left Eye (OS)</h4>
                       <div className="rx-grid">
-                        <select value={rxData.leftSph} onChange={e => setRxData({...rxData, leftSph: e.target.value})} style={{ padding: '12px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '15px' }}>
+                        <select
+                          value={rxData.leftSph}
+                          onChange={e => setRxData({...rxData, leftSph: e.target.value})}
+                          style={{ padding: '12px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '15px' }}
+                        >
                           <option value="">SPH</option>
                           {SPH_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                         </select>
-                        <select value={rxData.leftCyl} onChange={e => setRxData({...rxData, leftCyl: e.target.value})} style={{ padding: '12px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '15px' }}>
+                        <select
+                          value={rxData.leftCyl}
+                          onChange={e => {
+                            const val = e.target.value;
+                            setRxData({...rxData, leftCyl: val, leftAxis: isCylActive(val) ? rxData.leftAxis : ''});
+                          }}
+                          style={{ padding: '12px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '15px' }}
+                        >
                           <option value="">CYL (Optional)</option>
                           {CYL_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                         </select>
-                        <select value={rxData.leftAxis} onChange={e => setRxData({...rxData, leftAxis: e.target.value})} style={{ padding: '12px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', fontSize: '15px' }}>
-                          <option value="">AXIS (Optional)</option>
-                          {AXIS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                        </select>
+                        <div>
+                          <select
+                            value={rxData.leftAxis}
+                            disabled={!isCylActive(rxData.leftCyl)}
+                            onChange={e => setRxData({...rxData, leftAxis: e.target.value})}
+                            style={{
+                              padding: '12px', borderRadius: '6px', fontSize: '15px', width: '100%',
+                              backgroundColor: isCylActive(rxData.leftCyl) ? '#fff' : '#f5f5f5',
+                              color: isCylActive(rxData.leftCyl) ? '#222' : '#aaa',
+                              border: isCylActive(rxData.leftCyl) && !rxData.leftAxis ? '2px solid #e53935' : '1px solid #ccc',
+                              cursor: isCylActive(rxData.leftCyl) ? 'pointer' : 'not-allowed',
+                              opacity: isCylActive(rxData.leftCyl) ? 1 : 0.6,
+                            }}
+                          >
+                            <option value="">{isCylActive(rxData.leftCyl) ? 'AXIS (Required)' : 'AXIS (Select CYL first)'}</option>
+                            {AXIS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                          </select>
+                          {isCylActive(rxData.leftCyl) && !rxData.leftAxis && (
+                            <p style={{ margin: '4px 0 0 2px', fontSize: '12px', color: '#e53935', fontWeight: 500 }}>⚠ AXIS is required when CYL is selected</p>
+                          )}
+                        </div>
                       </div>
                     </div>
 
@@ -563,6 +770,50 @@ function SelectLenses() {
 
                         </div>
                       </div>
+                    </div>
+
+                    {/* Star Rating — Rate Your Current Vision (Required) */}
+                    <div style={{
+                      marginTop: '20px', padding: '16px', borderRadius: '10px',
+                      background: rxRating === 0 ? '#fff5f5' : '#FAF6F0',
+                      border: rxRating === 0 ? '2px solid #e53935' : '1px solid #e8ddd0',
+                      transition: 'all 0.2s ease'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                        <label style={{ fontWeight: 600, color: '#3A2415', fontSize: '14px' }}>
+                          Rate Your Current Vision
+                        </label>
+                        <span style={{
+                          fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '20px',
+                          background: rxRating === 0 ? '#e53935' : '#2e7d32',
+                          color: '#fff', letterSpacing: '0.5px'
+                        }}>
+                          {rxRating === 0 ? 'REQUIRED' : 'DONE ✓'}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <FaStar
+                            key={star}
+                            size={30}
+                            style={{ cursor: 'pointer', transition: 'color 0.15s, transform 0.15s', transform: (rxRatingHover || rxRating) >= star ? 'scale(1.2)' : 'scale(1)' }}
+                            color={(rxRatingHover || rxRating) >= star ? '#C5A059' : '#ddd'}
+                            onMouseEnter={() => setRxRatingHover(star)}
+                            onMouseLeave={() => setRxRatingHover(0)}
+                            onClick={() => setRxRating(prev => prev === star ? 0 : star)}
+                          />
+                        ))}
+                        {rxRating > 0 && (
+                          <span style={{ marginLeft: '8px', fontSize: '13px', color: '#6E4B34', fontWeight: 600 }}>
+                            {['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][rxRating]}
+                          </span>
+                        )}
+                      </div>
+                      {rxRating === 0 && (
+                        <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: '#e53935', fontWeight: 500 }}>
+                          ⚠ Please select a star rating to continue
+                        </p>
+                      )}
                     </div>
                   </div>
                 )}

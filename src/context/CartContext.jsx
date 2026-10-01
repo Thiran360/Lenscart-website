@@ -79,7 +79,7 @@ export function CartProvider({ children }) {
    * Fetch cart from backend API if not already fetched
    * "idha api la fetch pani irudha vitru pana ma irudha fetch paniru"
    */
-  const fetchCart = useCallback(async (force = false) => {
+  const fetchCart = useCallback(async (force = false, signal) => {
     // If already fetched from API and force is not set, skip redundant fetch
     if (isFetchedFromApiRef.current && !force) {
       return;
@@ -91,9 +91,12 @@ export function CartProvider({ children }) {
       return;
     }
 
+    // Set instantly to avoid duplicate concurrent calls in StrictMode
+    isFetchedFromApiRef.current = true;
+
     try {
       setLoading(true);
-      const res = await getCartApi();
+      const res = await getCartApi({ signal });
       let rawList = [];
 
       if (Array.isArray(res)) {
@@ -123,7 +126,7 @@ export function CartProvider({ children }) {
             }
           }
           // Re-fetch after syncing
-          const refreshed = await getCartApi();
+          const refreshed = await getCartApi({ signal });
           const refreshedList = (Array.isArray(refreshed?.data) ? refreshed.data : []).map(resolveCartItem).filter(Boolean);
           if (refreshedList.length > 0) {
             setCartItems(refreshedList);
@@ -135,9 +138,14 @@ export function CartProvider({ children }) {
         }
       }
 
-      isFetchedFromApiRef.current = true;
     } catch (err) {
+      if (err.name === "AbortError" || err.message?.includes("aborted")) {
+        console.log("[Cart API] Fetch aborted");
+        isFetchedFromApiRef.current = false;
+        return;
+      }
       console.warn("[Cart API Fetch Warning]:", err.message);
+      isFetchedFromApiRef.current = false;
     } finally {
       setLoading(false);
     }

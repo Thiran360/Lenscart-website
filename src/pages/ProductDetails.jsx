@@ -29,6 +29,7 @@ import VirtualTryOn from "../components/VirtualTryOn";
 import ProductInfoTabs from "../components/ProductInfoTabs";
 import RelatedProducts from "../components/RelatedProducts";
 import Footer from "../components/Footer";
+import ReturnPolicy from "../pages/ReturnPolicy";
 import { useToast } from "../context/ToastContext";
 import { getStoreProducts, getGlassProducts, getProductDetailsApi } from "../services/productService";
 import "./ProductDetails.css";
@@ -84,6 +85,7 @@ function ProductDetails() {
   const [selectedSize, setSelectedSize] = useState(product?.size || 'M');
   const [isTryOnOpen, setIsTryOnOpen] = useState(false);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  const [showReturnPolicy, setShowReturnPolicy] = useState(false);
   const [isOffersOpen, setIsOffersOpen] = useState(false);
   const [currentCouponIndex, setCurrentCouponIndex] = useState(0);
   const [pincode, setPincode] = useState('');
@@ -130,10 +132,11 @@ function ProductDetails() {
   // Load product details from Live API
   useEffect(() => {
     let isMounted = true;
+    const controller = new AbortController();
     setLoadingProduct(true);
 
     // Call GET /product-details/?product-id=id
-    getProductDetailsApi(id)
+    getProductDetailsApi(id, { signal: controller.signal })
       .then((apiProduct) => {
         if (!isMounted) return;
         if (apiProduct) {
@@ -146,6 +149,10 @@ function ProductDetails() {
       })
       .catch((err) => {
         if (!isMounted) return;
+        if (err.name === "AbortError" || err.message?.includes("aborted")) {
+          console.log("[ProductDetails] Fetch aborted");
+          return;
+        }
         console.warn("[ProductDetails] getProductDetailsApi error, attempting fallback:", err.message);
         fallbackLocalProduct();
       })
@@ -183,6 +190,7 @@ function ProductDetails() {
 
     return () => {
       isMounted = false;
+      // Removed controller.abort() to prevent React StrictMode from canceling valid requests
     };
   }, [id]);
 
@@ -245,16 +253,36 @@ function ProductDetails() {
     }
   };
 
-  const handleCheckPincode = () => {
+  const handleCheckPincode = async () => {
     if (pincode.trim().length === 6 && !isNaN(pincode)) {
-      const lastDigit = parseInt(pincode.charAt(5));
-      const deliveryDays = (lastDigit % 4) + 2;
-      
-      const d = new Date();
-      d.setDate(d.getDate() + deliveryDays);
-      const formattedDate = d.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' });
-      setDeliveryDate(formattedDate);
-      toast.success(`Express Delivery to ${pincode} available by ${formattedDate}!`);
+      try {
+        const res = await fetch(`https://capsule-most-rundown.ngrok-free.dev/api/serviceability/?pincode=${pincode}`);
+        if (!res.ok) throw new Error("Serviceability API error");
+        
+        const data = await res.json();
+        const payload = data.data || data;
+        
+        // Handle typical responses
+        if (payload.is_serviceable !== false && payload.isServiceable !== false) {
+          const estimatedDelivery = payload.estimated_delivery || payload.estimatedDelivery || "2-4 business days";
+          setDeliveryDate(estimatedDelivery);
+          toast.success(`Delivery to ${pincode} available! (Est. ${estimatedDelivery})`);
+        } else {
+          setDeliveryDate(null);
+          toast.error(`Sorry, delivery is not available for ${pincode}.`);
+        }
+      } catch (err) {
+        console.error("Pincode API failed, falling back to mock:", err);
+        // Fallback to local mock if server is down/CORS fails
+        const lastDigit = parseInt(pincode.charAt(5));
+        const deliveryDays = (lastDigit % 4) + 2;
+        
+        const d = new Date();
+        d.setDate(d.getDate() + deliveryDays);
+        const formattedDate = d.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' });
+        setDeliveryDate(formattedDate);
+        toast.success(`Express Delivery to ${pincode} available by ${formattedDate}!`);
+      }
     } else {
       toast.warning("Please enter a valid 6-digit postal pincode.");
       setDeliveryDate(null);
@@ -347,7 +375,13 @@ function ProductDetails() {
     );
   }
 
-  const isBogoEligible = Boolean(product.isBogo || product.applicable_for_buy_one_get_one);
+  const isBogoEligible = Boolean(
+    product.isBogo || 
+    product.applicable_for_buy_one_get_one ||
+    String(product.category || "").toLowerCase().includes("buy 1 get 1") ||
+    String(product.category || "").toLowerCase().includes("bogo") ||
+    Number(product.price) > 2500
+  );
   const displayPrice = Number(product.price || 1200);
   const displayOldPrice = Number(product.oldPrice || Math.round(displayPrice * 1.4));
   const discountPercent = Number(product.discount || (displayOldPrice > displayPrice ? Math.round(((displayOldPrice - displayPrice) / displayOldPrice) * 100) : 25));
@@ -486,7 +520,7 @@ function ProductDetails() {
                 <span>{product.rating || '4.8'}</span>
               </div>
               <a href="#reviews" className="pd-reviews-link">
-                <strong>218 verified customer ratings</strong> • Top Choice
+                Top Choice
               </a>
             </div>
 
@@ -576,11 +610,6 @@ function ProductDetails() {
             <div className="pd-cta-block">
               {/* Badges Row: 14 Days Free Returns & Frame Care Kit Checkbox */}
               <div className="pd-badges-row">
-                <div className="pd-free-returns-badge">
-                  <FaUndo className="pd-returns-icon" />
-                  <span>4 Days Free Returns</span>
-                </div>
-
                 {!isSunglasses && (
                   <label className="pd-carekit-checkbox-badge" title="Check to include a free frame care kit with your order">
                     <input
@@ -589,7 +618,6 @@ function ProductDetails() {
                       onChange={(e) => setIncludeCareKit(e.target.checked)}
                       className="pd-carekit-input"
                     />
-                    <FaBoxOpen className="pd-carekit-icon" />
                     <span className="pd-carekit-text">
                       Frame Care Kit <span className="pd-carekit-free-tag">FREE</span>
                     </span>
@@ -618,15 +646,7 @@ function ProductDetails() {
                 </button>
               </div>
 
-              {/* Secondary Actions: Add to Cart and Live 3D Try-On */}
-              <div className="pd-cta-row-secondary">
-                <button className="pd-btn-cta pd-btn-get-yours" onClick={handleAddToCart}>
-                  <FaShoppingCart style={{ color: '#0d6b6d' }} /> Add to Cart
-                </button>
-                <button className="pd-btn-cta pd-btn-live-tryon" onClick={() => setIsTryOnOpen(true)}>
-                  <FaCamera style={{ color: '#0d6b6d' }} /> Live 3D Try-On
-                </button>
-              </div>
+
             </div>
 
             {/* Delivery Pincode Checker */}
@@ -663,29 +683,46 @@ function ProductDetails() {
             <div className="pd-trust-grid">
               <div 
                 className={`pd-trust-item ${selectedAssurances.includes('return') ? 'active' : ''}`}
-                onClick={() => navigate('/policy-info/return')}
+                onClick={() => setShowReturnPolicy(true)}
               >
                 <FaBoxOpen className="pd-trust-icon" />
                 <div>
-                  <div className="pd-trust-text-title">4 Days Free Returns</div>
+                  <div className="pd-trust-text-title">
+                    {(() => {
+                      const pType = String(product?.type || "").toLowerCase();
+                      if (pType.includes('sunglass') || pType.includes('accessor') || pType.includes('zero')) {
+                        return '7 Days Free Returns';
+                      }
+                      return '4 Days Free Returns';
+                    })()}
+                  </div>
                   <div className="pd-trust-text-sub">100% Money Back</div>
                 </div>
               </div>
 
-              <div 
-                className={`pd-trust-item ${selectedAssurances.includes('exchange') ? 'active' : ''}`}
-                onClick={() => navigate('/policy-info/exchange')}
-              >
-                <FaExchangeAlt className="pd-trust-icon" />
-                <div>
-                  <div className="pd-trust-text-title">14 Days Free Exchange</div>
-                  <div className="pd-trust-text-sub">Hassle-Free Swap</div>
-                </div>
-              </div>
+              {(() => {
+                const pType = String(product?.type || "").toLowerCase();
+                const hideExchange = pType.includes('sunglass') || pType.includes('accessor') || pType.includes('zero');
+                
+                if (hideExchange) return null;
+                
+                return (
+                  <div 
+                    className={`pd-trust-item ${selectedAssurances.includes('exchange') ? 'active' : ''}`}
+                    onClick={() => setShowReturnPolicy(true)}
+                  >
+                    <FaExchangeAlt className="pd-trust-icon" />
+                    <div>
+                      <div className="pd-trust-text-title">14 Days Free Exchange</div>
+                      <div className="pd-trust-text-sub">Hassle-Free Swap</div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div 
                 className={`pd-trust-item ${selectedAssurances.includes('warranty') ? 'active' : ''}`}
-                onClick={() => navigate('/policy-info/warranty')}
+                onClick={() => setShowReturnPolicy(true)}
               >
                 <FaShieldAlt className="pd-trust-icon" />
                 <div>
@@ -707,6 +744,9 @@ function ProductDetails() {
         <RelatedProducts currentProduct={product} />
 
       </div>
+
+      {/* Return Policy Modal */}
+      {showReturnPolicy && <ReturnPolicy onClose={() => setShowReturnPolicy(false)} />}
 
       {/* 3D AR Virtual Try-On Modal */}
       <VirtualTryOn 

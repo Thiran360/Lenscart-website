@@ -70,25 +70,33 @@ function App() {
         return;
       }
 
-      const message = event?.detail?.message || "user_token is required. Please login to continue.";
+      const message = event?.detail?.message || "Your session has expired. Please log in again.";
 
-      // Check if already on an auth page (login, register, etc.)
       const currentPath = window.location.pathname || location.pathname;
       const authPages = ["/login", "/register", "/forgot-password", "/verify-otp"];
       const isAuthPage = authPages.some((path) => currentPath.startsWith(path));
+      
+      const protectedPages = ["/profile", "/checkout", "/admin", "/track-order", "/wishlist"];
+      const isProtectedPage = protectedPages.some((path) => currentPath.startsWith(path));
 
       if (!isAuthPage) {
-        if (toast?.error) {
-          toast.error(message);
+        if (isProtectedPage) {
+          if (event?.detail?.hadToken) {
+            if (toast?.error) toast.error("Your session has expired. Please log in again.");
+          }
+          navigate("/login", {
+            state: {
+              from: currentPath + (window.location.search || location.search || ""),
+              reason: message,
+            },
+            replace: true,
+          });
+        } else {
+          // If on a public page, just silently log them out (localStorage is already cleared by api.js)
+          if (event?.detail?.hadToken && toast?.info) {
+            toast.info("Your session expired and you were safely logged out.");
+          }
         }
-
-        navigate("/login", {
-          state: {
-            from: currentPath + (window.location.search || location.search || ""),
-            reason: message,
-          },
-          replace: true,
-        });
       }
     };
 

@@ -20,6 +20,8 @@ export const dispatchAuthRequired = (message = "user_token is required. Please l
   if (now - lastAuthDispatch < 2000) return;
   lastAuthDispatch = now;
 
+  const hadToken = Boolean(localStorage.getItem("user_token") || localStorage.getItem("userToken") || localStorage.getItem("token"));
+
   // Clear obsolete token and user data
   localStorage.removeItem("user_token");
   localStorage.removeItem("userToken");
@@ -31,7 +33,8 @@ export const dispatchAuthRequired = (message = "user_token is required. Please l
   window.dispatchEvent(
     new CustomEvent("auth:required", {
       detail: { 
-        message: message || "user_token is required. Please login to continue." 
+        message: message || "user_token is required. Please login to continue.",
+        hadToken: hadToken
       },
     })
   );
@@ -175,7 +178,7 @@ export const apiRequest = async (endpoint, method = "GET", body = null, customHe
     }
   }
 
-  const { timeout, ...safeCustomHeaders } = customHeaders;
+  const { timeout, signal, ...safeCustomHeaders } = customHeaders;
 
   const headers = {
     "ngrok-skip-browser-warning": "true",
@@ -197,7 +200,7 @@ export const apiRequest = async (endpoint, method = "GET", body = null, customHe
   if (!isAuthEndpoint) {
     const token = localStorage.getItem("user_token") || localStorage.getItem("userToken") || localStorage.getItem("token");
 
-    if (token) {
+    if (token && token !== "undefined" && token !== "null") {
       headers["Authorization"] = `Bearer ${token}`;
       headers["user-token"] = token;
       headers["user_token"] = token;
@@ -211,6 +214,7 @@ export const apiRequest = async (endpoint, method = "GET", body = null, customHe
     url,
     headers,
     timeout: reqTimeout,
+    signal,
   };
 
   // Only attach data property if body is provided (avoid sending null payload in DELETE / GET)
@@ -266,7 +270,11 @@ export const apiRequest = async (endpoint, method = "GET", body = null, customHe
       }
 
       if (!isPublicEndpoint(url) && checkIsAuthTokenError(responseData || error, status)) {
-        dispatchAuthRequired(errorMsg);
+        if (url.includes("/prescription")) {
+          console.warn(`[API Notice] Ignoring 401 Auth error for ${url} to prevent false global logout. Falling back to local storage.`);
+        } else {
+          dispatchAuthRequired(errorMsg);
+        }
       }
       const customError = new Error(errorMsg);
       customError.status = status;

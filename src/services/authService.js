@@ -32,7 +32,11 @@ export const registerUser = async (userData) => {
     }
     return response;
   } catch (error) {
-    console.warn("[registerUser] Backend unavailable or CORS error, activating demo/fallback mode:", error.message);
+    // Only fallback on network errors (no response) or 500+ server errors
+    if (error.response && error.response.status < 500) {
+      throw error; // Let the UI handle 4xx errors naturally
+    }
+    console.warn("[registerUser] Backend unavailable, activating demo/fallback mode:", error.message);
     const fallbackOtp = "1234";
     const fallbackToken = "demo_token_" + Date.now();
     localStorage.setItem("user_token", fallbackToken);
@@ -67,7 +71,11 @@ export const loginUser = async (credentials) => {
     }
     return response;
   } catch (error) {
-    console.warn("[loginUser] Backend unavailable or CORS error, activating demo/fallback mode:", error.message);
+    // Only fallback on network errors (no response) or 500+ server errors
+    if (error.response && error.response.status < 500) {
+      throw error; // Let the UI handle 4xx errors naturally
+    }
+    console.warn("[loginUser] Backend unavailable, activating demo/fallback mode:", error.message);
     const fallbackOtp = "1234";
     const fallbackToken = "demo_token_" + Date.now();
     localStorage.setItem("user_token", fallbackToken);

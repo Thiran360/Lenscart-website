@@ -149,20 +149,17 @@ export const placeOrderApi = async ({
   const generatedId = `LK${Math.floor(10000000 + Math.random() * 90000000)}`;
   const backendItems = items
     .filter((item) => isBackendProduct(item.id || item.product_id))
-    .map((item) => ({ product: Number(item.id || item.product_id), quantity: item.quantity || 1 }));
+    .map((item) => ({ product_id: Number(item.id || item.product_id), quantity: item.quantity || 1 }));
 
   if (backendItems.length > 0) {
     try {
-      const formattedAddress = `${payload.shipping_address.street_address}, ${payload.shipping_address.city}, ${payload.shipping_address.state} - ${payload.shipping_address.pincode}`.trim();
       const backendRes = await apiRequest("/order/create/", "POST", {
-        items: backendItems,
-        total_amount: totalAmount,
-        address: finalAddressId,
-        shipping_address: formattedAddress,
-        payment_method: paymentMethod || "card",
+        address_id: finalAddressId,
+        payment_method: paymentMethod || "gpay",
+        items: backendItems
       }, { timeout: 3000 });
 
-      const backendId = backendRes?.order_id || backendRes?.id || backendRes?.data?.id || backendRes?.data?.order_id;
+      const backendId = backendRes?.order_id || backendRes?.id || backendRes?.data?.order_id || backendRes?.data?.id;
       if (backendId) {
         return {
           status: true,

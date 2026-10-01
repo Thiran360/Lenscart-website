@@ -146,7 +146,33 @@ function PrescriptionManager() {
 
   // Save Prescription to API / Local Storage
   const handleSave = async () => {
-    if (!isRxValid || saving) return;
+    if (saving) return;
+
+    if (!rxData.name?.trim()) {
+      toast.error("Please enter a Name for this prescription.");
+      return;
+    }
+    if (!rxData.birthYear) {
+      toast.error("Please select a Birth Year.");
+      return;
+    }
+    if (!uploadedFile) {
+      if (!rxData.rightSph?.trim() || !rxData.leftSph?.trim()) {
+        toast.error("Please enter SPH values for both eyes, or upload a prescription file.");
+        return;
+      }
+      
+      if (rxData.rightCyl?.trim() && rxData.rightCyl !== "0.00" && !rxData.rightAxis?.trim()) {
+        toast.error("Right Eye (OD): If you select a CYL value, you must also select an AXIS.");
+        return;
+      }
+      
+      if (rxData.leftCyl?.trim() && rxData.leftCyl !== "0.00" && !rxData.leftAxis?.trim()) {
+        toast.error("Left Eye (OS): If you select a CYL value, you must also select an AXIS.");
+        return;
+      }
+    }
+
     setSaving(true);
 
     try {
@@ -428,7 +454,7 @@ function PrescriptionManager() {
             </div>
           )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: 20, alignItems: 'flex-end' }}>
             <div className="rx-form-group">
               <label style={{ fontWeight: 600, color: '#3A2415', fontSize: '13.5px' }}>Name * (Letters only)</label>
               <input 
@@ -545,7 +571,7 @@ function PrescriptionManager() {
               <button 
                 className="profile-submit-btn" 
                 onClick={handleSave} 
-                disabled={!isRxValid || saving}
+                disabled={saving}
                 style={{ marginTop: 0 }}
               >
                 {saving ? "Saving..." : "Save Prescription"}

@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Footer from '../components/Footer';
+import ReturnPolicy from '../pages/ReturnPolicy';
 import './ReturnPolicy.css'; // Reusing the same CSS for consistent styling
 
 function PolicyInfo() {
+  const [showReturnPolicy, setShowReturnPolicy] = useState(false);
   const { type } = useParams();
 
   const renderContent = () => {
@@ -97,12 +99,13 @@ function PolicyInfo() {
         {renderContent()}
 
         <div style={{ textAlign: 'center', marginTop: '30px' }}>
-          <Link to="/return-policy" style={{ color: '#0d707f', textDecoration: 'underline', fontWeight: 'bold' }}>
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowReturnPolicy(true); }} style={{ color: '#0d707f', textDecoration: 'underline', fontWeight: 'bold' }}>
             View Full Return, Exchange & Warranty Policy
-          </Link>
+          </a>
         </div>
       </div>
       <Footer />
+      {showReturnPolicy && <ReturnPolicy onClose={() => setShowReturnPolicy(false)} />}
     </div>
   );
 }

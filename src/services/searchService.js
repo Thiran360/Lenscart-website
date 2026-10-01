@@ -27,7 +27,7 @@ export const searchProductsApi = async (params = {}) => {
   const queryString = `?${queryParts.join("&")}`;
   
   try {
-    const response = await apiRequest(`/search/${queryString}`, "GET");
+    const response = await apiRequest(`/search/${queryString}`, "GET", null, { signal: params.signal });
     console.log(`[searchProductsApi] GET /search/${queryString}`, response);
 
     let list = [];
@@ -83,6 +83,10 @@ export const searchProductsApi = async (params = {}) => {
       page: Number(pagination.page || page)
     };
   } catch (error) {
+    if (error.name === "AbortError" || error.message?.includes("aborted")) {
+      console.log(`[searchProductsApi] Search aborted for filter="${filterVal}"`);
+      throw error;
+    }
     console.warn(`[searchProductsApi] Search failed for filter="${filterVal}":`, error.message);
     // Seamless fallback to catalog products matching search keywords when backend API throws FieldError (500)
     const searchLower = filterVal.toLowerCase().trim();

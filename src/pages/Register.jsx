@@ -85,22 +85,30 @@ function Register() {
       }
     } catch (err) {
       console.error("[Register API Error]:", err);
-      // Fallback navigation with demo OTP
-      const serverOtp = "1234";
-      sessionStorage.setItem("otp", serverOtp);
-      localStorage.setItem("pendingName", name.trim());
-      localStorage.setItem("pendingPhone", formattedDisplayPhone);
-      localStorage.setItem("cleanPhone", cleanPhone);
-      sessionStorage.setItem("otpFlow", "register");
-      toast.info("Backend unreachable. Navigating with test OTP: 1234");
-      navigate("/verify-otp", {
-        state: {
-          autoVerify: true,
-          otp: serverOtp,
-          name: name.trim(),
-          phone: cleanPhone
-        }
-      });
+      const isNetworkError = !err.response || err.response?.status >= 500;
+      
+      if (isNetworkError) {
+        // Fallback navigation with demo OTP only for network/server crashes
+        const serverOtp = "1234";
+        sessionStorage.setItem("otp", serverOtp);
+        localStorage.setItem("pendingName", name.trim());
+        localStorage.setItem("pendingPhone", formattedDisplayPhone);
+        localStorage.setItem("cleanPhone", cleanPhone);
+        sessionStorage.setItem("otpFlow", "register");
+        toast.info("Backend unreachable. Navigating with test OTP: 1234");
+        navigate("/verify-otp", {
+          state: {
+            autoVerify: true,
+            otp: serverOtp,
+            name: name.trim(),
+            phone: cleanPhone
+          }
+        });
+      } else {
+        // Display backend error (e.g., 400 Bad Request)
+        const msg = err.response?.data?.message || err.response?.data?.error || err.message || "Registration failed.";
+        setErrorMsg(msg);
+      }
     } finally {
       setLoading(false);
     }

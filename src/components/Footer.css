@@ -47,8 +47,8 @@
 .zenni-newsletter-row {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 40px;
+  justify-content: space-between;
+  gap: 32px;
   flex-wrap: wrap;
 }
 
@@ -349,3 +349,105 @@
     white-space: normal;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Policy Modal Styling
+   -------------------------------------------------------------------------- */
+.policy-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.policy-modal-content {
+  background: #ffffff;
+  color: #333333;
+  width: 100%;
+  max-width: 650px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 32px;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.policy-modal-close {
+  position: absolute;
+  top: 16px; right: 20px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.policy-modal-close:hover {
+  color: #000;
+}
+
+.policy-modal-title {
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  color: #111a24 !important;
+  margin-top: 0 !important;
+  margin-bottom: 8px !important;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.policy-modal-intro {
+  text-align: center;
+  color: #64748b !important;
+  font-size: 14px !important;
+  margin-bottom: 24px !important;
+}
+
+.policy-section {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.policy-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.policy-section h3 {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #0d707f !important;
+  margin: 0 0 8px 0 !important;
+}
+
+.policy-section p {
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  margin: 0 0 6px 0 !important;
+  color: #475569 !important;
+}
+
+.policy-section p strong {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+}
+
+.policy-section ul {
+  margin: 0 0 0 20px;
+  padding: 0;
+}
+
+.policy-section li {
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  color: #475569 !important;
+}
+

@@ -82,21 +82,29 @@ function Login() {
       }
     } catch (err) {
       console.error("[Login API Error]:", err);
-      // Even on direct network crash, allow user to test via test OTP fallback
-      const serverOtp = "1234";
-      sessionStorage.setItem("otp", serverOtp);
-      localStorage.setItem("pendingPhone", formattedDisplayPhone);
-      localStorage.setItem("cleanPhone", cleanPhone);
-      sessionStorage.setItem("otpFlow", "login");
-      toast.info("Backend unreachable. Navigating with test OTP: 1234");
-      navigate("/verify-otp", {
-        state: {
-          autoVerify: true,
-          otp: serverOtp,
-          name: "",
-          phone: cleanPhone
-        }
-      });
+      const isNetworkError = !err.response || err.response?.status >= 500;
+      
+      if (isNetworkError) {
+        // Only use fallback for actual network/server crashes
+        const serverOtp = "1234";
+        sessionStorage.setItem("otp", serverOtp);
+        localStorage.setItem("pendingPhone", formattedDisplayPhone);
+        localStorage.setItem("cleanPhone", cleanPhone);
+        sessionStorage.setItem("otpFlow", "login");
+        toast.info("Backend unreachable. Navigating with test OTP: 1234");
+        navigate("/verify-otp", {
+          state: {
+            autoVerify: true,
+            otp: serverOtp,
+            name: "",
+            phone: cleanPhone
+          }
+        });
+      } else {
+        // Display backend error (e.g., 404 Not Found, 400 Bad Request)
+        const msg = err.response?.data?.message || err.response?.data?.error || err.message || "Failed to send OTP.";
+        setErrorMsg(msg);
+      }
     } finally {
       setLoading(false);
     }

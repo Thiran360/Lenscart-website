@@ -593,7 +593,7 @@ export const getBuyOneGetOneApi = async (params = {}) => {
   const offset = (page - 1) * limit;
   const queryString = `?page=${page}&limit=${limit}&page_size=${limit}&page_number=${page}&offset=${offset}`;
 
-  const allBogo = productsData.filter(p => Number(p.price) >= 2500);
+  const allBogo = productsData.filter(p => Number(p.price) > 2500);
   const fallbackTotalItems = allBogo.length;
   const fallbackTotalPages = Math.max(1, Math.ceil(fallbackTotalItems / limit));
   const fallbackSlice = allBogo.slice(offset, offset + limit);
@@ -638,7 +638,7 @@ export const getBuyOneGetOneApi = async (params = {}) => {
         isBogo: true,
       }, idx))
       .filter(Boolean)
-      .filter(p => Number(p.price) >= 2500);
+      .filter(p => Number(p.price) > 2500);
 
     // Fallback if empty
     if (normalized.length === 0) {
@@ -687,7 +687,7 @@ export const getBuyOneGetOneApi = async (params = {}) => {
  * GET https://capsule-most-rundown.ngrok-free.dev/api/product-details/?product-id=46
  * @param {string|number} productId
  */
-export const getProductDetailsApi = async (productId) => {
+export const getProductDetailsApi = async (productId, options = {}) => {
   if (!productId) return null;
 
   const cleanId = String(productId).trim();
@@ -698,7 +698,7 @@ export const getProductDetailsApi = async (productId) => {
   console.log(`[getProductDetailsApi] GET ${url} (product_id: "${cleanId}")`);
 
   try {
-    const response = await apiRequest(url, "GET");
+    const response = await apiRequest(url, "GET", null, { signal: options.signal });
     console.log("[getProductDetailsApi Response]:", response);
 
     let rawData = response?.data?.product || 
@@ -716,6 +716,10 @@ export const getProductDetailsApi = async (productId) => {
       return normalizeProduct(rawData, 0);
     }
   } catch (error) {
+    if (error.name === "AbortError" || error.message?.includes("aborted")) {
+      console.log(`[getProductDetailsApi] Request aborted for product #${cleanId}`);
+      throw error;
+    }
     console.warn(`[getProductDetailsApi] Backend returned error for product #${cleanId} (${error.message}). Falling back to local catalog product.`);
   }
 

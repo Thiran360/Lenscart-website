@@ -1037,3 +1037,60 @@
     font-size: 11.5px;
   }
 }
+
+/* Prepaid Offer Announcement Bar */
+.announcement-bar {
+  background-color: #3B2418;
+  color: #FFF5E5;
+  overflow: hidden;
+  white-space: nowrap;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 999;
+}
+
+.announcement-text-wrapper {
+  display: inline-block;
+  white-space: nowrap;
+  animation: scroll-left 25s linear infinite;
+  /* Will translate by half its width to create seamless loop with duplicated text */
+}
+
+.announcement-bar:hover .announcement-text-wrapper {
+  animation-play-state: paused;
+}
+
+.announcement-text {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  padding-right: 50px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announcement-text-wrapper {
+    animation: none;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+  .announcement-text {
+    padding-right: 0;
+  }
+  /* Hide duplicates if animation is disabled */
+  .announcement-text:not(:first-child) {
+    display: none;
+  }
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

@@ -1,123 +1,103 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  AreaChart,
-  Area
-} from "recharts";
-import Navbar from "../components/Navbar";
+import React, { useState, useEffect } from "react";
+import { FaUsers, FaUserTag, FaFileAlt, FaGlobe } from "react-icons/fa";
 import "./Analytics.css";
 
-// Mock Data
-const trafficData = [
-  { name: "Mon", visitors: 4000, pageViews: 2400 },
-  { name: "Tue", visitors: 3000, pageViews: 1398 },
-  { name: "Wed", visitors: 2000, pageViews: 9800 },
-  { name: "Thu", visitors: 2780, pageViews: 3908 },
-  { name: "Fri", visitors: 1890, pageViews: 4800 },
-  { name: "Sat", visitors: 2390, pageViews: 3800 },
-  { name: "Sun", visitors: 3490, pageViews: 4300 },
-];
-
-const salesData = [
-  { name: "Jan", revenue: 4000 },
-  { name: "Feb", revenue: 3000 },
-  { name: "Mar", revenue: 2000 },
-  { name: "Apr", revenue: 2780 },
-  { name: "May", revenue: 1890 },
-  { name: "Jun", revenue: 2390 },
-];
-
 function Analytics() {
+  const [trafficData, setTrafficData] = useState({
+    totalVisitors: "--",
+    uniqueVisitors: "--",
+    pageViews: "--",
+    activeVisitors: "--"
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Generate dates for the last 30 days to satisfy backend requirements
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
+    
+    const endStr = endDate.toISOString().split('T')[0];
+    const startStr = startDate.toISOString().split('T')[0];
+
+    import("../services/api").then(({ apiRequest }) => {
+      apiRequest(`/analytics/traffic?start_date=${startStr}&end_date=${endStr}`, "GET")
+        .then(data => {
+          const payload = data.data || data;
+          setTrafficData({
+            totalVisitors: payload.total_visitors || payload.totalVisitors || "0",
+            uniqueVisitors: payload.unique_visitors || payload.uniqueVisitors || "0",
+            pageViews: payload.page_views || payload.pageViews || "0",
+            activeVisitors: payload.active_visitors || payload.activeVisitors || "0"
+          });
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error("Error fetching analytics:", err);
+          setError("Analytics not configured yet. Connect a data source to see live traffic.");
+          setLoading(false);
+        });
+    });
+  }, []);
+
   return (
-    <div className="analytics-page">
-      <Navbar />
-      
-      <div className="analytics-container">
-        <div className="analytics-header">
-          <h1>Website Analytics & Performance</h1>
-          <p>Real-time insights for your Mr.LensMaker store.</p>
+    <div className="analytics-container" style={{ padding: 0 }}>
+      <div className="dash-header-wrap">
+        <div>
+          <h1 className="dash-header">Site Traffic</h1>
+          <p className="dash-header-subtitle">Monitor your website traffic and visitor activity.</p>
         </div>
+      </div>
 
-        {/* KPI Cards */}
-        <div className="kpi-grid">
-          <div className="kpi-card">
-            <h3>Total Visitors</h3>
-            <h2>24,592</h2>
-            <span className="trend positive">↑ 12% vs last week</span>
-          </div>
-          <div className="kpi-card">
-            <h3>Conversion Rate</h3>
-            <h2>3.8%</h2>
-            <span className="trend positive">↑ 0.4% vs last week</span>
-          </div>
-          <div className="kpi-card">
-            <h3>Total Revenue</h3>
-            <h2>₹1,42,390</h2>
-            <span className="trend negative">↓ 2% vs last week</span>
-          </div>
-          <div className="kpi-card">
-            <h3>Active Users (Live)</h3>
-            <h2 className="live-users">142 <span>●</span></h2>
-            <span className="trend neutral">Right now</span>
-          </div>
+      {error && (
+        <div className="analytics-not-configured" style={{
+          background: '#fff',
+          padding: '24px',
+          borderRadius: '16px',
+          border: '1px solid rgba(224, 216, 200, 0.6)',
+          marginBottom: '24px',
+          textAlign: 'center',
+          color: '#6E4B34'
+        }}>
+          {error}
         </div>
+      )}
 
-        {/* Charts Grid */}
-        <div className="charts-grid">
-          {/* Traffic Area Chart */}
-          <div className="chart-card">
-            <h3>Weekly Traffic (Visitors vs PageViews)</h3>
-            <div className="chart-wrapper">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={trafficData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorVisitors" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#C9A66B" stopOpacity={0.4}/>
-                      <stop offset="95%" stopColor="#C9A66B" stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.4}/>
-                      <stop offset="95%" stopColor="#82ca9d" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                  <XAxis dataKey="name" stroke="#6E4B34" />
-                  <YAxis stroke="#6E4B34" />
-                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '5px', color: '#333' }} />
-                  <Legend />
-                  <Area type="monotone" dataKey="visitors" stroke="#C9A66B" strokeWidth={3} fillOpacity={1} fill="url(#colorVisitors)" />
-                  <Area type="monotone" dataKey="pageViews" stroke="#82ca9d" strokeWidth={3} fillOpacity={1} fill="url(#colorViews)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+      {/* KPI Cards */}
+      <div className="kpi-grid">
+        <div className="kpi-card" style={{ opacity: loading ? 0.7 : 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <FaUsers style={{ color: '#0d6b6d' }} />
+            <h3 style={{ margin: 0 }}>Total Visitors</h3>
           </div>
-
-          {/* Sales Bar Chart */}
-          <div className="chart-card">
-            <h3>Monthly Revenue (₹)</h3>
-            <div className="chart-wrapper">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={salesData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                  <XAxis dataKey="name" stroke="#6E4B34" />
-                  <YAxis stroke="#6E4B34" />
-                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '5px', color: '#333' }} />
-                  <Legend />
-                  <Bar dataKey="revenue" fill="#3A2415" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+          <h2>{loading ? "..." : trafficData.totalVisitors}</h2>
+        </div>
+        
+        <div className="kpi-card" style={{ opacity: loading ? 0.7 : 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <FaUserTag style={{ color: '#0d6b6d' }} />
+            <h3 style={{ margin: 0 }}>Unique Visitors</h3>
           </div>
+          <h2>{loading ? "..." : trafficData.uniqueVisitors}</h2>
+        </div>
+        
+        <div className="kpi-card" style={{ opacity: loading ? 0.7 : 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <FaFileAlt style={{ color: '#0d6b6d' }} />
+            <h3 style={{ margin: 0 }}>Total Page Views</h3>
+          </div>
+          <h2>{loading ? "..." : trafficData.pageViews}</h2>
+        </div>
+        
+        <div className="kpi-card" style={{ opacity: loading ? 0.7 : 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <FaGlobe style={{ color: '#0d6b6d' }} />
+            <h3 style={{ margin: 0 }}>Active Visitors</h3>
+          </div>
+          <h2 className="live-users" style={{ color: error ? '#aaa' : '#0d6b6d' }}>
+            {loading ? "..." : trafficData.activeVisitors} <span style={{ color: error ? '#aaa' : '#2e7d32' }}>●</span>
+          </h2>
         </div>
       </div>
     </div>

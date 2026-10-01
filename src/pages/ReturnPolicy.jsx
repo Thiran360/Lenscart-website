@@ -1,11 +1,31 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Footer from '../components/Footer';
 import './ReturnPolicy.css';
 
-function ReturnPolicy() {
+function ReturnPolicy({ onClose }) {
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    const resetScroll = () => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = 0;
+      }
+    };
+    resetScroll();
+    // Safety check in case content renders a tick later
+    const timeout = setTimeout(resetScroll, 50);
+    // Prevent background scrolling when modal is open
+    document.body.style.overflow = 'hidden';
+    return () => {
+      clearTimeout(timeout);
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
+
   return (
-    <div className="policy-page-wrapper">
-      <div className="policy-container">
+    <div className="policy-modal-overlay" onClick={onClose}>
+      <div className="policy-modal-content" onClick={e => e.stopPropagation()}>
+        <button className="policy-close-btn" onClick={onClose}>&times;</button>
         
         {/* Header Section */}
         <div className="policy-header-section">
@@ -18,8 +38,10 @@ function ReturnPolicy() {
           <p className="policy-subtitle">Mr. LensMaker wants you to shop with complete peace of mind.</p>
         </div>
 
-        {/* Intro */}
-        <div className="policy-intro">
+        {/* Scrollable Content */}
+        <div className="policy-scrollable-content" ref={scrollRef}>
+          {/* Intro */}
+          <div className="policy-intro">
           <p>
             We understand that buying eyewear online can sometimes feel uncertain. That is why we offer <strong>Free Returns, Free Exchanges, and a 365-Day Product Warranty</strong> on eligible products.
           </p>
@@ -348,7 +370,7 @@ function ReturnPolicy() {
         </section>
 
       </div>
-      <Footer />
+    </div>
     </div>
   );
 }

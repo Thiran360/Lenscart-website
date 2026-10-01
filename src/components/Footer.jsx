@@ -12,6 +12,7 @@ import "./Footer.css";
 function Footer() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
 
   const handleSubscribe = (e) => {
     e.preventDefault();
@@ -90,8 +91,11 @@ function Footer() {
               <li><Link to="/track-order">Track My Order</Link></li>
               <li><Link to="/profile?tab=address">Saved Delivery Addresses</Link></li>
               <li><Link to="/profile?tab=prescriptions">My Prescriptions</Link></li>
-              <li><Link to="/return-policy">Return & Exchange Policy</Link></li>
-              <li><Link to="/about">1-Year Warranty Information</Link></li>
+              <li>
+                <a href="#" onClick={(e) => { e.preventDefault(); setIsPolicyModalOpen(true); }}>
+                  Return, Exchange & Warranty Policy
+                </a>
+              </li>
               <li><Link to="/try-at-home">Try At Home Service</Link></li>
               <li><Link to="/stores">Find Optical Stores</Link></li>
             </ul>
@@ -185,6 +189,39 @@ function Footer() {
           </div>
         </div>
       </div>
+
+      {/* Policy Modal */}
+      {isPolicyModalOpen && (
+        <div className="policy-modal-overlay" onClick={() => setIsPolicyModalOpen(false)}>
+          <div className="policy-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="policy-modal-close" onClick={() => setIsPolicyModalOpen(false)}>×</button>
+            <h2 className="policy-modal-title">Return & Exchange Policy</h2>
+            <p className="policy-modal-intro">Mr. LensMaker wants you to shop with complete peace of mind.</p>
+            
+            <div className="policy-section">
+              <h3>Prescription Eyeglasses</h3>
+              <p><strong>4-Day Free Return:</strong> No Questions Asked.</p>
+              <p><strong>14-Day Free Exchange:</strong> For eligible products.</p>
+            </div>
+            
+            <div className="policy-section">
+              <h3>Sunglasses & Zero-Power Eyeglasses</h3>
+              <p><strong>7-Day Free Return:</strong> No Questions Asked. No exchange is offered for these products.</p>
+            </div>
+
+            <div className="policy-section">
+              <h3>Exceptions & Non-Returnable Items</h3>
+              <p>Bifocal lenses, Progressive lenses, and High-Power lenses (&gt; +6.00D or &lt; -6.00D) are <strong>not eligible</strong> for return or exchange.</p>
+            </div>
+            
+            <div className="policy-section">
+              <h3>COD & Shipping</h3>
+              <p>COD returns are refunded through Mr. LensMaker Store Credit only.</p>
+              <p>All eligible return and exchange shipping/pickup costs are completely free and borne by Mr. LensMaker.</p>
+            </div>
+          </div>
+        </div>
+      )}
 
     </footer>
   );
