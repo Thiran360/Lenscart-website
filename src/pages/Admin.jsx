@@ -4,7 +4,8 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import GlassManager from "../components/GlassManager";
 import Analytics from "./Analytics";
-import { FaBoxOpen, FaChartLine, FaChevronRight, FaUserShield } from "react-icons/fa";
+import AdminOrders from "../components/AdminOrders";
+import { FaBoxOpen, FaChartLine, FaChevronRight, FaUserShield, FaClipboardList } from "react-icons/fa";
 import "../pages/Profile.css"; // Reuse sidebar styles from Profile
 import "./Admin.css";
 
@@ -13,7 +14,7 @@ function Admin() {
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const activeTab = queryParams.get("tab") || "catalog";
+  const activeTab = queryParams.get("tab") || "orders";
 
   const changeTab = (tabName) => {
     navigate(`/admin?tab=${tabName}`, { replace: true });
@@ -51,6 +52,17 @@ function Admin() {
           
           <nav className="sidebar-nav">
             <div 
+              className={`sidebar-item ${activeTab === 'orders' ? 'active' : ''}`}
+              onClick={() => changeTab('orders')}
+            >
+              <div className="sidebar-icon-box">
+                <FaClipboardList />
+              </div>
+              <span>Orders</span>
+              {activeTab === 'orders' && <FaChevronRight className="sidebar-active-indicator" />}
+            </div>
+
+            <div 
               className={`sidebar-item ${activeTab === 'catalog' ? 'active' : ''}`}
               onClick={() => changeTab('catalog')}
             >
@@ -76,6 +88,7 @@ function Admin() {
 
         {/* Admin Content Area */}
         <main className="dashboard-content">
+          {activeTab === 'orders' && <AdminOrders />}
           {activeTab === 'catalog' && <GlassManager />}
           {activeTab === 'analytics' && <Analytics />}
         </main>

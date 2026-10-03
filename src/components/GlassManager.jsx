@@ -9,6 +9,7 @@ import "./GlassManager.css";
 const GLASS_TYPES = [
   { id: "eyeglasses", label: "Eyeglasses" },
   { id: "sunglasses", label: "Sunglasses" },
+  { id: "kids", label: "Kids Glasses" },
   { id: "power", label: "Power Glass" },
   { id: "contacts", label: "Contact Lenses" },
   { id: "computer", label: "Computer & Blue Light" }
@@ -51,16 +52,18 @@ function GlassManager() {
   });
 
   const fileInputRef = useRef(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
     name: "",
+    description: "",
     type: "eyeglasses",
     category: "Classic",
     price: "",
+    taxPercentage: "18",
     size: "M",
     shape: "Rectangle",
     gender: "Unisex",
@@ -137,22 +140,27 @@ function GlassManager() {
     });
   };
 
-  const processFile = (file) => {
-    if (!file || !file.type.startsWith("image/")) {
-      toast.warning("Please upload a valid image file (PNG, JPG, WEBP).");
+  const processFiles = (files) => {
+    const validFiles = Array.from(files).filter(file => file.type.startsWith("image/"));
+    if (validFiles.length === 0) {
+      toast.warning("Please upload valid image files (PNG, JPG, WEBP).");
       return;
     }
-    setSelectedFile(file);
-    const reader = new FileReader();
-    reader.onload = (uploadEvent) => {
-      setImagePreview(uploadEvent.target.result);
-    };
-    reader.readAsDataURL(file);
+    
+    setSelectedFiles(prev => [...prev, ...validFiles]);
+    
+    validFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (uploadEvent) => {
+        setImagePreviews(prev => [...prev, uploadEvent.target.result]);
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      processFile(e.target.files[0]);
+    if (e.target.files && e.target.files.length > 0) {
+      processFiles(e.target.files);
     }
   };
 
@@ -169,8 +177,8 @@ function GlassManager() {
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      processFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processFiles(e.dataTransfer.files);
     }
   };
 
@@ -187,10 +195,12 @@ function GlassManager() {
 
     const apiPayload = {
       product_name: formData.name.trim(),
+      description: formData.description.trim(),
       model_name: formData.name.trim(),
       category_type: formData.type.toLowerCase(),
       frame_size: formData.size.toUpperCase(),
       price: priceNum,
+      tax_percentage: Number(formData.taxPercentage) || 18,
       structure_style: formData.shape.toLowerCase(),
       target_audience: formData.gender.toLowerCase(),
       collection_tier: (is1200Store ? "essential" : formData.category.toLowerCase()),
@@ -203,14 +213,16 @@ function GlassManager() {
 
     try {
       // Call POST https://capsule-most-rundown.ngrok-free.dev/api/glass-product/create/
-      await createGlassProduct(apiPayload, selectedFile);
+      await createGlassProduct(apiPayload, selectedFiles.length > 0 ? selectedFiles : null);
 
       // Reset Form
       setFormData({
         name: "",
+        description: "",
         type: "eyeglasses",
         category: "Classic",
         price: "",
+        taxPercentage: "18",
         size: "M",
         shape: "Rectangle",
         gender: "Unisex",
@@ -222,8 +234,8 @@ function GlassManager() {
         colors: ["black", "gold"],
         rating: 4.8
       });
-      setImagePreview(null);
-      setSelectedFile(null);
+      setImagePreviews([]);
+      setSelectedFiles([]);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -303,16 +315,17 @@ function GlassManager() {
 
           {/* Image Upload Area */}
           <div className="glass-field" style={{ marginBottom: 25 }}>
-            <label>Product Imagery & Asset</label>
+            <label>Product Imagery & Assets (Up to 5 photos)</label>
             <input
               type="file"
               ref={fileInputRef}
               accept="image/*"
+              multiple
               style={{ display: "none" }}
               onChange={handleFileChange}
             />
 
-            {!imagePreview ? (
+            {!imagePreviews.length ? (
               <div
                 className={`glass-upload-zone ${isDragging ? 'dragging' : ''}`}
                 onClick={() => fileInputRef.current?.click()}
@@ -321,34 +334,64 @@ function GlassManager() {
                 onDrop={handleDrop}
               >
                 <FaCloudUploadAlt size={45} className="upload-icon" />
-                <p className="upload-title">Click to Upload or Drag & Drop Product Image</p>
+                <p className="upload-title">Click to Upload or Drag & Drop Product Images</p>
                 <span className="upload-sub">High-resolution JPG, PNG, or WEBP supported</span>
               </div>
             ) : (
-              <div className="glass-preview-card">
-                <img src={imagePreview} alt="Glass Preview" className="preview-img" />
+              <div className="glass-preview-container">
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} className="glass-preview-card" style={{ width: '120px', height: 'auto', position: 'relative' }}>
+                      <img src={preview} alt={`Preview ${index}`} className="preview-img" style={{ width: '100%', borderRadius: '8px' }} />
+                      <button
+                        type="button"
+                        style={{
+                          position: 'absolute', top: '-8px', right: '-8px',
+                          background: '#EF4444', color: '#fff', border: 'none',
+                          borderRadius: '50%', width: '24px', height: '24px',
+                          cursor: 'pointer', fontSize: '12px', display: 'flex',
+                          alignItems: 'center', justifyContent: 'center'
+                        }}
+                        onClick={() => {
+                          const newPreviews = [...imagePreviews];
+                          newPreviews.splice(index, 1);
+                          setImagePreviews(newPreviews);
+                          const newFiles = [...selectedFiles];
+                          newFiles.splice(index, 1);
+                          setSelectedFiles(newFiles);
+                          if (fileInputRef.current && newFiles.length === 0) {
+                            fileInputRef.current.value = "";
+                          }
+                        }}
+                      >
+                        <FaTrashAlt />
+                      </button>
+                    </div>
+                  ))}
+                  {imagePreviews.length < 5 && (
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      style={{
+                        width: '120px', height: '120px', border: '2px dashed #CBD5E1',
+                        borderRadius: '8px', display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                        color: '#64748B', background: '#F8FAFC'
+                      }}
+                    >
+                      <FaPlus size={24} style={{ marginBottom: '8px' }} />
+                      <span style={{ fontSize: '12px', fontWeight: '600' }}>Add More</span>
+                    </div>
+                  )}
+                </div>
                 <div className="preview-info">
-                  <strong>Product Asset Loaded</strong>
+                  <strong>{imagePreviews.length} {imagePreviews.length === 1 ? 'Image' : 'Images'} Loaded</strong>
                   <span>Ready for store publication</span>
                 </div>
-                <button
-                  type="button"
-                  className="remove-img-btn"
-                  onClick={() => {
-                    setImagePreview(null);
-                    setSelectedFile(null);
-                    if (fileInputRef.current) {
-                      fileInputRef.current.value = "";
-                    }
-                  }}
-                >
-                  Remove Image
-                </button>
               </div>
             )}
           </div>
 
-          {/* Row 1: Name */}
+          {/* Row 1: Name and Description */}
           <div className="glass-form-grid" style={{ gridTemplateColumns: '1fr' }}>
             <div className="glass-field">
               <label>Model Name / Product Title *</label>
@@ -359,6 +402,29 @@ function GlassManager() {
                 value={formData.name}
                 onChange={handleInputChange}
                 required
+              />
+            </div>
+            
+            <div className="glass-field" style={{ marginTop: '15px' }}>
+              <label>Product Description</label>
+              <textarea
+                name="description"
+                placeholder="Provide a detailed description of the product, materials used, etc."
+                value={formData.description}
+                onChange={handleInputChange}
+                rows="3"
+                style={{
+                  width: '100%',
+                  padding: '12px 14px',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '10px',
+                  background: '#f8fafc',
+                  color: '#1e293b',
+                  fontSize: '14.5px',
+                  transition: 'all 0.2s',
+                  resize: 'vertical',
+                  fontFamily: 'inherit'
+                }}
               />
             </div>
           </div>
@@ -402,6 +468,20 @@ function GlassManager() {
                 style={formData.category === "₹1200 Store" ? { backgroundColor: "#f8fafc", cursor: "not-allowed", fontWeight: 700, color: "#0d6b6d" } : {}}
                 required
               />
+            </div>
+          </div>
+
+          {/* Row 2.5: Tax */}
+          <div className="glass-form-grid" style={{ gridTemplateColumns: '1fr', marginTop: '15px' }}>
+            <div className="glass-field">
+              <label>Tax Percentage (%) *</label>
+              <select name="taxPercentage" value={formData.taxPercentage} onChange={handleInputChange} required>
+                <option value="0">0% (Tax Exempt)</option>
+                <option value="5">5%</option>
+                <option value="12">12%</option>
+                <option value="18">18%</option>
+                <option value="28">28%</option>
+              </select>
             </div>
           </div>
 

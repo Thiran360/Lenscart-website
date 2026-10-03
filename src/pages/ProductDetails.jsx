@@ -606,48 +606,7 @@ function ProductDetails() {
               </div>
             </div>
 
-            {/* CTAs Action Block */}
-            <div className="pd-cta-block">
-              {/* Badges Row: 14 Days Free Returns & Frame Care Kit Checkbox */}
-              <div className="pd-badges-row">
-                {!isSunglasses && (
-                  <label className="pd-carekit-checkbox-badge" title="Check to include a free frame care kit with your order">
-                    <input
-                      type="checkbox"
-                      checked={includeCareKit}
-                      onChange={(e) => setIncludeCareKit(e.target.checked)}
-                      className="pd-carekit-input"
-                    />
-                    <span className="pd-carekit-text">
-                      Frame Care Kit <span className="pd-carekit-free-tag">FREE</span>
-                    </span>
-                  </label>
-                )}
-              </div>
 
-              {/* Primary Action Buttons Row */}
-              <div className="pd-cta-row-primary">
-                <button 
-                  className="pd-btn-cta pd-btn-select-lenses-full" 
-                  style={{ marginBottom: 0 }} 
-                  onClick={handleSelectLenses}
-                >
-                  Select Lenses
-                </button>
-                <button 
-                  className="pd-btn-cta pd-btn-select-without-lenses" 
-                  style={{ marginBottom: 0 }} 
-                  onClick={() => {
-                    handleAddToCart();
-                    navigate("/cart");
-                  }}
-                >
-                  Select without Lenses
-                </button>
-              </div>
-
-
-            </div>
 
             {/* Delivery Pincode Checker */}
             <div className="pd-delivery-card">
@@ -732,6 +691,46 @@ function ProductDetails() {
               </div>
             </div>
 
+            {/* CTAs Action Block */}
+            <div className="pd-cta-block">
+              {/* Badges Row: 14 Days Free Returns & Frame Care Kit Checkbox */}
+              <div className="pd-badges-row">
+                {!isSunglasses && (
+                  <label className="pd-carekit-checkbox-badge" title="Check to include a free frame care kit with your order">
+                    <input
+                      type="checkbox"
+                      checked={includeCareKit}
+                      onChange={(e) => setIncludeCareKit(e.target.checked)}
+                      className="pd-carekit-input"
+                    />
+                    <span className="pd-carekit-text">
+                      Frame Care Kit <span className="pd-carekit-free-tag">FREE</span>
+                    </span>
+                  </label>
+                )}
+              </div>
+
+              {/* Primary Action Buttons Row */}
+              <div className="pd-cta-row-primary">
+                <button 
+                  className="pd-btn-cta pd-btn-select-lenses-full" 
+                  style={{ marginBottom: 0 }} 
+                  onClick={handleSelectLenses}
+                >
+                  Select Lenses
+                </button>
+                <button 
+                  className="pd-btn-cta pd-btn-select-without-lenses" 
+                  style={{ marginBottom: 0 }} 
+                  onClick={() => {
+                    handleAddToCart();
+                    navigate("/cart");
+                  }}
+                >
+                  Select without Lenses
+                </button>
+              </div>
+            </div>
 
 
           </div>

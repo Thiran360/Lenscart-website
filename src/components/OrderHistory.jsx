@@ -14,6 +14,7 @@ import {
   FaArrowRight
 } from "react-icons/fa";
 import { getOrdersApi } from "../services/profileService";
+import { apiRequest } from "../services/api";
 import { useToast } from "../context/ToastContext";
 import Pagination from "./Pagination";
 
@@ -22,6 +23,11 @@ function OrderHistory({ initialAction }) {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [ordersList, setOrdersList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [returnReason, setReturnReason] = useState("Size or frame width doesn't fit comfortably");
+  const [cancelType, setCancelType] = useState('full');
+  const [selectedItemsToCancel, setSelectedItemsToCancel] = useState([]);
+  const [returnType, setReturnType] = useState('full');
+  const [selectedItemsToReturn, setSelectedItemsToReturn] = useState([]);
   const { toast } = useToast();
 
   // Pagination state (5 items per page)
@@ -62,6 +68,10 @@ function OrderHistory({ initialAction }) {
 
           const items = Array.isArray(ord.items) && ord.items.length > 0
             ? ord.items.map(it => ({
+                id: it.id || it.order_item_id || null,
+                order_item_id: it.order_item_id || it.id || null,
+                product_id: it.product_id || it.product || null,
+                quantity: it.quantity || 1,
                 name: it.product_name || it.name || "Eyewear Frame",
                 image: it.image || it.product_image || "/eyeglass1.png",
                 price: it.price || it.unit_price || 0,
@@ -69,12 +79,20 @@ function OrderHistory({ initialAction }) {
               }))
             : Array.isArray(ord.products) && ord.products.length > 0
             ? ord.products.map(p => ({
+                id: p.id || null,
+                order_item_id: p.order_item_id || p.id || null,
+                product_id: p.product_id || p.product || null,
+                quantity: p.quantity || 1,
                 name: p.name || p.title || "Eyewear Frame",
                 image: p.image || "/eyeglass1.png",
                 price: p.price || 0,
                 color: p.color || "Standard"
               }))
             : [{
+                id: null,
+                order_item_id: null,
+                product_id: ord.product_id || null,
+                quantity: ord.quantity || 1,
                 name: ord.product_name || "Eyewear Frame",
                 image: "/eyeglass1.png",
                 price: ord.total_amount || ord.price || 0,
@@ -124,14 +142,132 @@ function OrderHistory({ initialAction }) {
     fetchOrders();
   }, []);
 
-  const openModal = (type, order) => {
+  const openModal = async (type, order) => {
     setSelectedOrder(order);
     setActiveModal(type);
+
+    if (type === 'return') {
+      // The modal just opens to allow the user to submit a return.
+      // We don't fetch return-get here because it will 404 if no return exists yet.
+    }
+    
+    if (type === 'view-return') {
+      try {
+        console.log(`Fetching return details (GET) for order ${order.id}...`);
+        const res = await apiRequest(`/order/${order.id}/return-get/`, "GET");
+        console.log("Return GET API Response:", res);
+        // Display this in the modal
+      } catch (err) {
+        console.warn("Return GET API failed", err);
+      }
+    }
+
+    if (type === 'track') {
+      try {
+        console.log(`Fetching live tracking details (GET) for order ${order.id}...`);
+        const res = await apiRequest(`/orders/${order.id}/`, "GET");
+        console.log("Track API Response:", res);
+        // Update local tracking state if the API returns live statuses
+      } catch (err) {
+        console.warn("Track API failed, using static fallback timeline", err);
+      }
+    }
   };
 
   const closeModal = () => {
     setActiveModal(null);
     setSelectedOrder(null);
+    setReturnReason("Size or frame width doesn't fit comfortably");
+    setCancelType('full');
+    setSelectedItemsToCancel([]);
+    setReturnType('full');
+    setSelectedItemsToReturn([]);
+  };
+
+  const handleReturnRequest = async () => {
+    try {
+      console.log(`Submitting return request for order ${selectedOrder.id}`);
+      
+      const itemsToProcess = returnType === 'partial' 
+        ? selectedOrder.items?.filter(item => selectedItemsToReturn.includes(item.id || item.product_id)) || []
+        : selectedOrder.items || [];
+
+      if (itemsToProcess.length === 0 && selectedOrder.items) {
+          itemsToProcess.push(selectedOrder.items[0]);
+      }
+
+      let hasBackendError = false;
+
+      for (const item of itemsToProcess) {
+        const payload = {
+          order_id: selectedOrder.id,
+          order_item_id: item.order_item_id || item.id || 12,
+          product_id: item.product_id || item.id || 41,
+          quantity: item.quantity || 1,
+          reason: returnReason
+        };
+
+        try {
+          const res = await apiRequest(`/order/${selectedOrder.id}/return/`, "POST", payload);
+          console.log(`Return API Response for product ${payload.product_id}:`, res);
+        } catch (apiErr) {
+          console.warn("API call failed", apiErr);
+          // Don't show toast if it's the fake offline ID failing due to 404
+          if (!String(selectedOrder.id).startsWith("LK")) {
+             toast.error(apiErr.message || "Failed to submit return request.");
+             hasBackendError = true;
+          }
+        }
+      }
+
+      if (hasBackendError) {
+         return; // Abort local update if backend explicitly rejected it
+      }
+
+      toast.success(returnType === 'partial' ? 'Selected items returned successfully!' : 'Return request initiated! Free doorstep pickup scheduled.'); 
+      
+      setOrdersList(prev => prev.map(o => String(o.id) === String(selectedOrder.id) ? { ...o, status: returnType === 'partial' ? 'Partially Returned' : 'Return Requested', eligibleForReturn: false } : o));
+      
+      const storedOrders = JSON.parse(localStorage.getItem("placedOrders")) || [];
+      const updatedStored = storedOrders.map(o => String(o.id) === String(selectedOrder.id) ? { ...o, status: returnType === 'partial' ? 'Partially Returned' : 'Return Requested' } : o);
+      localStorage.setItem("placedOrders", JSON.stringify(updatedStored));
+      
+      closeModal();
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to submit return request.');
+    }
+  };
+
+  const handleCancelRequest = async () => {
+    try {
+      console.log(`Submitting cancel request for order ${selectedOrder.id}`);
+      
+      const payload = {
+        cancel_type: cancelType,
+        item_ids: cancelType === 'partial' ? selectedItemsToCancel : undefined
+      };
+
+      try {
+        const res = await apiRequest(`/order/${selectedOrder.id}/cancel/`, "POST", payload);
+        console.log("Cancel API Response:", res);
+      } catch (apiErr) {
+        console.warn("Cancel API call failed, running offline simulation", apiErr);
+      }
+
+      toast.success(cancelType === 'partial' ? 'Selected items cancelled successfully!' : 'Order cancelled successfully!'); 
+      
+      setOrdersList(prev => prev.map(o => String(o.id) === String(selectedOrder.id) ? { ...o, status: cancelType === 'partial' ? 'Partially Cancelled' : 'Cancelled' } : o));
+      
+      const storedOrders = JSON.parse(localStorage.getItem("placedOrders")) || [];
+      const updatedStored = storedOrders.map(o => String(o.id) === String(selectedOrder.id) ? { ...o, status: cancelType === 'partial' ? 'Partially Cancelled' : 'Cancelled' } : o);
+      localStorage.setItem("placedOrders", JSON.stringify(updatedStored));
+      
+      closeModal();
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to cancel order.');
+    }
   };
 
   useEffect(() => {
@@ -258,7 +394,13 @@ function OrderHistory({ initialAction }) {
                     <FaTruck /> Track Package
                   </button>
 
-                  {order.status === 'Delivered' && order.eligibleForReturn && (
+                  {order.status !== 'Cancelled' && order.status !== 'Return Requested' && order.status !== 'Partially Returned' && order.status !== 'Partially Cancelled' && order.status !== 'Delivered' && (
+                    <button className="btn-outline-action" onClick={() => openModal('cancel', order)}>
+                      <FaTimes /> Cancel Order
+                    </button>
+                  )}
+
+                  {order.status !== 'Return Requested' && order.status !== 'Cancelled' && (
                     <button className="btn-outline-action" onClick={() => openModal('return', order)}>
                       <FaUndo /> Return / Exchange
                     </button>
@@ -357,16 +499,50 @@ function OrderHistory({ initialAction }) {
             <p style={{ color: '#64748B', margin: '0 0 20px 0', fontSize: '13.5px' }}>Order #{selectedOrder.id}</p>
             
             <div>
+              <label style={{ display: 'block', fontWeight: '700', marginBottom: '8px', color: '#334155', fontSize: '13px' }}>Return Type:</label>
+              <select 
+                value={returnType}
+                onChange={(e) => setReturnType(e.target.value)}
+                style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1.5px solid #E2E8F0', marginBottom: '16px', fontSize: '14px', background: '#F8FAFC', color: '#0F172A' }}
+              >
+                <option value="full">Return Entire Order</option>
+                <option value="partial">Return Specific Items</option>
+              </select>
+
+              {returnType === 'partial' && (
+                <div style={{ marginBottom: '16px', background: '#F8FAFC', padding: '16px', borderRadius: '12px' }}>
+                  <p style={{ fontWeight: 600, margin: '0 0 10px 0', fontSize: '13px' }}>Select items to return:</p>
+                  {selectedOrder.items && selectedOrder.items.map((item, idx) => (
+                    <label key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', cursor: 'pointer', fontSize: '14px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedItemsToReturn.includes(item.id || item.product_id)}
+                        onChange={(e) => {
+                          const val = item.id || item.product_id;
+                          if (e.target.checked) setSelectedItemsToReturn([...selectedItemsToReturn, val]);
+                          else setSelectedItemsToReturn(selectedItemsToReturn.filter(id => id !== val));
+                        }}
+                      />
+                      <span>{item.name || item.product_name} (Qty: {item.quantity || 1})</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+
               <label style={{ display: 'block', fontWeight: '700', marginBottom: '8px', color: '#334155', fontSize: '13px' }}>Reason for Return or Replacement:</label>
-              <select style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1.5px solid #E2E8F0', marginBottom: '20px', fontSize: '14px', background: '#F8FAFC', color: '#0F172A' }}>
-                <option>Size or frame width doesn't fit comfortably</option>
-                <option>Damaged or scratch on lens</option>
-                <option>Prescription power mismatch</option>
-                <option>Exchange for another color or frame style</option>
+              <select 
+                value={returnReason}
+                onChange={(e) => setReturnReason(e.target.value)}
+                style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1.5px solid #E2E8F0', marginBottom: '20px', fontSize: '14px', background: '#F8FAFC', color: '#0F172A' }}
+              >
+                <option value="Size or frame width doesn't fit comfortably">Size or frame width doesn't fit comfortably</option>
+                <option value="Damaged or scratch on lens">Damaged or scratch on lens</option>
+                <option value="Prescription power mismatch">Prescription power mismatch</option>
+                <option value="Exchange for another color or frame style">Exchange for another color or frame style</option>
               </select>
               <div style={{ display: 'flex', gap: '12px' }}>
                 <button 
-                  onClick={() => { toast.success('Return request initiated! Free doorstep pickup scheduled.'); closeModal(); }} 
+                  onClick={handleReturnRequest} 
                   className="profile-submit-btn"
                   style={{ flex: 1, marginTop: 0, justifyContent: 'center' }}
                 >
@@ -380,6 +556,73 @@ function OrderHistory({ initialAction }) {
                   Cancel
                 </button>
               </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Cancel Modal */}
+      {activeModal === 'cancel' && selectedOrder && createPortal(
+        <div className="dash-modal-overlay" onClick={closeModal} style={{ position: 'fixed', inset: 0, width: '100vw', height: '100vh', background: 'rgba(15, 23, 42, 0.65)', backdropFilter: 'blur(6px)', zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', boxSizing: 'border-box' }}>
+          <div className="dash-modal" onClick={e => e.stopPropagation()} style={{ background: '#FFFFFF', borderRadius: '20px', padding: '30px', maxWidth: '480px', width: '100%', position: 'relative', border: '1px solid #E2E8F0', boxShadow: '0 25px 60px rgba(15, 23, 42, 0.2)', margin: 'auto' }}>
+            <h2 style={{ margin: '0 0 10px 0', color: '#0F172A', fontSize: '20px', fontWeight: '800' }}>Cancel Order?</h2>
+            <p style={{ color: '#64748B', margin: '0 0 20px 0', fontSize: '14px', lineHeight: '1.5' }}>
+              Are you sure you want to cancel order #{selectedOrder.id}?
+            </p>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '14px', cursor: 'pointer', color: '#0F172A' }}>
+                <input type="radio" name="cancelType" checked={cancelType === 'full'} onChange={() => setCancelType('full')} />
+                Cancel Entire Order
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '14px', cursor: 'pointer', color: '#0F172A' }}>
+                <input type="radio" name="cancelType" checked={cancelType === 'partial'} onChange={() => setCancelType('partial')} />
+                Cancel Specific Items
+              </label>
+            </div>
+
+            {cancelType === 'partial' && (
+              <div style={{ marginBottom: '20px', maxHeight: '220px', overflowY: 'auto', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '10px' }}>
+                {selectedOrder.items && selectedOrder.items.map((item, idx) => (
+                  <label key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', fontSize: '13px', cursor: 'pointer', paddingBottom: '12px', borderBottom: idx < selectedOrder.items.length - 1 ? '1px solid #E2E8F0' : 'none' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={selectedItemsToCancel.includes(item.id || item.product_id)}
+                      onChange={(e) => {
+                        const id = item.id || item.product_id;
+                        if (e.target.checked) {
+                          setSelectedItemsToCancel([...selectedItemsToCancel, id]);
+                        } else {
+                          setSelectedItemsToCancel(selectedItemsToCancel.filter(i => i !== id));
+                        }
+                      }}
+                    />
+                    <img src={item.image} alt={item.name} style={{ width: '45px', height: '45px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #E2E8F0' }} onError={(e) => { e.target.src = "/eyeglass1.png"; }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: '600', color: '#0F172A', marginBottom: '2px' }}>{item.name}</div>
+                      <div style={{ color: '#64748B', fontSize: '12px' }}>Qty: {item.quantity || 1} • {item.color || 'Standard'}</div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            )}
+            
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={handleCancelRequest} 
+                disabled={cancelType === 'partial' && selectedItemsToCancel.length === 0}
+                style={{ flex: 1, padding: '12px', background: (cancelType === 'partial' && selectedItemsToCancel.length === 0) ? '#CBD5E1' : '#EF4444', color: '#FFF', border: 'none', borderRadius: '8px', fontWeight: '700', cursor: (cancelType === 'partial' && selectedItemsToCancel.length === 0) ? 'not-allowed' : 'pointer' }}
+              >
+                Yes, Cancel {cancelType === 'partial' ? 'Selected' : 'Order'}
+              </button>
+              <button 
+                onClick={closeModal} 
+                className="btn-outline-action"
+                style={{ flex: 1, padding: '12px' }}
+              >
+                No, Keep It
+              </button>
             </div>
           </div>
         </div>,

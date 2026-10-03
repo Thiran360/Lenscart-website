@@ -235,6 +235,10 @@ export const createGlassProduct = async (productData, imageFile = null) => {
     const productName = productData.product_name || productData.model_name || productData.name || "";
     formData.append("product_name", productName);
     formData.append("model_name", productName);
+    formData.append("description", productData.description || "");
+    if (productData.tax_percentage !== undefined) {
+      formData.append("tax_percentage", String(productData.tax_percentage));
+    }
     formData.append("category_type", String(productData.category_type || productData.type || "eyeglasses").toLowerCase());
     formData.append("frame_size", String(productData.frame_size || productData.size || "M").toUpperCase());
     const isStore1200 = productData.category === "₹1200 Store" || 
@@ -263,7 +267,16 @@ export const createGlassProduct = async (productData, imageFile = null) => {
     formData.append("applicable_for_buy_one_get_one", String(bogo));
 
     const fileToUpload = imageFile || productData.image || productData.file;
-    if (fileToUpload instanceof File || fileToUpload instanceof Blob) {
+    if (Array.isArray(fileToUpload)) {
+      fileToUpload.forEach((file) => {
+        if (file instanceof File || file instanceof Blob) {
+          formData.append("images", file);
+        }
+      });
+      if (fileToUpload.length > 0 && (fileToUpload[0] instanceof File || fileToUpload[0] instanceof Blob)) {
+        formData.append("image", fileToUpload[0]); // Provide the primary image
+      }
+    } else if (fileToUpload instanceof File || fileToUpload instanceof Blob) {
       formData.append("image", fileToUpload);
     }
 
@@ -693,7 +706,7 @@ export const getProductDetailsApi = async (productId, options = {}) => {
   const cleanId = String(productId).trim();
   if (!cleanId) return null;
 
-  const url = `/product-details/?product_id=${encodeURIComponent(cleanId)}&product-id=${encodeURIComponent(cleanId)}`;
+  const url = `/product-details/?product_id=${encodeURIComponent(cleanId)}`;
 
   console.log(`[getProductDetailsApi] GET ${url} (product_id: "${cleanId}")`);
 

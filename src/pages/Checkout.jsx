@@ -12,6 +12,7 @@ import { FaCreditCard, FaTag, FaCheckCircle, FaMoneyBillWave } from "react-icons
 import "./Checkout.css";
 
 const AVAILABLE_COUPONS = [
+  { code: "SAVE10", discount: 10, type: "percent", label: "10% OFF > ₹5000", desc: "10% off on orders above ₹5000", minOrder: 5000 },
   { code: "BUY1GET1", discount: 50, type: "percent", label: "Buy 1 Get 1 Free", desc: "Buy 1 Get 1 Free Promo", isBogo: true },
   { code: "FIRST15", discount: 15, type: "percent", label: "Flat 15% OFF", desc: "15% off first order" },
   { code: "HDFC10", discount: 10, type: "percent", label: "Extra 10% OFF", desc: "10% instant discount" },
@@ -91,6 +92,12 @@ function Checkout() {
 
     const matched = AVAILABLE_COUPONS.find(c => c.code === cleanCode || (c.isBogo && (cleanCode === "BOGO" || cleanCode === "BOGOFREE")));
     if (matched) {
+      if (matched.minOrder && subTotal < matched.minOrder) {
+        const errMsg = `Coupon "${cleanCode}" is valid only for orders above ₹${matched.minOrder}.`;
+        setCouponError(errMsg);
+        toast.error(errMsg);
+        return;
+      }
       if (matched.isBogo && !isBogoEligibleOrder) {
         const errMsg = `Coupon "${cleanCode}" is only valid for Buy 1 Get 1 Store products!`;
         setCouponError(errMsg);
@@ -118,6 +125,12 @@ function Checkout() {
   };
 
   const handleSelectCoupon = (c) => {
+    if (c.minOrder && subTotal < c.minOrder) {
+      const errMsg = `Coupon "${c.code}" is valid only for orders above ₹${c.minOrder}.`;
+      setCouponError(errMsg);
+      toast.error(errMsg);
+      return;
+    }
     if (c.isBogo && !isBogoEligibleOrder) {
       const errMsg = `Coupon "${c.code}" is only valid for Buy 1 Get 1 Store products!`;
       setCouponError(errMsg);
@@ -429,9 +442,40 @@ function Checkout() {
     setShowPaymentGateway(true);
   };
 
+  const sendOrderNotifications = async (orderId) => {
+    // Note: It's best practice for your backend to handle SMS/Email directly when placeOrderApi is called.
+    // However, if you need the frontend to trigger it separately, here is the structure:
+    try {
+      const payload = {
+        order_id: orderId,
+        customer_name: address.firstName,
+        customer_phone: address.phone,
+        customer_email: address.email || "customer@example.com", // Make sure email is captured in state if needed
+        delivery_date: "3-5 Business Days",
+        total_amount: checkoutTotal
+      };
+      
+      console.log("Triggering SMS & Email Notifications with payload:", payload);
+      
+      /* UNCOMMENT AND UPDATE THIS WHEN YOU HAVE THE NOTIFICATION API:
+      await fetch("https://capsule-most-rundown.ngrok-free.dev/api/send-notifications/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      */
+    } catch (err) {
+      console.error("Failed to send order notifications:", err);
+    }
+  };
+
   const handlePaymentSuccess = async () => {
     setShowPaymentGateway(false);
     const orderId = await placeOrderViaApi();
+    
+    // Trigger SMS and Email notifications
+    await sendOrderNotifications(orderId);
+    
     clearCart();
     navigate("/order-confirmed", { state: { orderId, total: checkoutTotal } });
   };

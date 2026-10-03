@@ -71,7 +71,7 @@ export const placeOrderApi = async ({
           data: rx.data
             ? {
                 name: rx.data.name || "",
-                birth_year: rx.data.birthYear || "",
+                birth_year: rx.dob?.year || rx.data.birthYear || "",
                 right_sph: rx.data.rightSph || "",
                 right_cyl: rx.data.rightCyl || "",
                 right_axis: rx.data.rightAxis || "",
@@ -145,18 +145,28 @@ export const placeOrderApi = async ({
 
   const finalAddressId = (addressId && !isNaN(Number(addressId))) ? Number(addressId) : 1;
 
-  // 2. Sync order to Django Order storage (/order/create/) only for products that exist in Django DB
   const generatedId = `LK${Math.floor(10000000 + Math.random() * 90000000)}`;
-  const backendItems = items
-    .filter((item) => isBackendProduct(item.id || item.product_id))
-    .map((item) => ({ product_id: Number(item.id || item.product_id), quantity: item.quantity || 1 }));
+  const backendItems = orderItems
+    .filter((item) => isBackendProduct(item.product_id))
+    .map((item) => ({
+      product_id: Number(item.product_id),
+      quantity: item.quantity || 1,
+      prescription: item.prescription,
+      lens_type: item.lens_type,
+      lens_package: item.lens_package,
+      lens_additional_price: item.lens_additional_price,
+      high_power_surcharge: item.high_power_surcharge
+    }));
 
   if (backendItems.length > 0) {
     try {
       const backendRes = await apiRequest("/order/create/", "POST", {
         address_id: finalAddressId,
         payment_method: paymentMethod || "gpay",
-        items: backendItems
+        items: backendItems,
+        email: address.email || "",
+        phone: address.phone || "",
+        customer_name: `${address.firstName || ""} ${address.lastName || ""}`.trim()
       }, { timeout: 3000 });
 
       const backendId = backendRes?.order_id || backendRes?.id || backendRes?.data?.order_id || backendRes?.data?.id;

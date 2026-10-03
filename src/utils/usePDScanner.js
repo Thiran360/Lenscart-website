@@ -6,6 +6,9 @@ export function usePDScanner(videoRef, isScanning) {
 
   useEffect(() => {
     if (!isScanning || !videoRef.current) return;
+    
+    // Reset previous result
+    setPdResult(null);
 
     let camera = null;
     let faceMeshObj = null;

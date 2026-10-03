@@ -199,8 +199,8 @@ function SelectLenses() {
         alert('Please enter the patient name before continuing.');
         return;
       }
-      if (rxMethod === 'manual' && (!rxData.dob.day || !rxData.dob.month || !rxData.dob.year)) {
-        alert('Please enter your complete Date of Birth before continuing.');
+      if (rxMethod === 'manual' && (!rxData.dob.year)) {
+        alert('Please select your Year of Birth before continuing.');
         return;
       }
       if (rxMethod === 'manual' && rxRating === 0) {
@@ -584,47 +584,25 @@ function SelectLenses() {
                           </span>
                         </div>
                         <div style={{
-                          display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px',
                           padding: '8px', borderRadius: '8px',
-                          minWidth: 0,
-                          border: (!rxData.dob.day || !rxData.dob.month || !rxData.dob.year) ? '2px solid #e53935' : '2px solid #c8e6c9',
-                          background: (!rxData.dob.day || !rxData.dob.month || !rxData.dob.year) ? '#fff5f5' : '#f1f8e9',
+                          border: (!rxData.dob.year) ? '2px solid #e53935' : '2px solid #c8e6c9',
+                          background: (!rxData.dob.year) ? '#fff5f5' : '#f1f8e9',
                           transition: 'all 0.2s ease'
                         }}>
                           <select
-                            value={rxData.dob.day}
-                            onChange={e => setRxData({...rxData, dob: {...rxData.dob, day: e.target.value}})}
-                            style={{ width: '100%', boxSizing: 'border-box', padding: '10px 4px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', backgroundColor: '#fff', minWidth: 0 }}
-                          >
-                            <option value="">Day</option>
-                            {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
-                              <option key={d} value={d}>{d}</option>
-                            ))}
-                          </select>
-                          <select
-                            value={rxData.dob.month}
-                            onChange={e => setRxData({...rxData, dob: {...rxData.dob, month: e.target.value}})}
-                            style={{ width: '100%', boxSizing: 'border-box', padding: '10px 4px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', backgroundColor: '#fff', minWidth: 0 }}
-                          >
-                            <option value="">Month</option>
-                            {['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].map((m, i) => (
-                              <option key={i+1} value={i+1}>{m}</option>
-                            ))}
-                          </select>
-                          <select
                             value={rxData.dob.year}
                             onChange={e => setRxData({...rxData, dob: {...rxData.dob, year: e.target.value}})}
-                            style={{ width: '100%', boxSizing: 'border-box', padding: '10px 4px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', backgroundColor: '#fff', minWidth: 0 }}
+                            style={{ width: '100%', boxSizing: 'border-box', padding: '10px 14px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', backgroundColor: '#fff' }}
                           >
-                            <option value="">Year</option>
+                            <option value="">Select Year</option>
                             {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(year => (
                               <option key={year} value={year}>{year}</option>
                             ))}
                           </select>
                         </div>
-                        {(!rxData.dob.day || !rxData.dob.month || !rxData.dob.year) && (
+                        {(!rxData.dob.year) && (
                           <p style={{ margin: '6px 0 0 2px', fontSize: '12px', color: '#e53935', fontWeight: 500 }}>
-                            ⚠ Please select Day, Month and Year
+                            ⚠ Please select Year
                           </p>
                         )}
                       </div>

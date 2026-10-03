@@ -97,10 +97,10 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
   const handleNextStep = () => {
     if (step === 1) {
       setStep(2);
-      playVoiceInstructions("Grab a standard magnetic card. Light colored cards work best. Make sure the room is well lit.");
+      playVoiceInstructions("Good news, no magnetic card is needed! Our advanced AI scans your irises to measure your PD accurately.");
     } else if (step === 2) {
       setStep(3);
-      playVoiceInstructions("Hold the magnetic card horizontally flat against your forehead just above your eyebrows.");
+      playVoiceInstructions("Just ensure the room is well lit, look directly into the camera, and keep steady.");
     } else if (step === 3) {
       setStep(4);
       startCamera();
@@ -148,7 +148,7 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
         videoRef.current.srcObject = stream;
         videoRef.current.play().catch(() => { });
       }
-      playVoiceInstructions("Hold your card straight against your forehead and look directly into the camera.");
+      playVoiceInstructions("Look directly into the camera and keep steady.");
 
       // Automatically start scan after 2 seconds
       setTimeout(() => {
@@ -242,9 +242,6 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
 
             <div className="pd-illustration-box">
               <div className="pd-card-head-graphic">
-                <div className="pd-forehead-card">
-                  <div className="pd-card-stripe" />
-                </div>
                 <div className="pd-head-contour">
                   <div className="pd-eyes-dots">
                     <span className="dot left" />
@@ -253,17 +250,17 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
                 </div>
               </div>
 
-              <h3 className="pd-instruction-main">Grab a standard magnetic card</h3>
-              <p className="pd-instruction-sub">Light-colored cards work best</p>
+              <h3 className="pd-instruction-main">No Card Required!</h3>
+              <p className="pd-instruction-sub">Our AI uses advanced Iris Tracking</p>
             </div>
 
             <div className="pd-tip-box">
               <FaSun className="pd-tip-icon" />
-              <span>Tip: Make sure the room is well lit and avoid backlight</span>
+              <span>Tip: Make sure the room is well lit so your eyes are clearly visible</span>
             </div>
 
             <button className="pd-primary-btn" onClick={handleNextStep}>
-              Show me how
+              Next
             </button>
           </div>
         )}
@@ -291,9 +288,9 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
                 playsInline
                 style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
               />
-              <div className="pd-card-highlight-guide">
-                <div className="pd-guide-card-overlay">
-                  <span>MAGNETIC CARD</span>
+              <div className="pd-card-highlight-guide" style={{ border: '2px dashed #0d707f', borderRadius: '50%', width: '150px', height: '150px', top: '30%', left: '50%', transform: 'translate(-50%, -50%)', background: 'transparent' }}>
+                <div className="pd-guide-card-overlay" style={{ background: 'transparent', color: '#0d707f', top: '160%' }}>
+                  <span style={{ background: 'rgba(255,255,255,0.8)', padding: '5px 10px', borderRadius: '15px' }}>IRIS TRACKING</span>
                 </div>
               </div>
               <div className="pd-media-overlay-banner">
@@ -312,7 +309,7 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
           <div className="pd-step-wrapper step-4">
             <h2 className="pd-step-title">Camera PD Scanner</h2>
             <p className="pd-scan-guide-text">
-              Align your face inside the frame with the card held flat on your forehead
+              Align your face inside the frame and look directly into the camera
             </p>
 
             <div className="pd-camera-viewport">
@@ -326,9 +323,11 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
                 />
               ) : (
                 <div className="pd-camera-fallback">
-                  <div className="pd-cam-warning-banner">
-                    {cameraError || "Camera starting or waiting for browser permission..."}
-                  </div>
+                  {cameraError && (
+                    <div className="pd-cam-warning-banner">
+                      {cameraError}
+                    </div>
+                  )}
                   <button
                     type="button"
                     onClick={startCamera}
@@ -356,8 +355,8 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
 
               {/* Augmented Measurement Overlay */}
               <div className="pd-scan-overlay">
-                <div className="pd-scan-card-box">
-                  <span className="pd-card-text">ALIGN CARD HERE</span>
+                <div className="pd-scan-card-box" style={{ border: 'none', background: 'transparent' }}>
+                  <span className="pd-card-text" style={{ background: 'rgba(0,0,0,0.5)', color: 'white', padding: '5px 10px', borderRadius: '15px' }}>AI SCAN ACTIVE</span>
                 </div>
 
                 <div className="pd-scan-eyes-box">
@@ -450,10 +449,7 @@ export default function PDMeasurementModal({ isOpen, onClose, onSelectPD }) {
                   )}
                   <button
                     className="pd-secondary-btn"
-                    onClick={() => {
-                      startCamera();
-                      handleStartScan();
-                    }}
+                    onClick={startCamera}
                     style={measuredPD === 0 ? { backgroundColor: "#0f3460", color: "white" } : {}}
                   >
                     <FaRedo /> {measuredPD === 0 ? "Scan Again" : "Retake Scan"}
