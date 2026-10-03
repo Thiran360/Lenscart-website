@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { 
   FaFacebookF, 
@@ -191,7 +192,7 @@ function Footer() {
       </div>
 
       {/* Policy Modal */}
-      {isPolicyModalOpen && (
+      {isPolicyModalOpen && createPortal(
         <div className="policy-modal-overlay" onClick={() => setIsPolicyModalOpen(false)}>
           <div className="policy-modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="policy-modal-close" onClick={() => setIsPolicyModalOpen(false)}>×</button>
@@ -220,7 +221,8 @@ function Footer() {
               <p>All eligible return and exchange shipping/pickup costs are completely free and borne by Mr. LensMaker.</p>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </footer>
