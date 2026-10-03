@@ -394,7 +394,7 @@ function OrderHistory({ initialAction }) {
                     <FaTruck /> Track Package
                   </button>
 
-                  {order.status !== 'Cancelled' && order.status !== 'Return Requested' && order.status !== 'Partially Returned' && order.status !== 'Partially Cancelled' && order.status !== 'Delivered' && (
+                  {order.status !== 'Cancelled' && order.status !== 'Return Requested' && order.status !== 'Partially Returned' && order.status !== 'Partially Cancelled' && (
                     <button className="btn-outline-action" onClick={() => openModal('cancel', order)}>
                       <FaTimes /> Cancel Order
                     </button>
