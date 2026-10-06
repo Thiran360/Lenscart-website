@@ -268,12 +268,12 @@ function SelectLenses() {
   // Returns true only when a real (non-zero) CYL value is present
   const isCylActive = (cylVal) => cylVal && cylVal !== "0.00";
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step === 1 && lensType) setStep(2);
     else if (step === 2 && lensPackage) {
       // Zero Power needs no prescription — skip step 3
       if (lensType === "zero") {
-        submitSelection();
+        await submitSelection();
       } else {
         setStep(3);
       }
@@ -305,11 +305,17 @@ function SelectLenses() {
         alert('Please upload a prescription file before continuing.');
         return;
       }
-      submitSelection();
+      if (rxMethod === 'saved' && isAddingRx) {
+        if (!newRxData.name.trim() || !newRxData.birthYear) {
+          alert('Please enter Name and Birth Year for the new prescription.');
+          return;
+        }
+      }
+      await submitSelection();
     }
   };
 
-  const submitSelection = () => {
+  const submitSelection = async () => {
     const selectedType = lensTypes.find((l) => l.id === lensType);
     const selectedPkg = lensPackages.find((l) => l.id === lensPackage);
     
@@ -342,26 +348,68 @@ function SelectLenses() {
               url: uploadedFile.url
             } : null
           };
-          savePrescriptionApi(payload);
+          await savePrescriptionApi(payload);
         } catch (err) {
           console.error("Failed to save prescription to profile", err);
         }
-      } else if (rxMethod === 'saved' && selectedSavedRx) {
-        prescriptionDetails = {
-          method: 'saved',
-          savedId: selectedSavedRx.id,
-          data: {
-            name: selectedSavedRx.name,
-            birthYear: selectedSavedRx.birth_year,
-            rightSph: selectedSavedRx.right_sph,
-            rightCyl: selectedSavedRx.right_cyl,
-            rightAxis: selectedSavedRx.right_axis,
-            leftSph: selectedSavedRx.left_sph,
-            leftCyl: selectedSavedRx.left_cyl,
-            leftAxis: selectedSavedRx.left_axis,
-          },
-          file: selectedSavedRx.file || null
-        };
+      } else if (rxMethod === 'saved') {
+        if (isAddingRx) {
+          // If user filled the new Rx form but didn't click "Save", save it now and use it
+          try {
+            const payload = {
+              name: newRxData.name.trim(),
+              birth_year: newRxData.birthYear ? parseInt(newRxData.birthYear, 10) : 2000,
+              right_sph: newRxData.rightSph || "0.00",
+              right_cyl: newRxData.rightCyl || null,
+              right_axis: newRxData.rightAxis || null,
+              left_sph: newRxData.leftSph || "0.00",
+              left_cyl: newRxData.leftCyl || null,
+              left_axis: newRxData.leftAxis || null,
+              image: newRxFile?.file || null,
+              file: newRxFile ? {
+                name: newRxFile.name,
+                size: newRxFile.size,
+                url: newRxFile.url
+              } : null
+            };
+            const response = await savePrescriptionApi(payload);
+            const savedItem = response?.data || payload;
+            
+            prescriptionDetails = {
+              method: 'saved',
+              savedId: savedItem.id || Date.now(),
+              data: {
+                name: savedItem.name || payload.name,
+                birthYear: savedItem.birth_year || payload.birth_year,
+                rightSph: savedItem.right_sph || payload.right_sph,
+                rightCyl: savedItem.right_cyl || payload.right_cyl,
+                rightAxis: savedItem.right_axis || payload.right_axis,
+                leftSph: savedItem.left_sph || payload.left_sph,
+                leftCyl: savedItem.left_cyl || payload.left_cyl,
+                leftAxis: savedItem.left_axis || payload.left_axis,
+              },
+              file: savedItem.file || payload.file || null
+            };
+          } catch (err) {
+            console.error("Failed to save new prescription to profile on Add to Cart", err);
+          }
+        } else if (selectedSavedRx) {
+          prescriptionDetails = {
+            method: 'saved',
+            savedId: selectedSavedRx.id,
+            data: {
+              name: selectedSavedRx.name,
+              birthYear: selectedSavedRx.birth_year,
+              rightSph: selectedSavedRx.right_sph,
+              rightCyl: selectedSavedRx.right_cyl,
+              rightAxis: selectedSavedRx.right_axis,
+              leftSph: selectedSavedRx.left_sph,
+              leftCyl: selectedSavedRx.left_cyl,
+              leftAxis: selectedSavedRx.left_axis,
+            },
+            file: selectedSavedRx.file || null
+          };
+        }
       }
     }
 
