@@ -86,6 +86,7 @@ function ProductDetails() {
   const [isTryOnOpen, setIsTryOnOpen] = useState(false);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [showReturnPolicy, setShowReturnPolicy] = useState(false);
+  const [activePolicyTab, setActivePolicyTab] = useState(null);
   const [isOffersOpen, setIsOffersOpen] = useState(false);
   const [currentCouponIndex, setCurrentCouponIndex] = useState(0);
   const [pincode, setPincode] = useState('');
@@ -519,9 +520,9 @@ function ProductDetails() {
                 <FaStar className="star-icon" />
                 <span>{product.rating || '4.8'}</span>
               </div>
-              <a href="#reviews" className="pd-reviews-link">
+              <span className="pd-reviews-link" style={{ cursor: 'default', color: '#6E4B34', fontSize: '13px', fontWeight: 600 }}>
                 Top Choice
-              </a>
+              </span>
             </div>
 
             {/* Luxury Price Card */}
@@ -642,7 +643,7 @@ function ProductDetails() {
             <div className="pd-trust-grid">
               <div 
                 className={`pd-trust-item ${selectedAssurances.includes('return') ? 'active' : ''}`}
-                onClick={() => setShowReturnPolicy(true)}
+                onClick={() => { setActivePolicyTab('return'); setShowReturnPolicy(true); }}
               >
                 <FaBoxOpen className="pd-trust-icon" />
                 <div>
@@ -668,7 +669,7 @@ function ProductDetails() {
                 return (
                   <div 
                     className={`pd-trust-item ${selectedAssurances.includes('exchange') ? 'active' : ''}`}
-                    onClick={() => setShowReturnPolicy(true)}
+                    onClick={() => { setActivePolicyTab('exchange'); setShowReturnPolicy(true); }}
                   >
                     <FaExchangeAlt className="pd-trust-icon" />
                     <div>
@@ -681,7 +682,7 @@ function ProductDetails() {
 
               <div 
                 className={`pd-trust-item ${selectedAssurances.includes('warranty') ? 'active' : ''}`}
-                onClick={() => setShowReturnPolicy(true)}
+                onClick={() => { setActivePolicyTab('warranty'); setShowReturnPolicy(true); }}
               >
                 <FaShieldAlt className="pd-trust-icon" />
                 <div>
@@ -711,23 +712,24 @@ function ProductDetails() {
               </div>
 
               {/* Primary Action Buttons Row */}
-              <div className="pd-cta-row-primary">
+              <div className="pd-cta-row-primary" style={{ display: 'flex', gap: '10px', alignItems: 'stretch' }}>
                 <button 
                   className="pd-btn-cta pd-btn-select-lenses-full" 
-                  style={{ marginBottom: 0 }} 
+                  style={{ flex: 1, marginBottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', padding: '12px 10px' }} 
                   onClick={handleSelectLenses}
                 >
-                  Select Lenses
+                  <span style={{ fontWeight: 700, fontSize: '15px', lineHeight: 1 }}>Select Lenses</span>
+                  <span style={{ fontSize: '10.5px', fontWeight: 400, opacity: 0.9, marginTop: '2px', lineHeight: 1 }}>Included in the cost</span>
                 </button>
                 <button 
                   className="pd-btn-cta pd-btn-select-without-lenses" 
-                  style={{ marginBottom: 0 }} 
+                  style={{ flex: 1, marginBottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', padding: '12px 10px' }} 
                   onClick={() => {
                     handleAddToCart();
                     navigate("/cart");
                   }}
                 >
-                  Select without Lenses
+                  <span style={{ fontWeight: 700, fontSize: '15px', lineHeight: 1 }}>Select without Lenses</span>
                 </button>
               </div>
             </div>
@@ -745,7 +747,7 @@ function ProductDetails() {
       </div>
 
       {/* Return Policy Modal */}
-      {showReturnPolicy && <ReturnPolicy onClose={() => setShowReturnPolicy(false)} />}
+      {showReturnPolicy && <ReturnPolicy onClose={() => setShowReturnPolicy(false)} product={product} activeTab={activePolicyTab} />}
 
       {/* 3D AR Virtual Try-On Modal */}
       <VirtualTryOn 

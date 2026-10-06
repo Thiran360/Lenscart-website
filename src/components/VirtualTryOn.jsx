@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Webcam from 'react-webcam';
 import { FaTimes, FaCamera, FaDownload, FaSyncAlt, FaUndo } from 'react-icons/fa';
 import './VirtualTryOn.css';
@@ -315,7 +316,7 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct, selectedColor }) => {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="tryon-overlay">
       <div className="tryon-container">
         {/* Header */}
@@ -494,7 +495,8 @@ const VirtualTryOn = ({ isOpen, onClose, initialProduct, selectedColor }) => {
         </div>
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

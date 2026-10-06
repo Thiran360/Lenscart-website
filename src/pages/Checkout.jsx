@@ -36,9 +36,11 @@ function Checkout() {
     Number(item.price) > 2500
   );
 
-  const isBogoEligibleOrder = getBogoEligibleItems().length > 0;
+  // Calculate total quantity of BOGO eligible items
+  const bogoEligibleQuantity = getBogoEligibleItems().reduce((acc, item) => acc + (item.quantity || 1), 0);
+  const isBogoEligibleOrder = bogoEligibleQuantity >= 2;
 
-  // Available coupons filtered so BUY1GET1 only appears when ordering BOGO products
+  // Available coupons filtered so BUY1GET1 only appears when ordering at least 2 BOGO products
   const displayCoupons = AVAILABLE_COUPONS.filter(c => !c.isBogo || isBogoEligibleOrder);
 
   const [appliedCoupon, setAppliedCoupon] = useState(null);
@@ -99,7 +101,7 @@ function Checkout() {
         return;
       }
       if (matched.isBogo && !isBogoEligibleOrder) {
-        const errMsg = `Coupon "${cleanCode}" is only valid for Buy 1 Get 1 Store products!`;
+        const errMsg = `Coupon "${cleanCode}" requires at least 2 Buy 1 Get 1 eligible items!`;
         setCouponError(errMsg);
         toast.error(errMsg);
         return;
@@ -155,10 +157,10 @@ function Checkout() {
     window.scrollTo(0, 0);
   }, []);
 
-  // Ensure COD is deselected if total exceeds 1200
+  // Ensure GPay is deselected if total exceeds 1200 (user preference: only COD/Card)
   useEffect(() => {
-    if (checkoutTotal > 1200 && paymentMethod === 'cod') {
-      setPaymentMethod('gpay');
+    if (checkoutTotal > 1200 && paymentMethod === 'gpay') {
+      setPaymentMethod('cod');
     }
   }, [checkoutTotal, paymentMethod]);
 
@@ -695,39 +697,39 @@ function Checkout() {
                 <p className="payment-subtitle">All transactions are secure and encrypted.</p>
                 
                 <div className="payment-methods-accordion">
-                  {/* Cash on Delivery (COD) - Only for <= 1200 */}
+                  {/* Cash on Delivery (COD) */}
+                  <div className={`payment-method-item ${paymentMethod === 'cod' ? 'active' : ''}`}>
+                    <label className="payment-method-header">
+                      <input type="radio" name="payment" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} />
+                      <span className="method-title">Cash on Delivery (COD)</span>
+                      <div className="method-icons">
+                        <FaMoneyBillWave style={{ fontSize: '18px', color: '#27ae60' }} />
+                      </div>
+                    </label>
+                    {paymentMethod === 'cod' && (
+                      <div className="payment-method-content">
+                        <p>You can pay in cash when the product is delivered to your doorstep.</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* UPI */}
                   {checkoutTotal <= 1200 && (
-                    <div className={`payment-method-item ${paymentMethod === 'cod' ? 'active' : ''}`}>
+                    <div className={`payment-method-item ${paymentMethod === 'gpay' ? 'active' : ''}`}>
                       <label className="payment-method-header">
-                        <input type="radio" name="payment" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} />
-                        <span className="method-title">Cash on Delivery (COD)</span>
+                        <input type="radio" name="payment" checked={paymentMethod === 'gpay'} onChange={() => setPaymentMethod('gpay')} />
+                        <span className="method-title">UPI / Google Pay</span>
                         <div className="method-icons">
-                          <FaMoneyBillWave style={{ fontSize: '18px', color: '#27ae60' }} />
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="GPay" height="16" />
                         </div>
                       </label>
-                      {paymentMethod === 'cod' && (
+                      {paymentMethod === 'gpay' && (
                         <div className="payment-method-content">
-                          <p>You can pay in cash when the product is delivered to your doorstep.</p>
+                          <p>You will be redirected to complete your UPI payment securely.</p>
                         </div>
                       )}
                     </div>
                   )}
-
-                  {/* UPI */}
-                  <div className={`payment-method-item ${paymentMethod === 'gpay' ? 'active' : ''}`}>
-                    <label className="payment-method-header">
-                      <input type="radio" name="payment" checked={paymentMethod === 'gpay'} onChange={() => setPaymentMethod('gpay')} />
-                      <span className="method-title">UPI / Google Pay</span>
-                      <div className="method-icons">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="GPay" height="16" />
-                      </div>
-                    </label>
-                    {paymentMethod === 'gpay' && (
-                      <div className="payment-method-content">
-                        <p>You will be redirected to complete your UPI payment securely.</p>
-                      </div>
-                    )}
-                  </div>
 
                   {/* Cards */}
                   <div className={`payment-method-item ${paymentMethod === 'card' ? 'active' : ''}`}>

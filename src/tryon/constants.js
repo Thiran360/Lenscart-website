@@ -43,7 +43,7 @@ export const OCCLUSION_TRIANGLES = [
 /** Default fine-tuning adjustments */
 export const DEFAULT_ADJUSTMENTS = {
   scaleMultiplier: 1.15,
-  verticalOffset: -0.01,
+  verticalOffset: -0.06,
   horizontalOffset: 0.0,
   tiltOffset: 0.0,
 };

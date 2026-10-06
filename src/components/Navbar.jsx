@@ -577,7 +577,6 @@ function Navbar() {
       <ConfirmModal
         show={showLogoutConfirm}
         title="Sign Out of Your Account?"
-        message="Are you sure you want to logout from Mr.LensMaker? You will need to verify your phone number to sign back in."
         confirmText="Yes, Logout"
         cancelText="Stay Logged In"
         variant="danger"

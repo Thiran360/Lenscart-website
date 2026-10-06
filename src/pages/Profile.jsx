@@ -353,7 +353,6 @@ function Profile() {
       <ConfirmModal
         show={showLogoutConfirm}
         title="Sign Out of Your Account?"
-        message="Are you sure you want to log out of Mr.LensMaker? You can sign back in anytime using your phone or credentials."
         confirmText="Yes, Sign Out"
         cancelText="Stay Signed In"
         variant="danger"

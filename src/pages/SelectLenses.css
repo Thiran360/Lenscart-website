@@ -475,7 +475,8 @@
 }
 
 .continue-btn:disabled {
-  background: #F6F1E8;
+  background: #e5e5e5;
+  color: #888888;
   cursor: not-allowed;
 }
 

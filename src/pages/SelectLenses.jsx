@@ -6,8 +6,9 @@ import { productsData } from "../data/products";
 import { useCart } from "../context/CartContext";
 import { FaCloudUploadAlt, FaCheckCircle, FaFileAlt, FaGlasses, FaStar } from "react-icons/fa";
 import { SPH_OPTIONS, CYL_OPTIONS, AXIS_OPTIONS } from "../utils/rxOptions";
-import { getPrescriptionsApi, getLocalPrescriptions } from "../services/profileService";
+import { getPrescriptionsApi, getLocalPrescriptions, savePrescriptionApi } from "../services/profileService";
 import PDMeasurementModal from "../components/PDMeasurementModal";
+import { useToast } from "../context/ToastContext";
 import "./SelectLenses.css";
 
 const PD_OPTIONS = Array.from({ length: 22 }, (_, i) => 54 + i);
@@ -18,9 +19,10 @@ function SelectLenses() {
   const navigate = useNavigate();
   const location = useLocation();
   const { addToCart } = useCart();
+  const { toast } = useToast();
   
   const product = location.state?.product || productsData.find(p => p.id === parseInt(id));
-  
+  const selectedColor = location.state?.selectedColor;
   // Extract action from URL query params (e.g., ?action=buy)
   const queryParams = new URLSearchParams(location.search);
   const action = queryParams.get("action") || "cart";
@@ -41,7 +43,16 @@ function SelectLenses() {
   const [leftPd, setLeftPd] = useState("");
   const [rxRating, setRxRating] = useState(0);
   const [rxRatingHover, setRxRatingHover] = useState(0);
+  const [isAddingRx, setIsAddingRx] = useState(false);
+  const [savingRx, setSavingRx] = useState(false);
+  const [newRxFile, setNewRxFile] = useState(null);
+  const [newRxData, setNewRxData] = useState({
+    name: "", birthYear: "",
+    rightSph: "", rightCyl: "", rightAxis: "",
+    leftSph: "", leftCyl: "", leftAxis: ""
+  });
   const fileInputRef = useRef(null);
+  const newRxFileInputRef = useRef(null);
 
   useEffect(() => {
     const loadRx = async () => {
@@ -52,6 +63,8 @@ function SelectLenses() {
         if (list.length > 0 && !rxMethod) {
           setRxMethod("saved");
           setSelectedSavedRx(list[0]);
+        } else if (list.length === 0 && !rxMethod) {
+          setRxMethod("upload");
         }
       } catch {
         const localList = getLocalPrescriptions();
@@ -59,6 +72,8 @@ function SelectLenses() {
         if (localList.length > 0 && !rxMethod) {
           setRxMethod("saved");
           setSelectedSavedRx(localList[0]);
+        } else if (localList.length === 0 && !rxMethod) {
+          setRxMethod("upload");
         }
       }
     };
@@ -116,6 +131,87 @@ function SelectLenses() {
     }
   };
 
+  const processNewRxFile = (file) => {
+    if (!file) return;
+    const isImage = file.type.startsWith("image/");
+    if (isImage) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setNewRxFile({
+          name: file.name,
+          size: (file.size / 1024).toFixed(1) + " KB",
+          type: file.type,
+          url: e.target.result,
+          originalFile: file
+        });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setNewRxFile({
+        name: file.name,
+        size: (file.size / 1024).toFixed(1) + " KB",
+        type: file.type,
+        url: null,
+        originalFile: file
+      });
+    }
+  };
+
+  const handleNewRxFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      processNewRxFile(e.target.files[0]);
+    }
+  };
+
+  const handleNewRxDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processNewRxFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleSaveNewRx = async () => {
+    if (savingRx) return;
+    if (!newRxData.name.trim()) return toast.error("Please enter a Name.");
+    if (!newRxData.birthYear) return toast.error("Please select a Birth Year.");
+    if (!newRxData.rightSph || !newRxData.leftSph) return toast.error("Please enter SPH for both eyes.");
+    if (isCylActive(newRxData.rightCyl) && !newRxData.rightAxis) return toast.error("Please enter AXIS for Right Eye.");
+    if (isCylActive(newRxData.leftCyl) && !newRxData.leftAxis) return toast.error("Please enter AXIS for Left Eye.");
+
+    setSavingRx(true);
+    try {
+      const payload = {
+        name: newRxData.name.trim(),
+        birth_year: parseInt(newRxData.birthYear, 10),
+        right_sph: newRxData.rightSph || "0.00",
+        right_cyl: newRxData.rightCyl || null,
+        right_axis: newRxData.rightAxis || null,
+        left_sph: newRxData.leftSph || "0.00",
+        left_cyl: newRxData.leftCyl || null,
+        left_axis: newRxData.leftAxis || null,
+        image: null,
+        file: newRxFile?.originalFile || null
+      };
+      await savePrescriptionApi(payload);
+      const res = await getPrescriptionsApi(1, 10);
+      const list = Array.isArray(res?.data) ? res.data : getLocalPrescriptions();
+      setSavedPrescriptions(list);
+      setSelectedSavedRx(list[0]);
+      setIsAddingRx(false);
+      setNewRxFile(null);
+      setNewRxData({
+        name: "", birthYear: "", rightSph: "", rightCyl: "", rightAxis: "", leftSph: "", leftCyl: "", leftAxis: ""
+      });
+      toast.success("Prescription saved successfully!");
+    } catch (err) {
+      toast.error(err.message || "Failed to save prescription.");
+    } finally {
+      setSavingRx(false);
+    }
+  };
+
   useEffect(() => {
     if (!product) {
       navigate("/products");
@@ -140,7 +236,7 @@ function SelectLenses() {
     if (lensType === "zero") return 0;
     
     let rSph = 0, lSph = 0, rCyl = 0, lCyl = 0;
-    if (rxMethod === "manual") {
+    if (rxMethod === "manual" || rxMethod === "upload") {
       rSph = parseFloat(rxData.rightSph) || 0;
       lSph = parseFloat(rxData.leftSph) || 0;
       rCyl = parseFloat(rxData.rightCyl) || 0;
@@ -183,7 +279,7 @@ function SelectLenses() {
       }
     }
     else if (step === 3 && rxMethod) {
-      // Validate: if a non-zero CYL is selected, AXIS must also be selected
+      // Validate forms
       if (rxMethod === 'manual') {
         if (isCylActive(rxData.rightCyl) && !rxData.rightAxis) {
           alert("Please select AXIS for Right Eye — it is required when CYL is entered.");
@@ -194,17 +290,19 @@ function SelectLenses() {
           return;
         }
       }
-      // Validate manual form: name, DOB, and rating are required
-      if (rxMethod === 'manual' && !rxData.name.trim()) {
-        alert('Please enter the patient name before continuing.');
-        return;
+      
+      if (rxMethod === 'manual' || rxMethod === 'upload') {
+        if (!rxData.name.trim()) {
+          alert('Please enter the patient name before continuing.');
+          return;
+        }
+        if (!rxData.dob.year) {
+          alert('Please select your Year of Birth before continuing.');
+          return;
+        }
       }
-      if (rxMethod === 'manual' && (!rxData.dob.year)) {
-        alert('Please select your Year of Birth before continuing.');
-        return;
-      }
-      if (rxMethod === 'manual' && rxRating === 0) {
-        alert('Please rate your current vision before continuing.');
+      if (rxMethod === 'upload' && !uploadedFile) {
+        alert('Please upload a prescription file before continuing.');
         return;
       }
       submitSelection();
@@ -217,22 +315,37 @@ function SelectLenses() {
     
     let prescriptionDetails = null;
     if (lensType !== "zero") {
-      if (rxMethod === 'manual') {
+      if (rxMethod === 'manual' || rxMethod === 'upload') {
         prescriptionDetails = {
-          method: 'manual',
+          method: rxMethod,
           name: rxData.name.trim(),
           dob: rxData.dob,
-          rating: rxRating,
-          ratingLabel: ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][rxRating] || '',
-          data: rxData,
-          file: null
+          data: rxMethod === 'manual' ? rxData : { name: rxData.name.trim(), dob: rxData.dob },
+          file: rxMethod === 'upload' ? uploadedFile : null
         };
-      } else if (rxMethod === 'upload') {
-        prescriptionDetails = {
-          method: 'upload',
-          data: null,
-          file: uploadedFile
-        };
+        
+        // Save to user profile automatically
+        try {
+          const payload = {
+            name: rxData.name.trim(),
+            birth_year: rxData.dob.year ? parseInt(rxData.dob.year, 10) : 2000,
+            right_sph: rxData.rightSph || "0.00",
+            right_cyl: rxData.rightCyl || null,
+            right_axis: rxData.rightAxis || null,
+            left_sph: rxData.leftSph || "0.00",
+            left_cyl: rxData.leftCyl || null,
+            left_axis: rxData.leftAxis || null,
+            image: uploadedFile?.file || null,
+            file: uploadedFile ? {
+              name: uploadedFile.name,
+              size: uploadedFile.size,
+              url: uploadedFile.url
+            } : null
+          };
+          savePrescriptionApi(payload);
+        } catch (err) {
+          console.error("Failed to save prescription to profile", err);
+        }
       } else if (rxMethod === 'saved' && selectedSavedRx) {
         prescriptionDetails = {
           method: 'saved',
@@ -342,34 +455,19 @@ function SelectLenses() {
                 <p className="subtitle">We need your eye power to craft your perfect lenses.</p>
                 
                 <div className="rx-method-tabs">
-                  {savedPrescriptions.length > 0 && (
-                    <button 
-                      className={`rx-tab ${rxMethod === 'saved' ? 'active' : ''}`} 
-                      onClick={() => setRxMethod('saved')}
-                    >
-                      Saved Prescription ({savedPrescriptions.length})
-                    </button>
-                  )}
-                  <button className={`rx-tab ${rxMethod === 'upload' ? 'active' : ''}`} onClick={() => setRxMethod('upload')}>Upload File</button>
+                  <button 
+                    className={`rx-tab ${rxMethod === 'saved' ? 'active' : ''}`} 
+                    onClick={() => setRxMethod('saved')}
+                  >
+                    Use Saved Prescription ({savedPrescriptions.length})
+                  </button>
+                  <button className={`rx-tab ${rxMethod === 'upload' ? 'active' : ''}`} onClick={() => setRxMethod('upload')}>Open Folder</button>
                   <button className={`rx-tab ${rxMethod === 'manual' ? 'active' : ''}`} onClick={() => setRxMethod('manual')}>Enter Manually</button>
                 </div>
 
                 {rxMethod === 'saved' && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px' }}>
-                    {savedPrescriptions.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '30px', background: '#FAF6F0', borderRadius: '12px', border: '1px dashed #C5A059' }}>
-                        <FaGlasses size={32} color="#C5A059" style={{ marginBottom: '10px' }} />
-                        <p style={{ margin: 0, color: '#3A2415', fontWeight: 600 }}>No saved prescriptions found.</p>
-                        <p style={{ margin: '4px 0 12px 0', fontSize: '13px', color: '#6E4B34' }}>You can upload a file or enter details manually below.</p>
-                        <button 
-                          className="rx-tab active" 
-                          onClick={() => setRxMethod('manual')}
-                          style={{ padding: '8px 16px', fontSize: '13px' }}
-                        >
-                          Enter Manually
-                        </button>
-                      </div>
-                    ) : (
+                    {savedPrescriptions.length > 0 && (
                       savedPrescriptions.map((rx) => {
                         const isSelected = selectedSavedRx?.id === rx.id;
                         return (
@@ -418,20 +516,208 @@ function SelectLenses() {
                         );
                       })
                     )}
+                    
+                    {!isAddingRx && (
+                      <button 
+                        onClick={() => setIsAddingRx(true)}
+                        style={{ width: '100%', padding: '14px', marginTop: '15px', borderRadius: '8px', border: '1px dashed #0D6B6D', background: '#F0FDFA', color: '#0D6B6D', fontWeight: 600, fontSize: '15px', cursor: 'pointer' }}
+                      >
+                        + Add New Prescription
+                      </button>
+                    )}
+
+                    {isAddingRx && (
+                      <div style={{ marginTop: '20px', padding: '20px', background: '#fff', borderRadius: '12px', border: '1px solid #E2E8F0', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <h4 style={{ margin: '0 0 15px 0', color: '#0F172A', fontSize: '16px' }}>Add New Prescription</h4>
+                        
+                        <input 
+                          type="file" 
+                          ref={newRxFileInputRef} 
+                          accept="image/*,.pdf" 
+                          style={{ display: "none" }} 
+                          onChange={handleNewRxFileChange} 
+                        />
+
+                        {!newRxFile ? (
+                          <div 
+                            onClick={() => newRxFileInputRef.current?.click()}
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={handleNewRxDrop}
+                            style={{
+                              border: isDragging ? "2px dashed #0D6B6D" : "2px dashed #E2E8F0",
+                              backgroundColor: isDragging ? "#F0FDFA" : "#F8FAFC",
+                              borderRadius: "8px",
+                              padding: "20px",
+                              textAlign: "center",
+                              cursor: "pointer",
+                              marginBottom: "20px",
+                              transition: "all 0.2s ease"
+                            }}
+                          >
+                            <FaCloudUploadAlt size={32} color={isDragging ? "#0D6B6D" : "#94A3B8"} style={{ marginBottom: 8 }} />
+                            <p style={{ margin: "0 0 4px 0", color: "#334155", fontWeight: 600, fontSize: 14 }}>
+                              Upload Prescription Image (Optional)
+                            </p>
+                            <span style={{ fontSize: 12, color: "#64748B" }}>Supported formats: JPG, PNG, PDF</span>
+                          </div>
+                        ) : (
+                          <div 
+                            style={{
+                              border: "1px solid #E2E8F0",
+                              backgroundColor: "#F8FAFC",
+                              borderRadius: "8px",
+                              padding: "12px 16px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              marginBottom: "20px"
+                            }}
+                          >
+                            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                              {newRxFile.url ? (
+                                <img src={newRxFile.url} alt="Rx preview" style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 6, border: "1px solid #E2E8F0" }} />
+                              ) : (
+                                <FaFileAlt size={24} color="#0D6B6D" />
+                              )}
+                              <div>
+                                <div style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 600, color: "#0F172A", fontSize: "13px" }}>
+                                  <FaCheckCircle color="#10B981" size={14} /> {newRxFile.name}
+                                </div>
+                                <span style={{ fontSize: 11, color: "#64748B" }}>{newRxFile.size}</span>
+                              </div>
+                            </div>
+                            <button 
+                              type="button"
+                              onClick={() => setNewRxFile(null)}
+                              style={{ background: "none", border: "1px solid #EF4444", color: "#EF4444", borderRadius: "4px", padding: "4px 8px", cursor: "pointer", fontWeight: 600, fontSize: "11px" }}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        )}
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: 20 }}>
+                          <div>
+                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>Name * (Letters only)</label>
+                            <input 
+                              type="text" 
+                              placeholder="e.g. John" 
+                              value={newRxData.name} 
+                              onChange={e => setNewRxData({...newRxData, name: e.target.value.replace(/[^a-zA-Z\s]/g, "")})} 
+                              style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', boxSizing: 'border-box' }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>Birth Year *</label>
+                            <select 
+                              value={newRxData.birthYear} 
+                              onChange={e => setNewRxData({...newRxData, birthYear: e.target.value})}
+                              style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', backgroundColor: '#fff', boxSizing: 'border-box' }}
+                            >
+                              <option value="">Select Birth Year</option>
+                              {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                                <option key={year} value={year}>{year}</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+
+                        <div style={{ marginBottom: '15px' }}>
+                          <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#3A2415', marginBottom: '8px' }}>Right Eye (OD) *</label>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                            <select value={newRxData.rightSph} onChange={e => setNewRxData({...newRxData, rightSph: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '13px', backgroundColor: '#fff' }}>
+                              <option value="">SPH *</option>
+                              {SPH_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                            </select>
+                            <select value={newRxData.rightCyl} onChange={e => setNewRxData({...newRxData, rightCyl: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '13px', backgroundColor: '#fff' }}>
+                              <option value="">CYL (Opt)</option>
+                              {CYL_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                            </select>
+                            <select value={newRxData.rightAxis} onChange={e => setNewRxData({...newRxData, rightAxis: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '13px', backgroundColor: '#fff' }}>
+                              <option value="">AXIS (Opt)</option>
+                              {AXIS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                            </select>
+                          </div>
+                        </div>
+
+                        <div style={{ marginBottom: '20px' }}>
+                          <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#3A2415', marginBottom: '8px' }}>Left Eye (OS) *</label>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                            <select value={newRxData.leftSph} onChange={e => setNewRxData({...newRxData, leftSph: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '13px', backgroundColor: '#fff' }}>
+                              <option value="">SPH *</option>
+                              {SPH_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                            </select>
+                            <select value={newRxData.leftCyl} onChange={e => setNewRxData({...newRxData, leftCyl: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '13px', backgroundColor: '#fff' }}>
+                              <option value="">CYL (Opt)</option>
+                              {CYL_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                            </select>
+                            <select value={newRxData.leftAxis} onChange={e => setNewRxData({...newRxData, leftAxis: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '13px', backgroundColor: '#fff' }}>
+                              <option value="">AXIS (Opt)</option>
+                              {AXIS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                            </select>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                          <button 
+                            onClick={handleSaveNewRx} 
+                            disabled={savingRx}
+                            style={{ flex: 1, padding: '12px', background: '#0D6B6D', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: savingRx ? 'not-allowed' : 'pointer' }}
+                          >
+                            {savingRx ? 'Saving...' : 'Save Prescription'}
+                          </button>
+                          <button 
+                            onClick={() => setIsAddingRx(false)} 
+                            disabled={savingRx}
+                            style={{ padding: '12px 20px', background: '#fff', color: '#475569', border: '1px solid #ccc', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
                 {rxMethod === 'upload' && (
-                  <div>
-                    <input 
-                      type="file" 
-                      ref={fileInputRef} 
-                      accept="image/*,.pdf" 
-                      style={{ display: "none" }} 
-                      onChange={handleFileChange} 
-                    />
+                  <div className="rx-manual-form">
+                    <div style={{ marginBottom: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                      <div className="rx-eye-section" style={{ margin: 0 }}>
+                        <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, color: '#333' }}>Name</label>
+                        <input 
+                          type="text" 
+                          placeholder="e.g. John" 
+                          value={rxData.name} 
+                          onChange={e => setRxData({...rxData, name: e.target.value.replace(/[^a-zA-Z\s]/g, "")})} 
+                          style={{ width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '15px' }}
+                        />
+                      </div>
+                      <div className="rx-eye-section" style={{ margin: 0 }}>
+                        <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, color: '#333' }}>Year of Birth</label>
+                        <select
+                          value={rxData.dob.year}
+                          onChange={e => setRxData({...rxData, dob: {...rxData.dob, year: e.target.value}})}
+                          style={{ width: '100%', boxSizing: 'border-box', padding: '12px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '15px', backgroundColor: '#fff' }}
+                        >
+                          <option value="">Select Year</option>
+                          {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                            <option key={year} value={year}>{year}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
 
-                    {!uploadedFile ? (
+                    <div style={{ marginBottom: 24 }}>
+                      <input 
+                        type="file" 
+                        ref={fileInputRef} 
+                        accept="image/*,.pdf" 
+                        style={{ display: "none" }} 
+                        onChange={handleFileChange} 
+                      />
+
+                      {!uploadedFile ? (
                       <div 
                         className="rx-upload-area" 
                         onClick={() => fileInputRef.current?.click()}
@@ -488,81 +774,16 @@ function SelectLenses() {
                         </button>
                       </div>
                     )}
+                    </div>
                   </div>
                 )}
 
                 {rxMethod === 'manual' && (
                   <div className="rx-manual-form">
 
-                    {/* ── Frame Info Card ── */}
-                    <div style={{
-                      marginBottom: 24, borderRadius: 12,
-                      border: '1.5px solid #C5A059', background: 'linear-gradient(135deg,#FAF6F0 0%,#fff 100%)',
-                      overflow: 'hidden', boxShadow: '0 2px 12px rgba(197,160,89,0.1)'
-                    }}>
-                      {/* Card Header */}
-                      <div style={{ background: '#3A2415', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <span style={{ fontSize: 18 }}>🕶️</span>
-                        <span style={{ color: '#C5A059', fontWeight: 700, fontSize: 13, letterSpacing: 1 }}>SELECTED FRAME DETAILS</span>
-                      </div>
 
-                      <div style={{ padding: '16px' }}>
-                        {/* Name + Model */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12, flexWrap: 'wrap', gap: 6 }}>
-                          <div>
-                            <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: '#1a1a1a' }}>{product.name}</p>
-                            <p style={{ margin: '2px 0 0', fontSize: 13, color: '#6E4B34' }}>Model #{product.id} &nbsp;·&nbsp; {product.brand}</p>
-                          </div>
-                          <span style={{ background: '#C5A059', color: '#fff', borderRadius: 20, padding: '3px 12px', fontSize: 12, fontWeight: 700 }}>
-                            {product.category || product.type}
-                          </span>
-                        </div>
-
-                        {/* Fit & Size */}
-                        <div style={{ marginBottom: 12, padding: '10px 14px', background: '#F4EDE2', borderRadius: 8, border: '1px solid #e8ddd0' }}>
-                          <p style={{ margin: '0 0 6px', fontSize: 12, fontWeight: 700, color: '#3A2415', textTransform: 'uppercase', letterSpacing: 0.8 }}>📐 Fit & Size</p>
-                          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                            {product.size && (
-                              <span style={{ background: '#fff', border: '1px solid #C5A059', borderRadius: 6, padding: '4px 12px', fontSize: 13, fontWeight: 600, color: '#3A2415' }}>
-                                Size: {product.size === 'S' ? 'Small' : product.size === 'M' ? 'Medium' : product.size === 'L' ? 'Large' : product.size}
-                              </span>
-                            )}
-                            {product.shape && (
-                              <span style={{ background: '#fff', border: '1px solid #C5A059', borderRadius: 6, padding: '4px 12px', fontSize: 13, fontWeight: 600, color: '#3A2415' }}>
-                                Shape: {product.shape}
-                              </span>
-                            )}
-                            {product.gender && (
-                              <span style={{ background: '#fff', border: '1px solid #C5A059', borderRadius: 6, padding: '4px 12px', fontSize: 13, fontWeight: 600, color: '#3A2415' }}>
-                                {product.gender}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Features */}
-                        <div style={{ marginBottom: 12, padding: '10px 14px', background: '#F4EDE2', borderRadius: 8, border: '1px solid #e8ddd0' }}>
-                          <p style={{ margin: '0 0 6px', fontSize: 12, fontWeight: 700, color: '#3A2415', textTransform: 'uppercase', letterSpacing: 0.8 }}>✨ Features</p>
-                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                            {product.type && <span style={{ background: '#3A2415', color: '#C5A059', borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>{product.type.charAt(0).toUpperCase() + product.type.slice(1)}</span>}
-                            {product.material && <span style={{ background: '#3A2415', color: '#C5A059', borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>{product.material}</span>}
-                            {product.discount > 0 && <span style={{ background: '#2e7d32', color: '#fff', borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>{product.discount}% OFF</span>}
-                            {product.colors && <span style={{ background: '#3A2415', color: '#C5A059', borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>{product.colors.length} Colours</span>}
-                          </div>
-                        </div>
-
-                        {/* Description */}
-                        {product.description && (
-                          <div style={{ padding: '10px 14px', background: '#F4EDE2', borderRadius: 8, border: '1px solid #e8ddd0' }}>
-                            <p style={{ margin: '0 0 4px', fontSize: 12, fontWeight: 700, color: '#3A2415', textTransform: 'uppercase', letterSpacing: 0.8 }}>📋 Description</p>
-                            <p style={{ margin: 0, fontSize: 13, color: '#4a3728', lineHeight: 1.6 }}>{product.description}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div style={{ marginBottom: 20 }}>
-                      <div className="rx-eye-section" style={{ margin: '0 0 16px 0' }}>
+                    <div style={{ marginBottom: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                      <div className="rx-eye-section" style={{ margin: 0 }}>
                         <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, color: '#333' }}>Name</label>
                         <input 
                           type="text" 
@@ -573,38 +794,17 @@ function SelectLenses() {
                         />
                       </div>
                       <div className="rx-eye-section" style={{ margin: 0 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                          <label style={{ fontWeight: 600, color: '#333' }}>Date of Birth</label>
-                          <span style={{
-                            fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '20px',
-                            background: (!rxData.dob.day || !rxData.dob.month || !rxData.dob.year) ? '#e53935' : '#2e7d32',
-                            color: '#fff', letterSpacing: '0.5px'
-                          }}>
-                            {(!rxData.dob.day || !rxData.dob.month || !rxData.dob.year) ? 'REQUIRED' : 'DONE ✓'}
-                          </span>
-                        </div>
-                        <div style={{
-                          padding: '8px', borderRadius: '8px',
-                          border: (!rxData.dob.year) ? '2px solid #e53935' : '2px solid #c8e6c9',
-                          background: (!rxData.dob.year) ? '#fff5f5' : '#f1f8e9',
-                          transition: 'all 0.2s ease'
-                        }}>
-                          <select
-                            value={rxData.dob.year}
-                            onChange={e => setRxData({...rxData, dob: {...rxData.dob, year: e.target.value}})}
-                            style={{ width: '100%', boxSizing: 'border-box', padding: '10px 14px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', backgroundColor: '#fff' }}
-                          >
-                            <option value="">Select Year</option>
-                            {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(year => (
-                              <option key={year} value={year}>{year}</option>
-                            ))}
-                          </select>
-                        </div>
-                        {(!rxData.dob.year) && (
-                          <p style={{ margin: '6px 0 0 2px', fontSize: '12px', color: '#e53935', fontWeight: 500 }}>
-                            ⚠ Please select Year
-                          </p>
-                        )}
+                        <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, color: '#333' }}>Year of Birth</label>
+                        <select
+                          value={rxData.dob.year}
+                          onChange={e => setRxData({...rxData, dob: {...rxData.dob, year: e.target.value}})}
+                          style={{ width: '100%', boxSizing: 'border-box', padding: '12px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '15px', backgroundColor: '#fff' }}
+                        >
+                          <option value="">Select Year</option>
+                          {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                            <option key={year} value={year}>{year}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                     <div className="rx-eye-section">
@@ -698,6 +898,46 @@ function SelectLenses() {
                       </div>
                     </div>
 
+                    {/* ── Frame Info Card Moved Above PD ── */}
+                    <div style={{
+                      marginBottom: 24, marginTop: 24,
+                      paddingTop: 16, borderTop: '1px solid #E2E8F0',
+                      display: 'flex', flexDirection: 'column', gap: 10
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 16 }}>👓</span>
+                        <h4 style={{ margin: 0, fontSize: 15, color: '#334155' }}>Selected Frame: <span style={{ color: '#0F172A' }}>{product.name}</span></h4>
+                        <span style={{ fontSize: 13, color: '#64748B' }}>(Model #{product.id})</span>
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', fontSize: 13 }}>
+                        {product.size && (
+                          <span style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', color: '#475569', borderRadius: 6, padding: '4px 10px', fontWeight: 500 }}>
+                            Size: {product.size === 'S' ? 'Small' : product.size === 'M' ? 'Medium' : product.size === 'L' ? 'Large' : product.size}
+                          </span>
+                        )}
+                        {product.shape && (
+                          <span style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', color: '#475569', borderRadius: 6, padding: '4px 10px', fontWeight: 500 }}>
+                            Shape: {product.shape}
+                          </span>
+                        )}
+                        {product.gender && (
+                          <span style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', color: '#475569', borderRadius: 6, padding: '4px 10px', fontWeight: 500 }}>
+                            {product.gender}
+                          </span>
+                        )}
+                        {(() => {
+                          const colorObj = selectedColor || (product.colors && product.colors[0]);
+                          const colorName = colorObj ? (typeof colorObj === 'object' ? (colorObj.name || colorObj.color) : colorObj) : null;
+                          return colorName ? (
+                            <span style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', color: '#475569', borderRadius: 6, padding: '4px 10px', fontWeight: 500 }}>
+                              Color: <span style={{ textTransform: 'capitalize' }}>{colorName}</span>
+                            </span>
+                          ) : null;
+                        })()}
+                      </div>
+                    </div>
+
                     {/* Compact PD section matching Screenshot 4 */}
                     <div className="pd-compact-section">
                       <div className="pd-compact-row">
@@ -750,49 +990,7 @@ function SelectLenses() {
                       </div>
                     </div>
 
-                    {/* Star Rating — Rate Your Current Vision (Required) */}
-                    <div style={{
-                      marginTop: '20px', padding: '16px', borderRadius: '10px',
-                      background: rxRating === 0 ? '#fff5f5' : '#FAF6F0',
-                      border: rxRating === 0 ? '2px solid #e53935' : '1px solid #e8ddd0',
-                      transition: 'all 0.2s ease'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                        <label style={{ fontWeight: 600, color: '#3A2415', fontSize: '14px' }}>
-                          Rate Your Current Vision
-                        </label>
-                        <span style={{
-                          fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '20px',
-                          background: rxRating === 0 ? '#e53935' : '#2e7d32',
-                          color: '#fff', letterSpacing: '0.5px'
-                        }}>
-                          {rxRating === 0 ? 'REQUIRED' : 'DONE ✓'}
-                        </span>
-                      </div>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <FaStar
-                            key={star}
-                            size={30}
-                            style={{ cursor: 'pointer', transition: 'color 0.15s, transform 0.15s', transform: (rxRatingHover || rxRating) >= star ? 'scale(1.2)' : 'scale(1)' }}
-                            color={(rxRatingHover || rxRating) >= star ? '#C5A059' : '#ddd'}
-                            onMouseEnter={() => setRxRatingHover(star)}
-                            onMouseLeave={() => setRxRatingHover(0)}
-                            onClick={() => setRxRating(prev => prev === star ? 0 : star)}
-                          />
-                        ))}
-                        {rxRating > 0 && (
-                          <span style={{ marginLeft: '8px', fontSize: '13px', color: '#6E4B34', fontWeight: 600 }}>
-                            {['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][rxRating]}
-                          </span>
-                        )}
-                      </div>
-                      {rxRating === 0 && (
-                        <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: '#e53935', fontWeight: 500 }}>
-                          ⚠ Please select a star rating to continue
-                        </p>
-                      )}
-                    </div>
+                    {/* Removed Star Rating section */}
                   </div>
                 )}
 

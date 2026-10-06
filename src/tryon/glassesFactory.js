@@ -357,13 +357,13 @@ export async function createHDTexturedGlasses(product, selectedColor) {
     const frontGeo = new THREE.PlaneGeometry(planeWidth, planeHeight);
     const frontMat = new THREE.MeshStandardMaterial({
       map: texture,
-      color: new THREE.Color(frameColor).lerp(new THREE.Color(0xffffff), 0.3), // Tint the image with the selected color
+      color: 0xffffff, // Use pure white to preserve the original image colors without tinting
       transparent: true,
       alphaTest: 0.02,
       depthWrite: true,
       side: THREE.DoubleSide,
       roughness: 0.25,
-      metalness: isMetalColor(frameColor) ? 0.6 : 0.05,
+      metalness: 0.0,
     });
 
     const frontMesh = new THREE.Mesh(frontGeo, frontMat);

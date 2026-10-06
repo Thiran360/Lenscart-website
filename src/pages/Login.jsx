@@ -135,7 +135,7 @@ function Login() {
               <FaTimes />
             </button>
 
-            <h2>Welcome To Mr.LensMaker!</h2>
+            <h2>Mr.LensMaker Welcomes You</h2>
             <p style={{ textAlign: "center", color: "#666", marginTop: "-25px", marginBottom: "30px", fontSize: "14px" }}>
               Sign in with your mobile phone number
             </p>
